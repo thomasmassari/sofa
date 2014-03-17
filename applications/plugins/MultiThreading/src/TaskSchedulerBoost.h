@@ -98,7 +98,7 @@ namespace sofa
 		{
 		public:
 
-			WorkerThread(TaskScheduler* const& taskScheduler);
+			WorkerThread(TaskScheduler* const& taskScheduler, int index);
 
 			~WorkerThread();
 
@@ -112,6 +112,8 @@ namespace sofa
 			Task::Status* getCurrentStatus() const {return mCurrentStatus;}
 
 			boost::detail::spinlock* getTaskMutex() const {return &mTaskMutex;}
+    
+    int getThreadIndex();
 
 
 		private:
@@ -175,7 +177,8 @@ namespace sofa
 
 		
 			TaskScheduler*     mTaskScheduler;    
-			boost::shared_ptr<boost::thread>  mThread;  
+			boost::shared_ptr<boost::thread>  mThread;
+			int                               mThreadIndex;
 
 			// The following members may be accessed by _multiple_ threads at the same time:
 			volatile bool	mFinished;

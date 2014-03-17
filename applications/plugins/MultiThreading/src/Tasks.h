@@ -31,6 +31,8 @@
 #include <boost/pool/singleton_pool.hpp>
 
 #include <sofa/helper/system/atomic.h>
+#include <sofa/helper/system/thread/CTime.h>
+#include <sofa/defaulttype/Vec.h>
 #include <boost/thread/mutex.hpp>
 
 namespace sofa
@@ -67,9 +69,21 @@ namespace sofa
 				friend class WorkerThread;
 			};
 
+        typedef sofa::helper::system::thread::ctime_t ctime_t;
+        typedef std::pair<ctime_t,ctime_t> TimeInterval;
+        typedef sofa::defaulttype::Vec4f Color;
 
+        virtual const char* getName();
+        virtual Color getColor();
+
+        bool runTask(WorkerThread* thread);
+
+        const TimeInterval& getExecTime() const { return execTime; }
+        int getExecThreadIndex() const { return execThreadIndex; }
 
 		protected:
+    
+            virtual bool run(WorkerThread* thread) = 0;
 
 			Task(const Task::Status* status);
 
@@ -80,9 +94,6 @@ namespace sofa
 
 			//struct TaskTag{};
 			//typedef boost::singleton_pool<TaskTag, sizeof(*this)> memory_pool;
-
-
-			virtual bool run(WorkerThread* thread) = 0;
 
 
 		private:
@@ -100,6 +111,9 @@ namespace sofa
 			const Task::Status*	m_Status;
 
 			friend class WorkerThread;
+
+    TimeInterval execTime;
+    int execThreadIndex;
 
 		};
 
