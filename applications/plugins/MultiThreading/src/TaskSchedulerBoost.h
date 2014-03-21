@@ -114,6 +114,10 @@ namespace sofa
 			boost::detail::spinlock* getTaskMutex() const {return &mTaskMutex;}
     
     int getThreadIndex();
+    
+    void enableTaskLog(bool val);
+    void clearTaskLog();
+    const std::vector<Task*>& getTaskLog();
 
 
 		private:
@@ -179,6 +183,8 @@ namespace sofa
 			TaskScheduler*     mTaskScheduler;    
 			boost::shared_ptr<boost::thread>  mThread;
 			int                               mThreadIndex;
+    bool mTaskLogEnabled;
+    std::vector<Task*> mTaskLog;
 
 			// The following members may be accessed by _multiple_ threads at the same time:
 			volatile bool	mFinished;
@@ -222,7 +228,7 @@ namespace sofa
 
 			unsigned size()	const volatile;
 
-			const WorkerThread* getWorkerThread(const unsigned int index);
+			WorkerThread* getWorkerThread(const unsigned int index);
 		
 
 		private:

@@ -52,12 +52,12 @@ namespace sofa
 		}
 
 
-		const WorkerThread* TaskScheduler::getWorkerThread(const unsigned int index) 
+WorkerThread* TaskScheduler::getWorkerThread(const unsigned int index) 
 		{
-			const WorkerThread* thread = mThread[index];
-			if ( index >= mThreadCount ) 
+			WorkerThread* thread = 0;
+			if ( index < mThreadCount ) 
 			{
-				return thread = 0;
+				thread = mThread[index];
 			}
 			return thread;
 		}
@@ -183,6 +183,7 @@ namespace sofa
 
 		WorkerThread::WorkerThread(TaskScheduler* const& pScheduler, int index)
 			: mTaskScheduler(pScheduler), mThreadIndex(index)
+    , mTaskLogEnabled(false)
 		{
 			assert(pScheduler);
 
@@ -299,6 +300,25 @@ int WorkerThread::getThreadIndex()
     return mThreadIndex;
 }
 
+void WorkerThread::enableTaskLog(bool val)
+{
+    mTaskLogEnabled = val;
+    if (!val)
+    {
+        mTaskLog.clear();
+    }
+}
+
+void WorkerThread::clearTaskLog()
+{
+    mTaskLog.clear();
+}
+
+const std::vector<Task*>& WorkerThread::getTaskLog()
+{
+    return mTaskLog;
+}
+
 
 		void WorkerThread::Idle()
 		{
@@ -335,6 +355,9 @@ int WorkerThread::getThreadIndex()
 					mCurrentStatus->MarkBusy(false);
 					mCurrentStatus = pPrevStatus;
 					
+            if (mTaskLogEnabled)
+                mTaskLog.push_back(pTask);
+
 					if ( status && !status->IsBusy() ) 
 						return;
 				}
@@ -426,11 +449,13 @@ int WorkerThread::getThreadIndex()
 			if (pushTask(task))
 				return true;
 
-			
 			task->runTask(this);
+
+    if (mTaskLogEnabled)
+        mTaskLog.push_back(task);
+
 			return false;
 		}
-
 
 		bool WorkerThread::giveUpSomeWork(WorkerThread* idleThread)
 		{	
