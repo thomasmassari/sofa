@@ -104,8 +104,11 @@ namespace sofa
 
 			static WorkerThread* getCurrent();
 
-			// queue task if there is space, and run it otherwise
-			bool addTask(Task* pTask);	
+			/// queue task if there is space, and run it otherwise
+			bool addStealableTask(Task* pTask);	
+
+    /// queue a task to the specific task list. It cannot be stealed, and therefore be executed only by this thread. 
+    bool addSpecificTask(Task* pTask);
 
 			void workUntilDone(Task::Status* status);
 
@@ -118,7 +121,6 @@ namespace sofa
     void enableTaskLog(bool val);
     void clearTaskLog();
     const std::vector<Task*>& getTaskLog();
-
 
 		private:
 
@@ -137,7 +139,7 @@ namespace sofa
 			boost::thread::id getId();
 
 			// queue task if there is space (or do nothing)
-			bool pushTask(Task* pTask);
+			bool pushTask(Task* pTask, Task* taskArray[], unsigned* taskCount );
 
 			// pop task from queue
 			bool popTask(Task** ppTask);
@@ -175,16 +177,19 @@ namespace sofa
 		
 
 			mutable boost::detail::spinlock		mTaskMutex;
-			Task*		mTask[Max_TasksPerThread];
-			unsigned			mTaskCount;								
-			Task::Status*	mCurrentStatus;	
 
 		
-			TaskScheduler*     mTaskScheduler;    
+    TaskScheduler*                    mTaskScheduler; 
+    Task*		                      mStealableTask[Max_TasksPerThread];///< shared task list, stealable by other threads
+    Task*                             mSpecificTask[Max_TasksPerThread];///< thread specific task list, not stealable. They have a higher priority compared to the shared task list
+    unsigned			              mStealableTaskCount;///< current size of the shared task list
+    unsigned                          mSpecificTaskCount;///< current size of the specific task list								
+    Task::Status*	                  mCurrentStatus;	
+   
 			boost::shared_ptr<boost::thread>  mThread;
 			int                               mThreadIndex;
-    bool mTaskLogEnabled;
-    std::vector<Task*> mTaskLog;
+    bool                              mTaskLogEnabled;
+    std::vector<Task*>                mTaskLog;
 
 			// The following members may be accessed by _multiple_ threads at the same time:
 			volatile bool	mFinished;
