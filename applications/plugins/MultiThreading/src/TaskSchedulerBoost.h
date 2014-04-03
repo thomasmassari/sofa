@@ -109,6 +109,9 @@ namespace sofa
 
     /// queue a task to the specific task list. It cannot be stealed, and therefore be executed only by this thread. 
     bool addSpecificTask(Task* pTask);
+    
+    /// run the given task directly
+    void runTask(Task* pTask);
 
 			void workUntilDone(Task::Status* status);
 
@@ -286,10 +289,6 @@ namespace sofa
 
 
 		
-
-		SOFA_MULTITHREADING_PLUGIN_API bool runThreadSpecificTask(WorkerThread* pThread, const Task *pTask );
-
-		SOFA_MULTITHREADING_PLUGIN_API bool runThreadSpecificTask(const Task *pTask );
 
 
 
