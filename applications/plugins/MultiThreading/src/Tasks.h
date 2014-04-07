@@ -76,7 +76,7 @@ namespace sofa
         virtual const char* getName();
         virtual Color getColor();
 
-        bool runTask(WorkerThread* thread);
+    virtual bool runTask(WorkerThread* thread);
 
         const TimeInterval& getExecTime() const { return execTime; }
         int getExecThreadIndex() const { return execThreadIndex; }
