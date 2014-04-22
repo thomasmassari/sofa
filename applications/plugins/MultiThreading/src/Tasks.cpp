@@ -32,7 +32,7 @@ const char* Task::getName()
 		Task::~Task()
 		{
 			//m_Status;
-			//delete this;
+            //delete this;
 		}
 
 		Task::Color Task::getColor()
