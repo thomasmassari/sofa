@@ -38,122 +38,122 @@
 namespace sofa
 {
 
-	namespace simulation
-	{
+namespace simulation
+{
 
-		class WorkerThread;
-		class TaskScheduler;
-
-
-		class SOFA_MULTITHREADING_PLUGIN_API Task
-		{
-		public:
+class WorkerThread;
+class TaskScheduler;
 
 
-			// Task Status class definition
-			class Status
-			{
-			public:
-				Status();
-
-				bool IsBusy() const;
-
-				
-
-			private:
-
-				void MarkBusy(bool bBusy);
-
-				/*volatile*/ boost::detail::atomic_count mBusy;
-
-				friend class WorkerThread;
-			};
-
-        typedef sofa::helper::system::thread::ctime_t ctime_t;
-        typedef std::pair<ctime_t,ctime_t> TimeInterval;
-        typedef sofa::defaulttype::Vec4f Color;
-
-        virtual const char* getName();
-        virtual Color getColor();
-
-    virtual bool runTask(WorkerThread* thread);
-
-        const TimeInterval& getExecTime() const { return execTime; }
-        int getExecThreadIndex() const { return execThreadIndex; }
-    ctime_t getExecDuration() const { return execTime.second - execTime.first; }
-
-    static bool compareExecDuration(Task* a, Task* b)
-    {
-        return a->getExecDuration() < b->getExecDuration();
-    }
-    
-    static bool compareExecDurationReverse(Task* a, Task* b)
-    {
-        return a->getExecDuration() > b->getExecDuration();
-    }
-		protected:
-    
-            virtual bool run(WorkerThread* thread) = 0;
-
-			Task(const Task::Status* status);
-
-		
-		public:
-			
-			virtual ~Task();
-
-			//struct TaskTag{};
-			//typedef boost::singleton_pool<TaskTag, sizeof(*this)> memory_pool;
+class SOFA_MULTITHREADING_PLUGIN_API Task
+{
+public:
 
 
-		private:
+// Task Status class definition
+class Status
+{
+public:
+Status();
 
-            Task(const Task& /*task*/) {}
-            Task& operator= (const Task& /*task*/) {return *this;}
-
-
-		protected:
-
-			inline Task::Status* getStatus(void) const;
+bool IsBusy() const;
 
 
 
-			const Task::Status*	m_Status;
+private:
 
-			friend class WorkerThread;
+void MarkBusy(bool bBusy);
 
-    TimeInterval execTime;
-    int execThreadIndex;
+/*volatile*/ boost::detail::atomic_count mBusy;
 
-		};
+friend class WorkerThread;
+};
+
+typedef sofa::helper::system::thread::ctime_t ctime_t;
+typedef std::pair<ctime_t,ctime_t> TimeInterval;
+typedef sofa::defaulttype::Vec4f Color;
+
+virtual const char* getName() const;
+virtual Color getColor() const;
+
+virtual bool runTask(WorkerThread* thread);
+
+const TimeInterval& getExecTime() const { return execTime; }
+int getExecThreadIndex() const { return execThreadIndex; }
+ctime_t getExecDuration() const { return execTime.second - execTime.first; }
+
+static bool compareExecDuration(Task* a, Task* b)
+{
+    return a->getExecDuration() < b->getExecDuration();
+}
+
+static bool compareExecDurationReverse(Task* a, Task* b)
+{
+    return a->getExecDuration() > b->getExecDuration();
+}
+protected:
+
+virtual bool run(WorkerThread* thread) = 0;
+
+Task(const Task::Status* status);
+
+
+public:
+
+virtual ~Task();
+
+//struct TaskTag{};
+//typedef boost::singleton_pool<TaskTag, sizeof(*this)> memory_pool;
+
+
+private:
+
+Task(const Task& /*task*/) {}
+Task& operator= (const Task& /*task*/) {return *this;}
+
+
+protected:
+
+inline Task::Status* getStatus(void) const;
+
+
+
+const Task::Status*	m_Status;
+
+friend class WorkerThread;
+
+TimeInterval execTime;
+int execThreadIndex;
+
+};
 
 
 
 
 
-		// not used yet
-		template<class T>
-		class TaskAllocator
-		{
-			struct TaskBaseTag{};
-			typedef boost::singleton_pool<TaskBaseTag, sizeof(T)> memory_pool; 
+// not used yet
+template<class T>
+class TaskAllocator
+{
+struct TaskBaseTag{};
+typedef boost::singleton_pool<TaskBaseTag, sizeof(T)> memory_pool;
 
-		public:
-            static inline void* operator new (std::size_t /*size*/)
-			{
-				return memory_pool::malloc();
-			}
+public:
+static inline void* operator new (std::size_t /*size*/)
+{
+    return memory_pool::malloc();
+}
 
-			static inline void operator delete (void* ptr) 
-			{
-				memory_pool::free(ptr);
+static inline void operator delete (void* ptr)
+{
+memory_pool::free(ptr);
 
-			}
+}
 
-		};
+};
 
 
-	} // namespace simulation
+} // namespace simulation
 
 } // namespace sofa
 

@@ -5,12 +5,12 @@
 namespace sofa
 {
 
-	namespace simulation
-	{
+namespace simulation
+{
 
 
-		Task::Task(const Task::Status* pStatus) 
-			: m_Status(pStatus)
+Task::Task(const Task::Status* pStatus)
+    : m_Status(pStatus)
 , execTime(ctime_t(),ctime_t()), execThreadIndex(-1)
 {
 }
@@ -24,23 +24,23 @@ bool Task::runTask(WorkerThread* thread)
     return res;
 }
 
-const char* Task::getName()
-		{
+const char* Task::getName() const
+{
     return "Task";
-		}
+}
 
-		Task::~Task()
-		{
-			//m_Status;
-            //delete this;
-		}
+Task::~Task()
+{
+    //m_Status;
+    //delete this;
+}
 
-		Task::Color Task::getColor()
-		{
-			return Color(0.5f,0.5f,0.5f,1.0f);
-		}
+Task::Color Task::getColor() const
+{
+    return Color(0.5f,0.5f,0.5f,1.0f);
+}
 
 
-	} // namespace simulation
+} // namespace simulation
 
 } // namespace sofa
