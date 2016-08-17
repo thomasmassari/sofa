@@ -27,7 +27,7 @@
 
 #include <sofa/helper/io/Mesh.h>
 #include <sofa/helper/helper.h>
-#include <fstream>
+#include <istream>
 
 namespace sofa
 {
@@ -51,7 +51,7 @@ public:
 
 protected:
 
-    void readOBJ (std::ifstream &file, const std::string &filename);
+    void readOBJ (std::istream &file, const std::string &filename);
     void readMTL (const char *filename);
 
 };
