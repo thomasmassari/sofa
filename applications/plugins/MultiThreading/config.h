@@ -25,7 +25,7 @@
 #ifndef MULTITHREADING_CONFIG_H
 #define MULTITHREADING_CONFIG_H
 
-#include <sofa/helper/system/config.h>
+#include <SofaGeneral/config.h>
 
 #ifdef SOFA_MULTITHREADING_PLUGIN
 #  define SOFA_MULTITHREADING_PLUGIN_API SOFA_EXPORT_DYNAMIC_LIBRARY

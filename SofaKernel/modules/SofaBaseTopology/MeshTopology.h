@@ -637,6 +637,9 @@ public:
     Data< bool > _drawTetra;
     Data< bool > _drawHexa;
 
+    // To use codes for multithreading
+    Data< bool > _useMultithreading;
+
     void invalidate();
 
     virtual void updateTetrahedra();
