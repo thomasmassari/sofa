@@ -26,7 +26,6 @@
 #define SOFA_COMPONENT_ENGINE_CLUSTERING_INL
 
 #include <SofaGeneralEngine/ClusteringEngine.h>
-#include <sofa/helper/gl/template.h>
 #include <iostream>
 #include <sofa/core/visual/VisualParams.h>
 #include <fstream>
@@ -355,44 +354,43 @@ bool ClusteringEngine<DataTypes>::save()
 template <class DataTypes>
 void ClusteringEngine<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (vparams->displayFlags().getShowBehaviorModels())
     {
         const VecCoord& currentPositions = this->mstate->read(core::ConstVecCoordId::position())->getValue();
-//        sofa::helper::ReadAccessor< Data< VecCoord > > fixedPositions = this->fixedPosition;
         sofa::helper::ReadAccessor< Data< VVI > > clust = this->cluster;
         const unsigned int nbp = currentPositions.size();
 
-        glPushAttrib( GL_LIGHTING_BIT);
-
-        glDisable(GL_LIGHTING);
-
-        glBegin(GL_LINES);
-
+        vparams->drawTool()->saveLastState();
+        vparams->drawTool()->setLightingEnabled(false);
+        
         float r, g, b;
+        std::vector<defaulttype::Vector3> positions;
+        std::vector<defaulttype::Vec4f> colors;
+
 
         for (unsigned int i=0 ; i<clust.size() ; ++i)
         {
             r = (float)((i*7543)%11)/11;
             g = (float)((i*1357)%13)/13;
             b = (float)((i*4829)%17)/17;
-
-            glColor3f(r,g,b);
+            
+            colors.push_back(defaulttype::Vec4f(r, g, b, 1.0));
+            colors.push_back(defaulttype::Vec4f(r, g, b, 1.0));
 
             VI::const_iterator it, itEnd;
             for (it = clust[i].begin()+1, itEnd = clust[i].end(); it != itEnd ; ++it)
                 if(*it<nbp) // discard visualization of fixed particles (as their current positions is unknown)
                 {
-                    // helper::gl::glVertexT(Xcm[i]);
-                    helper::gl::glVertexT(currentPositions[clust[i].front()]);
-                    helper::gl::glVertexT(currentPositions[*it]);
+                    positions.push_back(currentPositions[clust[i].front()]);
+                    positions.push_back(currentPositions[*it]);
+
                 }
         }
-        glEnd();
+        vparams->drawTool()->drawLines(positions, 1, colors);
 
-        glPopAttrib();
+        vparams->drawTool()->restoreLastState();
+
     }
-#endif /* SOFA_NO_OPENGL */
 }
 
 

@@ -30,8 +30,6 @@
 #endif
 
 #include <SofaGeneralEngine/MeshROI.h>
-#include <sofa/helper/gl/template.h>
-#include <sofa/helper/gl/BasicShapes.h>
 #include <sofa/core/visual/VisualParams.h>
 
 namespace sofa
@@ -556,42 +554,38 @@ void MeshROI<DataTypes>::update()
 template <class DataTypes>
 void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
+
     if (!vparams->displayFlags().getShowBehaviorModels() && !this->_drawSize.getValue())
         return;
 
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLightingEnabled(false);
+
     const VecCoord* x0 = &f_X0.getValue();
 
-    glColor3f(1.0f, 0.4f, 0.4f);
+    std::vector<defaulttype::Vector3> positions;
 
     // draw the ROI mesh
     if( p_drawMesh.getValue())
     {
-        glColor3f(0.4f, 0.4f, 1.0f);
         const VecCoord* x0_i = &f_X0_i.getValue();
         ///draw ROI points
         if(p_drawPoints.getValue())
         {
-            if (_drawSize.getValue())
-                glPointSize((GLfloat)_drawSize.getValue());
-            glDisable(GL_LIGHTING);
-            glBegin(GL_POINTS);
-            glPointSize(5.0);
+            int sizePoint = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
             helper::ReadAccessor< Data<VecCoord > > points_i = f_X0_i;
             for (unsigned int i=0; i<points_i.size() ; ++i)
             {
                 CPos p = DataTypes::getCPos(points_i[i]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
-            glEnd();
-            glPointSize(1);
+            vparams->drawTool()->drawPoints(positions, sizePoint, Vec4f(0.4, 0.4, 1.0, 1.0));
+            positions.clear();
         }
         /// draw ROI edges
         if(p_drawEdges.getValue())
         {
-            glDisable(GL_LIGHTING);
-            glLineWidth((GLfloat)_drawSize.getValue());
-            glBegin(GL_LINES);
+            int sizeLine = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
             helper::ReadAccessor< Data<helper::vector<Edge> > > edges_i = f_edges_i;
             for (unsigned int i=0; i<edges_i.size() ; ++i)
             {
@@ -599,17 +593,15 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<2 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0_i)[e[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
-            glEnd();
-            glPointSize(1);
+            vparams->drawTool()->drawLines(positions, sizeLine, Vec4f(1.0, 0.4, 0.4, 1.0));
+            positions.clear();
         }
         // draw ROI triangles
         if(p_drawTriangles.getValue())
         {
-            glDisable(GL_LIGHTING);
-            glBegin(GL_TRIANGLES);
             helper::ReadAccessor< Data<helper::vector<Triangle> > > triangles_i = f_triangles_i;
             for (unsigned int i=0; i<triangles_i.size() ; ++i)
             {
@@ -617,69 +609,35 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<3 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0_i)[t[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
-            glEnd();
+            vparams->drawTool()->drawTriangles(positions, Vec4f(1.0, 0.4, 0.4, 1.0));
+            positions.clear();
         }
-        glColor3f(1.0f, 0.4f, 0.4f);
     }
     // draw the bounding box
     if( p_drawBox.getValue())
     {
-        glDisable(GL_LIGHTING);
-        if (_drawSize.getValue())
-            glLineWidth((GLfloat)_drawSize.getValue());
-        glBegin(GL_LINES);
+        int sizeLine = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
         const Vec6& b=f_box.getValue();
-        const Real& Xmin=b[0];
-        const Real& Xmax=b[3];
-        const Real& Ymin=b[1];
-        const Real& Ymax=b[4];
-        const Real& Zmin=b[2];
-        const Real& Zmax=b[5];
-        glVertex3d(Xmin,Ymin,Zmin);
-        glVertex3d(Xmin,Ymin,Zmax);
-        glVertex3d(Xmin,Ymin,Zmin);
-        glVertex3d(Xmax,Ymin,Zmin);
-        glVertex3d(Xmin,Ymin,Zmin);
-        glVertex3d(Xmin,Ymax,Zmin);
-        glVertex3d(Xmin,Ymax,Zmin);
-        glVertex3d(Xmax,Ymax,Zmin);
-        glVertex3d(Xmin,Ymax,Zmin);
-        glVertex3d(Xmin,Ymax,Zmax);
-        glVertex3d(Xmin,Ymax,Zmax);
-        glVertex3d(Xmin,Ymin,Zmax);
-        glVertex3d(Xmin,Ymin,Zmax);
-        glVertex3d(Xmax,Ymin,Zmax);
-        glVertex3d(Xmax,Ymin,Zmax);
-        glVertex3d(Xmax,Ymax,Zmax);
-        glVertex3d(Xmax,Ymin,Zmax);
-        glVertex3d(Xmax,Ymin,Zmin);
-        glVertex3d(Xmin,Ymax,Zmax);
-        glVertex3d(Xmax,Ymax,Zmax);
-        glVertex3d(Xmax,Ymax,Zmin);
-        glVertex3d(Xmax,Ymin,Zmin);
-        glVertex3d(Xmax,Ymax,Zmin);
-        glVertex3d(Xmax,Ymax,Zmax);
-        glEnd();
-        glLineWidth(1);
+        defaulttype::Vector3 bmin(b[0], b[1], b[2]);
+        defaulttype::Vector3 bmax(b[3], b[4], b[5]);
+
+        vparams->drawTool()->drawBoundingBox(bmin, bmax, sizeLine);
     }
     ///draw points in ROI
     if( p_drawPoints.getValue())
     {
-        if (_drawSize.getValue())
-            glPointSize((GLfloat)_drawSize.getValue());
-        glDisable(GL_LIGHTING);
-        glBegin(GL_POINTS);
-        glPointSize(5.0);
+        int sizePoint = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
+
         if(p_drawOut.getValue())
         {
             helper::ReadAccessor< Data<VecCoord > > pointsROI = f_pointsOutROI;
             for (unsigned int i=0; i<pointsROI.size() ; ++i)
             {
                 CPos p = DataTypes::getCPos(pointsROI[i]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
         else
@@ -688,18 +646,17 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
             for (unsigned int i=0; i<pointsROI.size() ; ++i)
             {
                 CPos p = DataTypes::getCPos(pointsROI[i]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        glEnd();
-        glPointSize(1);
+        vparams->drawTool()->drawPoints(positions, sizePoint, Vec4f(1.0, 0.4, 0.4, 1.0));
+        positions.clear();
     }
     ///draw edges in ROI
     if( p_drawEdges.getValue())
     {
-        glDisable(GL_LIGHTING);
-        glLineWidth((GLfloat)_drawSize.getValue());
-        glBegin(GL_LINES);
+        int sizeLine = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
+
         if(p_drawOut.getValue())
         {
             helper::ReadAccessor< Data<helper::vector<Edge> > > edgesROI = f_edgesOutROI;
@@ -709,7 +666,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<2 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0)[e[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
         }
@@ -722,18 +679,16 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<2 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0)[e[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
         }
-        glEnd();
-        glLineWidth(1);
+        vparams->drawTool()->drawLines(positions, sizeLine, Vec4f(1.0, 0.4, 0.4, 1.0));
+        positions.clear();
     }
     ///draw triangles in ROI
     if( p_drawTriangles.getValue())
     {
-        glDisable(GL_LIGHTING);
-        glBegin(GL_TRIANGLES);
         if(p_drawOut.getValue())
         {
             helper::ReadAccessor< Data<helper::vector<Triangle> > > trianglesROI = f_trianglesOutROI;
@@ -743,7 +698,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<3 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
         }
@@ -756,18 +711,18 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<3 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
         }
-        glEnd();
+        vparams->drawTool()->drawTriangles(positions, Vec4f(1.0, 0.4, 0.4, 1.0));
+        positions.clear();
     }
     ///draw tetrahedra in ROI
     if( p_drawTetrahedra.getValue())
     {
-        glDisable(GL_LIGHTING);
-        glLineWidth((GLfloat)_drawSize.getValue());
-        glBegin(GL_LINES);
+        int sizeLine = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
+
         if(p_drawOut.getValue())
         {
             helper::ReadAccessor< Data<helper::vector<Tetra> > > tetrahedraROI = f_tetrahedraOutROI;
@@ -777,19 +732,19 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<4 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                     p = DataTypes::getCPos((*x0)[t[(j+1)%4]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
 
                 CPos p = DataTypes::getCPos((*x0)[t[0]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[2]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[1]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[3]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
         else
@@ -801,25 +756,25 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 for (unsigned int j=0 ; j<4 ; j++)
                 {
                     CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                     p = DataTypes::getCPos((*x0)[t[(j+1)%4]]);
-                    helper::gl::glVertexT(p);
+                    positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
 
                 CPos p = DataTypes::getCPos((*x0)[t[0]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[2]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[1]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[3]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        glEnd();
-        glLineWidth(1);
+        vparams->drawTool()->drawLines(positions, sizeLine, defaulttype::Vec4f(1.0, 0.4, 0.4, 1.0));
+        positions.clear();
     }
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace engine

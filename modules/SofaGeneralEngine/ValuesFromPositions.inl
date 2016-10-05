@@ -31,7 +31,6 @@
 
 #include <SofaGeneralEngine/ValuesFromPositions.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
 
 #include <sofa/simulation/Node.h>
 #include <sofa/simulation/Simulation.h>
@@ -430,21 +429,23 @@ void ValuesFromPositions<DataTypes>::updateVectors(TempData &_data)
 
 
 template <class DataTypes>
-void ValuesFromPositions<DataTypes>::draw(const core::visual::VisualParams* )
+void ValuesFromPositions<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (p_drawVectors.getValue())
     {
-        glDisable(GL_LIGHTING);
+        vparams->drawTool()->saveLastState();
+        vparams->drawTool()->setLightingEnabled(false);
+
         const VecCoord* x0 = &f_X0.getValue();
         helper::ReadAccessor< Data<helper::vector<Tetra> > > tetrahedra = f_tetrahedra;
         helper::WriteAccessor< Data<sofa::helper::vector<Vec3> > > tetrahedronVectors = f_tetrahedronVectors;
 
         CPos point2, point1;
-        sofa::defaulttype::Vec<3,float> colors(0,0,1);
+        sofa::defaulttype::Vec4f color(0.0,0.0,1.0,1.0);
+        std::vector<defaulttype::Vector3> positions;
+        std::vector<defaulttype::Vec4f> colors;
 
         float vectorLength = p_vectorLength.getValue();
-        glBegin(GL_LINES);
 
         for (unsigned int i =0; i<tetrahedronVectors.size(); i++)
         {
@@ -457,17 +458,20 @@ void ValuesFromPositions<DataTypes>::draw(const core::visual::VisualParams* )
             point2 = point1 + tetrahedronVectors[i]*vectorLength;
 
             for(unsigned int j=0; j<3; j++)
-                colors[j] = (float)fabs (tetrahedronVectors[i][j]);
+                color[j] = (float)fabs (tetrahedronVectors[i][j]);
 
-            glColor3f (colors[0], colors[1], colors[2]);
 
-            glVertex3d(point1[0], point1[1], point1[2]);
-            glVertex3d(point2[0], point2[1], point2[2]);
+            colors.push_back(color);
+            colors.push_back(color);
+
+            positions.push_back(sofa::defaulttype::Vector3(point1[0], point1[1], point1[2]));
+            positions.push_back(sofa::defaulttype::Vector3(point2[0], point2[1], point2[2]));
         }
-        glEnd();
 
+        vparams->drawTool()->drawLines(positions, 1.0,colors);
+
+        vparams->drawTool()->restoreLastState();
     }
-#endif /* SOFA_NO_OPENGL */
 }
 
 } // namespace engine

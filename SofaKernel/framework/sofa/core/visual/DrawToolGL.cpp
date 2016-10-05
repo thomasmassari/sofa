@@ -878,8 +878,11 @@ void DrawToolGL::drawEllipsoid(const Vector3 &p, const Vector3 &radii)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void DrawToolGL::drawBoundingBox( const Vector3 &min, const Vector3 &max )
+void DrawToolGL::drawBoundingBox( const Vector3 &min, const Vector3 &max, const float scale, const Vec4f &color )
 {
+    setMaterial(color);
+    glLineWidth(scale);
+
     glBegin( GL_LINES );
 
     // 0-1
@@ -920,6 +923,8 @@ void DrawToolGL::drawBoundingBox( const Vector3 &min, const Vector3 &max )
     glVertex3f( (float)min[0], (float)max[1], (float)max[2] );
 
     glEnd();
+    glLineWidth(1.0);
+    resetMaterial(color);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -956,15 +961,13 @@ void DrawToolGL::setLightingEnabled(bool _isAnabled)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void DrawToolGL::setMaterial(const Vec<4,float> &colour)
+void DrawToolGL::setMaterial(const Vec<4, float> &colour, const Vec<4, float> &specular, float shininess, const Vec<4, float> &emissive)
 {
-    glColor4f(colour[0],colour[1],colour[2],colour[3]);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &colour[0]);
-    static const float emissive[4] = { 0.0f, 0.0f, 0.0f, 0.0f};
-    static const float specular[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
-    glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION, emissive);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-    glMaterialf  (GL_FRONT_AND_BACK, GL_SHININESS, 20);
+    glColor4f(colour[0], colour[1], colour[2], colour[3]);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, &colour[0]);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, &emissive[0]);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, &specular[0]);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
     if (colour[3] < 1)
     {
         glEnable(GL_BLEND);

@@ -273,31 +273,38 @@ void RandomPointDistributionInSurface<DataTypes>::update()
 template <class DataTypes>
 void RandomPointDistributionInSurface<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowBehaviorModels() || !isVisible.getValue())
         return;
 
-    if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLightingEnabled(false);
 
-    //DRAW
+    if (vparams->displayFlags().getShowWireFrame())
+        vparams->drawTool()->setPolygonMode(0, true);
+
     const VecCoord& in = f_inPoints.getValue();
     const VecCoord& out = f_outPoints.getValue();
-    glDisable(GL_LIGHTING);
+
+    std::vector<defaulttype::Vector3> positions;
+
     glPointSize(5.0);
     glBegin(GL_POINTS);
     glColor3f(1.0,0.0,0.0);
     for (unsigned int i=0 ; i<in.size() ; i++)
-        helper::gl::glVertexT(in[i]);
+        positions.push_back(defaulttype::Vector3(in[i][0], in[i][1], in[i][2]));
+
+    vparams->drawTool()->drawPoints(positions, 5.0, defaulttype::Vec4f(1.0, 0.0, 0.0, 1.0) );
+    positions.clear();
 
     if (drawOutputPoints.getValue())
     {
-        glColor3f(0.0,0.0,1.0);
         for (unsigned int i=0 ; i<out.size() ; i++)
-            helper::gl::glVertexT(out[i]);
+            positions.push_back(defaulttype::Vector3(out[i][0], out[i][1], out[i][2]));
+        
+        vparams->drawTool()->drawPoints(positions, 5.0, defaulttype::Vec4f(0.0, 0.0, 1.0, 1.0));
+        positions.clear();
     }
 
-    glEnd();
     //Debug : normals
 //    const VecCoord& vertices = f_vertices.getValue();
 //    const helper::vector<BaseMeshTopology::Triangle>& triangles = f_triangles.getValue();
@@ -318,10 +325,9 @@ void RandomPointDistributionInSurface<DataTypes>::draw(const core::visual::Visua
     //trianglesOctree.octreeRoot->draw(vparams);
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        vparams->drawTool()->setPolygonMode(0, false);
 
-    glEnable(GL_LIGHTING);
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace engine

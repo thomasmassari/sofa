@@ -810,70 +810,73 @@ bool SubsetTopology<DataTypes>::isPointChecked(unsigned int id, sofa::helper::ve
 template <class DataTypes>
 void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowBehaviorModels())
         return;
 
     const VecCoord* x0 = &f_X0.getValue();
-    glColor3f(0.0, 1.0, 1.0);
+
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLightingEnabled(false);
+
+    std::vector<defaulttype::Vector3> positions;
+
     if( p_drawROI.getValue())
     {
         ///draw the boxes
-        glBegin(GL_LINES);
         const helper::vector<Vec6>& vb=boxes.getValue();
         for (unsigned int bi=0; bi<vb.size(); ++bi)
         {
             const Vec6& b=vb[bi];
-            const Real& Xmin=b[0];
-            const Real& Xmax=b[3];
-            const Real& Ymin=b[1];
-            const Real& Ymax=b[4];
-            const Real& Zmin=b[2];
-            const Real& Zmax=b[5];
-            glVertex3d(Xmin,Ymin,Zmin);
-            glVertex3d(Xmin,Ymin,Zmax);
-            glVertex3d(Xmin,Ymin,Zmin);
-            glVertex3d(Xmax,Ymin,Zmin);
-            glVertex3d(Xmin,Ymin,Zmin);
-            glVertex3d(Xmin,Ymax,Zmin);
-            glVertex3d(Xmin,Ymax,Zmin);
-            glVertex3d(Xmax,Ymax,Zmin);
-            glVertex3d(Xmin,Ymax,Zmin);
-            glVertex3d(Xmin,Ymax,Zmax);
-            glVertex3d(Xmin,Ymax,Zmax);
-            glVertex3d(Xmin,Ymin,Zmax);
-            glVertex3d(Xmin,Ymin,Zmax);
-            glVertex3d(Xmax,Ymin,Zmax);
-            glVertex3d(Xmax,Ymin,Zmax);
-            glVertex3d(Xmax,Ymax,Zmax);
-            glVertex3d(Xmax,Ymin,Zmax);
-            glVertex3d(Xmax,Ymin,Zmin);
-            glVertex3d(Xmin,Ymax,Zmax);
-            glVertex3d(Xmax,Ymax,Zmax);
-            glVertex3d(Xmax,Ymax,Zmin);
-            glVertex3d(Xmax,Ymin,Zmin);
-            glVertex3d(Xmax,Ymax,Zmin);
-            glVertex3d(Xmax,Ymax,Zmax);
+            const Real& Xmin = b[0];
+            const Real& Xmax = b[3];
+            const Real& Ymin = b[1];
+            const Real& Ymax = b[4];
+            const Real& Zmin = b[2];
+            const Real& Zmax = b[5];
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymin, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymin, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymin, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymin, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymin, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymax, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymax, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymax, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymax, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymax, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymax, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymin, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymin, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymin, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymin, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymax, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymin, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymin, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmin, Ymax, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymax, Zmax));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymax, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymin, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymax, Zmin));
+            positions.push_back(sofa::defaulttype::Vector3(Xmax, Ymax, Zmax));
+
+            vparams->drawTool()->drawLines(positions, 1.0, defaulttype::Vec4f(0.0, 1.0, 1.0,1.0));
         }
-        glEnd();
     }
     if( p_drawPoints.getValue())
     {
         ///draw points in boxes
-        glBegin(GL_POINTS);
-        glPointSize(5.0);
         helper::ReadAccessor< Data<VecCoord > > pointsInROI = f_pointsInROI;
         for (unsigned int i=0; i<pointsInROI.size() ; ++i)
         {
             CPos p = DataTypes::getCPos(pointsInROI[i]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
-        glEnd();
+
+        vparams->drawTool()->drawPoints(positions, 5.0 , Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
     if( p_drawEdges.getValue())
     {
         ///draw edges in boxes
-        glBegin(GL_LINES);
         helper::ReadAccessor< Data<helper::vector<Edge> > > edgesInROI = f_edgesInROI;
         for (unsigned int i=0; i<edgesInROI.size() ; ++i)
         {
@@ -881,15 +884,15 @@ void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
             for (unsigned int j=0 ; j<2 ; j++)
             {
                 CPos p = DataTypes::getCPos((*x0)[e[j]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        glEnd();
+        vparams->drawTool()->drawLines(positions, 1.0, Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
     if( p_drawTriangles.getValue())
     {
         ///draw triangles in boxes
-        glBegin(GL_TRIANGLES);
         helper::ReadAccessor< Data<helper::vector<Triangle> > > trianglesInROI = f_trianglesInROI;
         for (unsigned int i=0; i<trianglesInROI.size() ; ++i)
         {
@@ -897,16 +900,16 @@ void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
             for (unsigned int j=0 ; j<3 ; j++)
             {
                 CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        glEnd();
+        vparams->drawTool()->drawTriangles(positions, Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
 
     if( p_drawTetrahedra.getValue())
     {
         ///draw tetrahedra in boxes
-        glBegin(GL_LINES);
         helper::ReadAccessor< Data<helper::vector<Tetra> > > tetrahedraInROI = f_tetrahedraInROI;
         for (unsigned int i=0; i<tetrahedraInROI.size() ; ++i)
         {
@@ -914,23 +917,25 @@ void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
             for (unsigned int j=0 ; j<4 ; j++)
             {
                 CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[(j+1)%4]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
 
             CPos p = DataTypes::getCPos((*x0)[t[0]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             p = DataTypes::getCPos((*x0)[t[2]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             p = DataTypes::getCPos((*x0)[t[1]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             p = DataTypes::getCPos((*x0)[t[3]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
-        glEnd();
+        vparams->drawTool()->drawLines(positions, 1.0, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
-#endif /* SOFA_NO_OPENGL */
+
+    vparams->drawTool()->restoreLastState();
 }
 
 template <class DataTypes>

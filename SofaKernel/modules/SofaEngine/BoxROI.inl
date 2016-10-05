@@ -520,6 +520,8 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     const VecCoord& x0 = f_X0.getValue();
     sofa::defaulttype::Vec4f color = sofa::defaulttype::Vec4f(1.0f, 0.4f, 0.4f, 1.0f);
 
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLightingEnabled(false);
 
     ///draw the boxes
     if( p_drawBoxes.getValue())

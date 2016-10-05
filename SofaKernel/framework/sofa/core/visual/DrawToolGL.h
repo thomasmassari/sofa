@@ -141,7 +141,7 @@ public:
     virtual void drawSphere( const Vector3 &p, float radius);
     virtual void drawEllipsoid(const Vector3 &p, const Vector3 &radii);
 
-    virtual void drawBoundingBox( const Vector3 &min, const Vector3 &max );
+    virtual void drawBoundingBox( const Vector3 &min, const Vector3 &max, const float scale = 1.0, const Vec4f &color = Vec4f(1.0, 1.0, 0.0, 1.0) );
 
     virtual void draw3DText(const Vector3 &p, float scale, const Vec4f &color, const char* text);
 
@@ -149,7 +149,7 @@ public:
 
     virtual void clear();
 
-    virtual void setMaterial(const Vec4f &colour);
+    virtual void setMaterial(const Vec4f &colour, const Vec4f &specular = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), float shininess = 20, const Vec4f &emissive = Vec4f(0.0, 0.0, 0.0, 0.0));
 
     virtual void resetMaterial(const Vec4f &colour);
     virtual void resetMaterial();

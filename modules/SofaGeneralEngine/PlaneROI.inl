@@ -31,8 +31,6 @@
 
 #include <SofaGeneralEngine/PlaneROI.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
-#include <sofa/helper/gl/BasicShapes.h>
 
 namespace sofa
 {
@@ -411,17 +409,20 @@ void PlaneROI<DataTypes>::update()
 template <class DataTypes>
 void PlaneROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
+
     if (!vparams->displayFlags().getShowBehaviorModels())
         return;
 
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLightingEnabled(false);
+
     const VecCoord* x0 = &f_X0.getValue();
-    glColor3f(0.0, 1.0, 1.0);
+
+    std::vector<defaulttype::Vector3> positions;
 
     if( _drawSize.getValue() == 0) // old classical drawing by points
     {
         ///draw the boxes
-        glBegin(GL_LINES);
         const helper::vector<Vec10>& vp=planes.getValue();
         for (unsigned int pi=0; pi<vp.size(); ++pi)
         {
@@ -444,61 +445,55 @@ void PlaneROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
             p2 = p2 + (-n) * (depth/2);
             Vec3 p7 = p3 + n * (depth/2);
             p3 = p3 + (-n) * (depth/2);
+            
 
-            glVertex3d(p0.x(), p0.y(), p0.z());
-            glVertex3d(p1.x(), p1.y(), p1.z());
-            glVertex3d(p1.x(), p1.y(), p1.z());
-            glVertex3d(p2.x(), p2.y(), p2.z());
-            glVertex3d(p2.x(), p2.y(), p2.z());
-            glVertex3d(p3.x(), p3.y(), p3.z());
-            glVertex3d(p3.x(), p3.y(), p3.z());
-            glVertex3d(p0.x(), p0.y(), p0.z());
+            positions.push_back(p0);
+            positions.push_back(p1);
+            positions.push_back(p2);
+            positions.push_back(p3);
 
-            glVertex3d(p4.x(), p4.y(), p4.z());
-            glVertex3d(p5.x(), p5.y(), p5.z());
-            glVertex3d(p5.x(), p5.y(), p5.z());
-            glVertex3d(p6.x(), p6.y(), p6.z());
-            glVertex3d(p6.x(), p6.y(), p6.z());
-            glVertex3d(p7.x(), p7.y(), p7.z());
-            glVertex3d(p7.x(), p7.y(), p7.z());
-            glVertex3d(p4.x(), p4.y(), p4.z());
+            positions.push_back(p4);
+            positions.push_back(p5);
+            positions.push_back(p6);
+            positions.push_back(p7);
 
-            glVertex3d(p0.x(), p0.y(), p0.z());
-            glVertex3d(p4.x(), p4.y(), p4.z());
+            positions.push_back(p0);
+            positions.push_back(p1);
+            positions.push_back(p5);
+            positions.push_back(p4);
 
-            glVertex3d(p1.x(), p1.y(), p1.z());
-            glVertex3d(p5.x(), p5.y(), p5.z());
+            positions.push_back(p2);
+            positions.push_back(p3);
+            positions.push_back(p7);
+            positions.push_back(p6);
 
-            glVertex3d(p2.x(), p2.y(), p2.z());
-            glVertex3d(p6.x(), p6.y(), p6.z());
-
-            glVertex3d(p3.x(), p3.y(), p3.z());
-            glVertex3d(p7.x(), p7.y(), p7.z());
         }
-        glEnd();
+
+        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->drawQuads(positions, defaulttype::Vec4f(0.0, 1.0, 1.0,1.0));
+        vparams->drawTool()->setPolygonMode(0, false);
+        positions.clear();
     }
 
     ///draw points in ROI
     if( p_drawPoints.getValue())
     {
-        glDisable(GL_LIGHTING);
-        glBegin(GL_POINTS);
-        glPointSize(5.0);
+        int sizePoint = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
         helper::ReadAccessor< Data<VecCoord > > pointsInROI = f_pointsInROI;
         for (unsigned int i=0; i<pointsInROI.size() ; ++i)
         {
             CPos p = DataTypes::getCPos(pointsInROI[i]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
-        glEnd();
+        vparams->drawTool()->drawPoints(positions, sizePoint, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
 
     ///draw edges in ROI
     if( p_drawEdges.getValue())
     {
-        glDisable(GL_LIGHTING);
-        glLineWidth((GLfloat)_drawSize.getValue());
-        glBegin(GL_LINES);
+        int sizeLine = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
+
         helper::ReadAccessor< Data<helper::vector<Edge> > > edgesInROI = f_edgesInROI;
         for (unsigned int i=0; i<edgesInROI.size() ; ++i)
         {
@@ -506,18 +501,16 @@ void PlaneROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
             for (unsigned int j=0 ; j<2 ; j++)
             {
                 CPos p = DataTypes::getCPos((*x0)[e[j]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        glEnd();
+        vparams->drawTool()->drawLines(positions, sizeLine, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
 
     ///draw triangles in ROI
     if( p_drawTriangles.getValue())
     {
-        glDisable(GL_LIGHTING);
-        glLineWidth((GLfloat)_drawSize.getValue());
-        glBegin(GL_TRIANGLES);
         helper::ReadAccessor< Data<helper::vector<Triangle> > > trianglesInROI = f_trianglesInROI;
         for (unsigned int i=0; i<trianglesInROI.size() ; ++i)
         {
@@ -525,18 +518,17 @@ void PlaneROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
             for (unsigned int j=0 ; j<3 ; j++)
             {
                 CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        glEnd();
+        vparams->drawTool()->drawTriangles(positions, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
 
     ///draw tetrahedra in ROI
     if( p_drawTetrahedra.getValue())
     {
-        glDisable(GL_LIGHTING);
-        glLineWidth((GLfloat)_drawSize.getValue());
-        glBegin(GL_LINES);
+        int sizeLine = (_drawSize.getValue()) ? _drawSize.getValue() : 1;
         helper::ReadAccessor< Data<helper::vector<Tetra> > > tetrahedraInROI = f_tetrahedraInROI;
         for (unsigned int i=0; i<tetrahedraInROI.size() ; ++i)
         {
@@ -544,23 +536,25 @@ void PlaneROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
             for (unsigned int j=0 ; j<4 ; j++)
             {
                 CPos p = DataTypes::getCPos((*x0)[t[j]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 p = DataTypes::getCPos((*x0)[t[(j+1)%4]]);
-                helper::gl::glVertexT(p);
+                positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
 
             CPos p = DataTypes::getCPos((*x0)[t[0]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             p = DataTypes::getCPos((*x0)[t[2]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             p = DataTypes::getCPos((*x0)[t[1]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             p = DataTypes::getCPos((*x0)[t[3]]);
-            helper::gl::glVertexT(p);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
-        glEnd();
+
+        vparams->drawTool()->drawLines(positions, sizeLine, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
+        positions.clear();
     }
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace engine
