@@ -139,7 +139,7 @@ public:
     virtual void drawScaledHexahedra(const std::vector<Vector3> &points, const Vec4f& colour, const float scale);
 
     virtual void drawSphere( const Vector3 &p, float radius);
-    virtual void drawEllipsoid(const Vector3 &p, const Vector3 &radii);
+    virtual void drawEllipsoid(const Vector3 &p, const Vector3 &radii, const Vec4f color = Vec4f(1.0, 1.0, 0.0, 1.0));
 
     virtual void drawBoundingBox( const Vector3 &min, const Vector3 &max, const float scale = 1.0, const Vec4f &color = Vec4f(1.0, 1.0, 0.0, 1.0) );
 

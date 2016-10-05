@@ -185,8 +185,6 @@ void ConstantForceField<DataTypes>::setForce(unsigned i, const Deriv& force)
 template<class DataTypes>
 void ConstantForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-    vparams->drawTool()->saveLastState();
-
     SReal aSC = arrowSizeCoef.getValue();
 
     Deriv singleForce;
@@ -201,6 +199,9 @@ void ConstantForceField<DataTypes>::draw(const core::visual::VisualParams* vpara
     }
 
     if ((!vparams->displayFlags().getShowForceFields() && (aSC==0)) || (aSC < 0.0)) return;
+
+    vparams->drawTool()->saveLastState();
+
     const VecIndex& indices = points.getValue();
     const VecDeriv& f = forces.getValue();
     const Deriv f_end = (f.empty()? singleForce : f[f.size()-1]);

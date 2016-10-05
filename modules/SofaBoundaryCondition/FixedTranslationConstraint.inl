@@ -28,7 +28,6 @@
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <SofaBoundaryCondition/FixedTranslationConstraint.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
 #include <SofaBaseTopology/TopologySubsetData.inl>
 
 namespace sofa
@@ -192,31 +191,41 @@ void FixedTranslationConstraint<DataTypes>::projectJacobianMatrix(const core::Me
 template <class DataTypes>
 void FixedTranslationConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     const SetIndexArray & indices = f_indices.getValue();
     if (!vparams->displayFlags().getShowBehaviorModels())
         return;
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
-    glDisable(GL_LIGHTING);
-    glPointSize(10);
-    glColor4f(1, 0.5, 0.5, 1);
-    glBegin(GL_POINTS);
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
+
+    std::vector<defaulttype::Vector3> positions;
+    defaulttype::Vec4f color(1, 0.5, 0.5, 1);
+
     if (f_fixAll.getValue() == true)
     {
         for (unsigned i = 0; i < x.size(); i++)
         {
-            sofa::helper::gl::glVertexT(x[i].getCenter());
+            defaulttype::Vector3 p;
+            for (unsigned int j = 0; j < Coord::spatial_dimensions ; j++)
+                p[j] = x[i].getCenter()[j];
+
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
     }
     else
     {
         for (SetIndex::const_iterator it = indices.begin(); it != indices.end(); ++it)
         {
-            sofa::helper::gl::glVertexT(x[*it].getCenter());
+            defaulttype::Vector3 p;
+            for (unsigned int j = 0; j < Coord::spatial_dimensions; j++)
+                p[j] = x[*it].getCenter()[j];
+
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
     }
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->drawPoints(positions, 10.0, color);
+
+    vparams->drawTool()->restoreLastState();
 }
 
 

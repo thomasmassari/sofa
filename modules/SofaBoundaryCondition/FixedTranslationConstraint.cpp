@@ -70,62 +70,71 @@ template class SOFA_BOUNDARY_CONDITION_API FixedTranslationConstraint<Vec6fTypes
 template <>
 void FixedTranslationConstraint<Vec6dTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     const SetIndexArray & indices = f_indices.getValue();
     if (!vparams->displayFlags().getShowBehaviorModels())
         return;
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
-    glDisable(GL_LIGHTING);
-    glPointSize(10);
-    glColor4f(1, 0.5, 0.5, 1);
-    glBegin(GL_POINTS);
+
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
+
+    std::vector<defaulttype::Vector3> positions;
+    defaulttype::Vec4f color(1, 0.5, 0.5, 1);
+
     if (f_fixAll.getValue() == true)
     {
         for (unsigned i = 0; i < x.size(); i++)
         {
-            gl::glVertexT(Vec<3,double>(x[i][0], x[i][1], x[i][2]));
+            defaulttype::Vec3d p(x[i][0], x[i][1], x[i][2]);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
     }
     else
     {
         for (SetIndex::const_iterator it = indices.begin(); it != indices.end(); ++it)
         {
-            gl::glVertexT(Vec<3,double>(x[*it][0], x[*it][1], x[*it][2]));
+            defaulttype::Vec3d p(x[*it][0], x[*it][1], x[*it][2]);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
     }
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+
+    vparams->drawTool()->drawPoints(positions, 10.0, color);
+
+    vparams->drawTool()->restoreLastState();
 }
 #endif
 #ifndef SOFA_DOUBLE
 template <>
 void FixedTranslationConstraint<Vec6fTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     const SetIndexArray & indices = f_indices.getValue();
     if (!vparams->displayFlags().getShowBehaviorModels())
         return;
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
-    glDisable(GL_LIGHTING);
-    glPointSize(10);
-    glColor4f(1, 0.5, 0.5, 1);
-    glBegin(GL_POINTS);
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
+
+    std::vector<defaulttype::Vector3> positions;
+    defaulttype::Vec4f color(1, 0.5, 0.5, 1);
     if (f_fixAll.getValue() == true)
     {
         for (unsigned i = 0; i < x.size(); i++)
         {
-            gl::glVertexT(Vec<3,float>(x[i][0], x[i][1], x[i][2]));
+            defaulttype::Vec3f p(x[i][0], x[i][1], x[i][2]);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
     }
     else
     {
         for (SetIndex::const_iterator it = indices.begin(); it != indices.end(); ++it)
         {
-            gl::glVertexT(Vec<3,float>(x[*it][0], x[*it][1], x[*it][2]));
+            defaulttype::Vec3f p(x[*it][0], x[*it][1], x[*it][2]);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
     }
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->drawPoints(positions, 10.0, color);
+
+    vparams->drawTool()->restoreLastState();
 }
 #endif
 } // namespace projectiveconstraintset

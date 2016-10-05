@@ -162,7 +162,6 @@ void ConicalForceField<DataTypes>::updateStiffness( const VecCoord&  )
 template<class DataTypes>
 void ConicalForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowForceFields()) return;
     if (!bDraw.getValue()) return;
 
@@ -173,20 +172,18 @@ void ConicalForceField<DataTypes>::draw(const core::visual::VisualParams* vparam
     const Coord c = coneCenter.getValue();
 //    Coord axis = height.cross(Coord(0,0,1));
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_BLEND) ;
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
+
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
+
+    vparams->drawTool()->setBlending(true);
+
     sofa::defaulttype::Vec4f color4(color.getValue()[0], color.getValue()[1], color.getValue()[2], 0.5);
 
-    glPushMatrix();
     vparams->drawTool()->drawCone(c, c+height, 0, b, color4);
-    glPopMatrix();
 
-    glDisable(GL_BLEND) ;
-    glDisable(GL_LIGHTING);
-    glDisable(GL_COLOR_MATERIAL);
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->setBlending(false);
+    vparams->drawTool()->restoreLastState();
 }
 
 template<class DataTypes>

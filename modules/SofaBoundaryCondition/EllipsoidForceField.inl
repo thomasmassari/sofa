@@ -29,7 +29,6 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/helper/system/config.h>
 #include <sofa/helper/rmath.h>
-#include <sofa/helper/system/gl.h>
 #include <assert.h>
 #include <iostream>
 
@@ -148,9 +147,10 @@ void EllipsoidForceField<DataTypes>::addDForce(const sofa::core::MechanicalParam
 template<class DataTypes>
 void EllipsoidForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowForceFields()) return;
     if (!bDraw.getValue()) return;
+
+    vparams->drawTool()->saveLastState();
 
     Real cx=0, cy=0, cz=0;
     DataTypes::get(cx, cy, cz, center.getValue());
@@ -159,17 +159,11 @@ void EllipsoidForceField<DataTypes>::draw(const core::visual::VisualParams* vpar
 	sofa::defaulttype::Vector3 radii(rx, ry, (stiffness.getValue()>0 ? rz : -rz));
 	sofa::defaulttype::Vector3 vCenter(cx, cy, cz);
 
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_COLOR_MATERIAL);
-    glColor3f(color.getValue()[0],color.getValue()[1],color.getValue()[2]);
-    
-	vparams->drawTool()->drawEllipsoid(vCenter, radii);
+    vparams->drawTool()->setLighting(true);
+    defaulttype::Vec4f color(color.getValue()[0], color.getValue()[1], color.getValue()[2], 1.0);
+	vparams->drawTool()->drawEllipsoid(vCenter, radii, color);
 
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_COLOR_MATERIAL);
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
 }
 
 

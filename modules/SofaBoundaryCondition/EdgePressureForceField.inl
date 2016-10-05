@@ -370,9 +370,8 @@ void EdgePressureForceField<DataTypes>::selectEdgesFromEdgeList()
 }
 
 template<class DataTypes>
-void EdgePressureForceField<DataTypes>::draw(const core::visual::VisualParams*)
+void EdgePressureForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!p_showForces.getValue())
         return;
 
@@ -381,8 +380,11 @@ void EdgePressureForceField<DataTypes>::draw(const core::visual::VisualParams*)
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
     glDisable(GL_LIGHTING);
 
-    glBegin(GL_LINES);
-    glColor4f(1,1,0,1);
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
+
+    defaulttype::Vec4f color(1,1,0,1);
+    std::vector<defaulttype::Vector3> positions;
 
     const sofa::helper::vector <unsigned int>& my_map = edgePressureMap.getMap2Elements();
     const sofa::helper::vector<EdgePressureInformation>& my_subset = edgePressureMap.getValue();
@@ -390,15 +392,17 @@ void EdgePressureForceField<DataTypes>::draw(const core::visual::VisualParams*)
     for (unsigned int i=0; i<my_map.size(); ++i)
     {
         sofa::defaulttype::Vec3d p = (x[_topology->getEdge(my_map[i])[0]] + x[_topology->getEdge(my_map[i])[1]]) / 2.0;
-        sofa::helper::gl::glVertexT(p);
+        positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
 
         sofa::defaulttype::Vec3d f = my_subset[i].force;
         //f.normalize();
         f *= aSC;
-        helper::gl::glVertexT(p + f);
+        sofa::defaulttype::Vec3d ppf = p + f;
+        positions.push_back(defaulttype::Vector3(ppf[0], ppf[1], ppf[2]));
     }
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+
+    vparams->drawTool()->drawLines(positions, 1.0, color);
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace forcefield
