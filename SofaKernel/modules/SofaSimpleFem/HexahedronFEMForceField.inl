@@ -1353,7 +1353,7 @@ void HexahedronFEMForceField<DataTypes>::draw(const core::visual::VisualParams* 
 
         if(_sparseGrid )
         {
-            vparams->drawTool()->enableBlending();
+            vparams->drawTool()->setBlending(true);
         }
 
 
@@ -1412,7 +1412,7 @@ void HexahedronFEMForceField<DataTypes>::draw(const core::visual::VisualParams* 
         points[5].push_back(pf);
 
 
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         vparams->drawTool()->drawTriangles(points[0], defaulttype::Vec<4,float>(0.7f,0.7f,0.1f,(_sparseGrid?_sparseGrid->getStiffnessCoef(i):1.0f)));
         vparams->drawTool()->drawTriangles(points[1], defaulttype::Vec<4,float>(0.7f,0.0f,0.0f,(_sparseGrid?_sparseGrid->getStiffnessCoef(i):1.0f)));
         vparams->drawTool()->drawTriangles(points[2], defaulttype::Vec<4,float>(0.0f,0.7f,0.0f,(_sparseGrid?_sparseGrid->getStiffnessCoef(i):1.0f)));
@@ -1427,7 +1427,7 @@ void HexahedronFEMForceField<DataTypes>::draw(const core::visual::VisualParams* 
         vparams->drawTool()->setPolygonMode(0,false);
 
     if(_sparseGrid )
-       vparams->drawTool()->disableBlending();
+       vparams->drawTool()->setBlending(false);
 }
 
 

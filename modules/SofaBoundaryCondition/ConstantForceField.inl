@@ -233,7 +233,7 @@ void ConstantForceField<DataTypes>::draw(const core::visual::VisualParams* vpara
     else
     {
 
-        vparams->drawTool()->setLightingEnabled(true);
+        vparams->drawTool()->setLighting(true);
         for (unsigned int i=0; i<indices.size(); i++)
         {
             Real xx,xy,xz,fx,fy,fz;

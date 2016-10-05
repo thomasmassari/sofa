@@ -225,7 +225,7 @@ void ExtrudeSurface<DataTypes>::draw(const core::visual::VisualParams* vparams)
 
     helper::vector<BaseMeshTopology::TriangleID>::const_iterator itTriangles;
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     if (!vparams->displayFlags().getShowBehaviorModels() || !isVisible.getValue())
         return;

@@ -290,7 +290,7 @@ void RestShapeSpringsForceField<DataTypes>::draw(const core::visual::VisualParam
     }
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     sofa::helper::ReadAccessor< DataVecCoord > p0 = *getExtPosition();
 

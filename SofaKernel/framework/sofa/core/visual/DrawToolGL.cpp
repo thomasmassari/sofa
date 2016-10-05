@@ -952,7 +952,7 @@ void DrawToolGL::setPolygonMode(int _mode, bool _wireframe)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void DrawToolGL::setLightingEnabled(bool _isAnabled)
+void DrawToolGL::setLighting(bool _isAnabled)
 {
     mLightEnabled = _isAnabled;
     if (this->getLightEnabled()) glEnable(GL_LIGHTING);
@@ -1082,16 +1082,31 @@ void DrawToolGL::writeOverlayText( int x, int y, unsigned fontSize, const Vec4f 
 
 }
 
-void DrawToolGL::enableBlending()
+void DrawToolGL::setBlending(bool enabled)
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if (enabled)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
 }
 
-void DrawToolGL::disableBlending()
+void DrawToolGL::setDepthTest(bool enabled)
 {
-    glDisable(GL_BLEND);
+    if (enabled)
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DrawToolGL::draw3DText(const Vector3 &p, float scale, const Vec4f &color, const char* text)
 {

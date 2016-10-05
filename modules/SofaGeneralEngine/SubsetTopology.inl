@@ -816,7 +816,7 @@ void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
     const VecCoord* x0 = &f_X0.getValue();
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     std::vector<defaulttype::Vector3> positions;
 

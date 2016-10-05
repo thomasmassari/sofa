@@ -1873,7 +1873,7 @@ void TetrahedronFEMForceField<DataTypes>::draw(const core::visual::VisualParams*
 
     }
 
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
     //glEnable(GL_BLEND) ;
     //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     //glDepthMask(0);

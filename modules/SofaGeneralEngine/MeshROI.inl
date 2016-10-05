@@ -559,7 +559,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
         return;
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     const VecCoord* x0 = &f_X0.getValue();
 

@@ -120,7 +120,7 @@ void FixedConstraint<Rigid2dTypes>::draw(const core::visual::VisualParams* vpara
     vparams->drawTool()->saveLastState();
 
     const VecCoord& x =mstate->read(core::ConstVecCoordId::position())->getValue();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
     sofa::defaulttype::Vec4f color (1,0.5,0.5,1);
     std::vector<sofa::defaulttype::Vector3> vertices;
 
@@ -175,7 +175,7 @@ void FixedConstraint<Rigid2fTypes>::draw(const core::visual::VisualParams* vpara
     vparams->drawTool()->saveLastState();
 
     const VecCoord& x =mstate->read(core::ConstVecCoordId::position())->getValue();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
     sofa::defaulttype::Vec4f color (1,0.5,0.5,1);
     std::vector<sofa::defaulttype::Vector3> vertices;
 

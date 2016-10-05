@@ -765,9 +765,9 @@ void TriangularFEMForceFieldOptim<DataTypes>::draw(const core::visual::VisualPar
                 vparams->drawTool()->setPolygonMode(1,false);
             }
 
-            vparams->drawTool()->setLightingEnabled(true);
+            vparams->drawTool()->setLighting(true);
             vparams->drawTool()->drawTriangles(points, normals, colors);
-            vparams->drawTool()->setLightingEnabled(false);
+            vparams->drawTool()->setLighting(false);
             if (stressValueAlpha < 1.0f)
                 vparams->drawTool()->resetMaterial(Vec4f(1.0f,1.0f,1.0f,stressValueAlpha));
  

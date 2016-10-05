@@ -166,7 +166,7 @@ void TCapsuleModel<sofa::defaulttype::StdRigidTypes<3,MyReal> >::draw(const core
     {
         sofa::defaulttype::Vec<4,float> col4f(getColor4f());
         vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());//maybe ??
-        vparams->drawTool()->setLightingEnabled(true); //Enable lightning
+        vparams->drawTool()->setLighting(true); //Enable lightning
 
         // Check topological modifications
         //const int npoints = _mstate->getSize()/2;
@@ -175,7 +175,7 @@ void TCapsuleModel<sofa::defaulttype::StdRigidTypes<3,MyReal> >::draw(const core
             vparams->drawTool()->drawCapsule(point1(i),point2(i),(float)radius(i),col4f);
         }
 
-        vparams->drawTool()->setLightingEnabled(false); //Disable lightning
+        vparams->drawTool()->setLighting(false); //Disable lightning
     }
 
     if (getPrevious()!=NULL && vparams->displayFlags().getShowBoundingCollisionModels())

@@ -146,7 +146,7 @@ void SmoothMeshEngine<DataTypes>::draw(const core::visual::VisualParams* vparams
     sofa::core::topology::BaseMeshTopology::SeqTriangles tri = m_topo->getTriangles();
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(true);
+    vparams->drawTool()->setLighting(true);
 
     if (this->showInput.getValue())
     {

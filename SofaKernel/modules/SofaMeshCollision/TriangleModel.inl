@@ -554,9 +554,9 @@ void TTriangleModel<DataTypes>::draw(const core::visual::VisualParams* vparams ,
 //        glEnd();
 
     vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());
-    vparams->drawTool()->setLightingEnabled(true);
+    vparams->drawTool()->setLighting(true);
     vparams->drawTool()->drawTriangle( t.p1(), t.p2(), t.p3(), t.n() );
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
 }
 
@@ -592,9 +592,9 @@ void TTriangleModel<DataTypes>::draw(const core::visual::VisualParams* vparams)
             index+=3;
         }
 
-        vparams->drawTool()->setLightingEnabled(true);
+        vparams->drawTool()->setLighting(true);
         vparams->drawTool()->drawTriangles(points, indices, normals, defaulttype::Vec<4,float>(getColor4f()));
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         vparams->drawTool()->setPolygonMode(0,false);
 
 

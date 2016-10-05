@@ -389,17 +389,16 @@ int BuoyantForceField<DataTypes>::isTriangleInFluid(const Triangle &tri, const V
 template<class DataTypes>
 void BuoyantForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!this->mstate) return;
 
-    glPushAttrib( GL_ALL_ATTRIB_BITS);
-
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT, GL_LINE);
-
-    glDisable(GL_LIGHTING);
-
+        vparams->drawTool()->setPolygonMode(0, true);
+    
+    std::vector<defaulttype::Vector3> positions;
+    defaulttype::Vec4f color(1.0, 1.0, 1.0, 1.0);
 
     if (m_showBoxOrPlane.getValue())
     {
@@ -408,78 +407,84 @@ void BuoyantForceField<DataTypes>::draw(const core::visual::VisualParams* vparam
 
         if ( fluidModel == AABOX)
         {
-            glLineWidth(5.0f);
-            glBegin(GL_LINE_LOOP);
-            glColor4f(0.f, 0.f, 1.0f, 1.f);
-            glVertex3d(min[0],min[1],min[2]);
-            glVertex3d(min[0],min[1],max[2]);
-            glVertex3d(min[0],max[1],max[2]);
-            glVertex3d(min[0],max[1],min[2]);
-            glEnd();
+            color = defaulttype::Vec4f(0.f, 0.f, 1.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(min[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], max[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], min[1], min[2]));
+            vparams->drawTool()->drawLineStrip(positions, 5.0, color);
+            positions.clear();
 
-            glBegin(GL_LINE_LOOP);
-            glColor4f(0.f, 1.f, 1.0f, 1.f);
-            glVertex3d(min[0],max[1],min[2]);
-            glVertex3d(min[0],max[1],max[2]);
-            glVertex3d(max[0],max[1],max[2]);
-            glVertex3d(max[0],max[1],min[2]);
-            glEnd();
+            color = defaulttype::Vec4f(0.f, 1.f, 1.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(min[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], min[2]));
+            vparams->drawTool()->drawLineStrip(positions, 5.0, color);
+            positions.clear();
 
-            glBegin(GL_LINE_LOOP);
-            glColor4f(1.f, 0.f, 1.0f, 1.f);
-            glVertex3d(min[0],min[1],max[2]);
-            glVertex3d(max[0],min[1],max[2]);
-            glVertex3d(max[0],max[1],max[2]);
-            glVertex3d(min[0],max[1],max[2]);
-            glEnd();
+            color = defaulttype::Vec4f(1.f, 0.f, 1.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(min[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], max[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], max[2]));
+            positions.push_back(defaulttype::Vector3(min[0], min[1], max[2]));
+            vparams->drawTool()->drawLineStrip(positions, 5.0, color);
+            positions.clear();
 
-            glBegin(GL_LINE_LOOP);
-            glColor4f(1.f, 1.f, 1.0f, 1.f);
-            glVertex3d(max[0],min[1],min[2]);
-            glVertex3d(max[0],min[1],max[2]);
-            glVertex3d(max[0],max[1],max[2]);
-            glVertex3d(max[0],max[1],min[2]);
-            glEnd();
+            color = defaulttype::Vec4f(1.f, 1.f, 1.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(max[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], min[2]));
+            vparams->drawTool()->drawLineStrip(positions, 5.0, color);
+            positions.clear();
 
-            glBegin(GL_LINE_LOOP);
-            glColor4f(1.f, 0.f, 0.0f, 1.f);
-            glVertex3d(min[0],min[1],min[2]);
-            glVertex3d(min[0],min[1],max[2]);
-            glVertex3d(max[0],min[1],max[2]);
-            glVertex3d(max[0],min[1],min[2]);
-            glEnd();
+            color = defaulttype::Vec4f(1.f, 0.f, 0.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(min[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], min[1], min[2]));
+            vparams->drawTool()->drawLineStrip(positions, 5.0, color);
+            positions.clear();
 
-            glBegin(GL_LINE_LOOP);
-            glColor4f(1.f, 1.f, 0.0f, 1.f);
-            glVertex3d(min[0],min[1],min[2]);
-            glVertex3d(max[0],min[1],min[2]);
-            glVertex3d(max[0],max[1],min[2]);
-            glVertex3d(min[0],max[1],min[2]);
-            glEnd();
+            color = defaulttype::Vec4f(1.f, 1.f, 0.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(min[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], min[1], min[2]));
+            vparams->drawTool()->drawLineStrip(positions, 5.0, color);
+            positions.clear();
 
-            glColor4f(1.f, 0.f, 0.0f, 1.f);
-            glBegin(GL_LINES);
-            glVertex3d(m_fluidSurfaceOrigin[0],m_fluidSurfaceOrigin[1],m_fluidSurfaceOrigin[2]);
-            glVertex3d(m_fluidSurfaceOrigin[0] +m_fluidSurfaceDirection[0],
-                    m_fluidSurfaceOrigin[1] +m_fluidSurfaceDirection[1],
-                    m_fluidSurfaceOrigin[2] +m_fluidSurfaceDirection[2]);
-            glEnd();
+            color = defaulttype::Vec4f(1.f, 0.f, 0.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(m_fluidSurfaceOrigin[0], m_fluidSurfaceOrigin[1], m_fluidSurfaceOrigin[2]));
+            positions.push_back(defaulttype::Vector3(m_fluidSurfaceOrigin[0] + m_fluidSurfaceDirection[0],
+                                                    m_fluidSurfaceOrigin[1] + m_fluidSurfaceDirection[1],
+                                                    m_fluidSurfaceOrigin[2] + m_fluidSurfaceDirection[2]));
+            vparams->drawTool()->drawLines(positions, 5.0, color);
+            positions.clear();
 
-            glColor4f(0.f, 1.f, 1.0f, 1.f);
+            color = defaulttype::Vec4f(0.f, 1.f, 1.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(min[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], min[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], min[2]));
+            positions.push_back(defaulttype::Vector3(min[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], min[1], max[2]));
+            positions.push_back(defaulttype::Vector3(min[0], max[1], max[2]));
+            positions.push_back(defaulttype::Vector3(max[0], max[1], max[2]));
+            vparams->drawTool()->drawPoints(positions, 10.0, color);
+            positions.clear();
 
-            glPointSize(10.0f);
-            glBegin(GL_POINTS);
-            glVertex3d(min[0],min[1],min[2]);
-            glVertex3d(max[0],min[1],min[2]);
-            glVertex3d(max[0],max[1],min[2]);
-            glVertex3d(min[0],max[1],min[2]);
-            glVertex3d(min[0],min[1],max[2]);
-            glVertex3d(max[0],min[1],max[2]);
-            glVertex3d(min[0],max[1],max[2]);
-            glVertex3d(max[0],max[1],max[2]);
-            glColor4f(1.f, 0.f, 0.0f, 1.f); glPointSize(20.0f);
-            glVertex3d(m_fluidSurfaceOrigin[0],m_fluidSurfaceOrigin[1],m_fluidSurfaceOrigin[2]);
-            glEnd();
+            color = defaulttype::Vec4f(1.f, 0.f, 0.0f, 1.f);
+            positions.push_back(defaulttype::Vector3(m_fluidSurfaceOrigin[0], m_fluidSurfaceOrigin[1], m_fluidSurfaceOrigin[2]));
+            vparams->drawTool()->drawPoints(positions, 20.0, color);
+            positions.clear();
         }
         else if (fluidModel == PLANE)
         {
@@ -535,20 +540,19 @@ void BuoyantForceField<DataTypes>::draw(const core::visual::VisualParams* vparam
                 }
 
                 //disable depth test to draw transparency
-                glDisable(GL_DEPTH_TEST);
+                vparams->drawTool()->setBlending(true);
+                vparams->drawTool()->setDepthTest(false);
+                
+                color = defaulttype::Vec4f(1.f, 1.f, 1.0f, 0.2f);
+                positions.push_back(defaulttype::Vector3(firstPoint[0], firstPoint[1], firstPoint[2]));
+                positions.push_back(defaulttype::Vector3(secondPoint[0], secondPoint[1], secondPoint[2]));
+                positions.push_back(defaulttype::Vector3(thirdPoint[0], thirdPoint[1], thirdPoint[2]));
+                positions.push_back(defaulttype::Vector3(fourthPoint[0], fourthPoint[1], fourthPoint[2]));
+                vparams->drawTool()->drawQuads(positions, color);
+                positions.clear();
 
-                glEnable (GL_BLEND);
-                glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-                glBegin(GL_QUADS);
-                glColor4f(1.f, 1.f, 1.0f, 0.2f);
-                glVertex3d(firstPoint[0],firstPoint[1],firstPoint[2]);
-                glVertex3d(secondPoint[0],secondPoint[1],secondPoint[2]);
-                glVertex3d(thirdPoint[0],thirdPoint[1],thirdPoint[2]);
-                glVertex3d(fourthPoint[0],fourthPoint[1],fourthPoint[2]);
-                glEnd();
-
-                glEnable(GL_DEPTH_TEST);
+                vparams->drawTool()->setBlending(false);
+                vparams->drawTool()->setDepthTest(true);
             }
         }
     }
@@ -559,32 +563,35 @@ void BuoyantForceField<DataTypes>::draw(const core::visual::VisualParams* vparam
         {
             if (this->m_showPressureForces.getValue())
             {
-                glColor4f(1.f, 0.f, 0.0f, 1.0f);
+                color = defaulttype::Vec4f(1.f, 0.f, 0.0f, 1.0f);
 
-                glBegin(GL_LINES);
                 for ( unsigned int i = 0 ; i < m_showPosition.size() ; i++)
                 {
-                    glVertex3d(m_showPosition[i][0], m_showPosition[i][1], m_showPosition[i][2]);
-                    glVertex3d(m_showPosition[i][0] - m_showForce[i][0]*m_showFactorSize.getValue(), m_showPosition[i][1] -  m_showForce[i][1]*m_showFactorSize.getValue(), m_showPosition[i][2] - m_showForce[i][2]*m_showFactorSize.getValue());
+                    positions.push_back(defaulttype::Vector3(m_showPosition[i][0], m_showPosition[i][1], m_showPosition[i][2]));
+                    positions.push_back(defaulttype::Vector3(m_showPosition[i][0] - m_showForce[i][0] * m_showFactorSize.getValue(), m_showPosition[i][1] - m_showForce[i][1] * m_showFactorSize.getValue(), m_showPosition[i][2] - m_showForce[i][2] * m_showFactorSize.getValue()));
                 }
-                glEnd();
+                vparams->drawTool()->drawLines(positions, 1.0, color);
+                positions.clear();
             }
             if (this->m_showViscosityForces.getValue())
             {
-                glColor4f(0.f, 1.f, 1.0f, 1.0f);
+                color = defaulttype::Vec4f(0.f, 1.f, 1.0f, 1.0f);
 
-                glBegin(GL_LINES);
                 for ( unsigned int i = 0 ; i < m_showPosition.size() ; i++)
                 {
-                    glVertex3d(m_showPosition[i][0], m_showPosition[i][1], m_showPosition[i][2]);
-                    glVertex3d(m_showPosition[i][0] - m_showViscosityForce[i][0]*m_showFactorSize.getValue(), m_showPosition[i][1] -  m_showViscosityForce[i][1]*m_showFactorSize.getValue(), m_showPosition[i][2] - m_showViscosityForce[i][2]*m_showFactorSize.getValue());
+                    positions.push_back(defaulttype::Vector3(m_showPosition[i][0], m_showPosition[i][1], m_showPosition[i][2]));
+                    positions.push_back(defaulttype::Vector3(m_showPosition[i][0] - m_showViscosityForce[i][0] * m_showFactorSize.getValue(), m_showPosition[i][1] - m_showViscosityForce[i][1] * m_showFactorSize.getValue(), m_showPosition[i][2] - m_showViscosityForce[i][2] * m_showFactorSize.getValue()));
                 }
-                glEnd();
+                vparams->drawTool()->drawLines(positions, 1.0, color);
+                positions.clear();
             }
         }
 
-    glPopAttrib();
-#endif /* SOFA_NO_OPENGL */
+    if (vparams->displayFlags().getShowWireFrame())
+        vparams->drawTool()->setPolygonMode(0, false);
+
+    vparams->drawTool()->restoreLastState();
+
 }
 
 

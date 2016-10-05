@@ -162,9 +162,10 @@ public:
 
     virtual void writeOverlayText( int x, int y, unsigned fontSize, const Vec4f &color, const char* text );
 
-    virtual void enableBlending();
-
-    virtual void disableBlending();
+    /// @name Set rendering options.
+    virtual void setBlending(bool activated);
+    virtual void setDepthTest(bool activated);
+    virtual void setLighting(bool _isEnabled);
 
     virtual void saveLastState();
     virtual void restoreLastState();
@@ -179,7 +180,6 @@ protected:
 
 public:
     // getter & setter
-    virtual void setLightingEnabled(bool _isAnabled);
 
     bool getLightEnabled() {return mLightEnabled;}
 

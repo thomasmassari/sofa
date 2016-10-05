@@ -199,7 +199,7 @@ void RestShapeSpringsForceField<Rigid3dTypes>::draw(const core::visual::VisualPa
         return;  /// \todo put this in the parent class
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     sofa::helper::ReadAccessor< DataVecCoord > p0 = *getExtPosition();
     sofa::helper::ReadAccessor< DataVecCoord > p = this->mstate->read(core::VecCoordId::position());
@@ -335,7 +335,7 @@ void RestShapeSpringsForceField<Rigid3fTypes>::draw(const core::visual::VisualPa
         return;  /// \todo put this in the parent class
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     sofa::helper::ReadAccessor< DataVecCoord > p0 = *getExtPosition();
     sofa::helper::ReadAccessor< DataVecCoord > p = this->mstate->read(core::VecCoordId::position());

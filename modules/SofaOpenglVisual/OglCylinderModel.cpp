@@ -91,7 +91,7 @@ void OglCylinderModel::drawVisual(const core::visual::VisualParams* vparams)
 
     // glPushAttrib(GL_ENABLE_BIT);
 
-    vparams->drawTool()->setLightingEnabled(true);
+    vparams->drawTool()->setLighting(true);
 	Real _radius = radius.getValue();
 
 	Vec<4,float> col( r, g, b, a );

@@ -714,7 +714,7 @@ void Distances< DataTypes >::draw(const core::visual::VisualParams* vparams)
     if ( showDistanceMap.getValue() )
     {
         vparams->drawTool()->saveLastState();
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
 
         const helper::vector<double>& distMap = distanceMap[showMapIndex.getValue()%distanceMap.size()];
         for ( unsigned int j = 0; j < distMap.size(); j++ )

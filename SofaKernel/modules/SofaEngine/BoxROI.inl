@@ -521,12 +521,12 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     sofa::defaulttype::Vec4f color = sofa::defaulttype::Vec4f(1.0f, 0.4f, 0.4f, 1.0f);
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     ///draw the boxes
     if( p_drawBoxes.getValue())
     {
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         float linesWidth = _drawSize.getValue() ? (float)_drawSize.getValue() : 1;
         std::vector<sofa::defaulttype::Vector3> vertices;
         const helper::vector<Vec6>& vb=boxes.getValue();
@@ -573,7 +573,7 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     if( p_drawPoints.getValue())
     {
         float pointsWidth = _drawSize.getValue() ? (float)_drawSize.getValue() : 1;
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         std::vector<sofa::defaulttype::Vector3> vertices;
         helper::ReadAccessor< Data<VecCoord > > pointsInROI = f_pointsInROI;
         for (unsigned int i=0; i<pointsInROI.size() ; ++i)
@@ -590,7 +590,7 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     ///draw edges in ROI
     if( p_drawEdges.getValue())
     {
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         float linesWidth = _drawSize.getValue() ? (float)_drawSize.getValue() : 1;
         std::vector<sofa::defaulttype::Vector3> vertices;
         helper::ReadAccessor< Data<helper::vector<Edge> > > edgesInROI = f_edgesInROI;
@@ -612,7 +612,7 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     ///draw triangles in ROI
     if( p_drawTriangles.getValue())
     {
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         std::vector<sofa::defaulttype::Vector3> vertices;
         helper::ReadAccessor< Data<helper::vector<Triangle> > > trianglesInROI = f_trianglesInROI;
         for (unsigned int i=0; i<trianglesInROI.size() ; ++i)
@@ -633,7 +633,7 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     ///draw tetrahedra in ROI
     if( p_drawTetrahedra.getValue())
     {
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         float linesWidth = _drawSize.getValue() ? (float)_drawSize.getValue() : 1;
         std::vector<sofa::defaulttype::Vector3> vertices;
         helper::ReadAccessor< Data<helper::vector<Tetra> > > tetrahedraInROI = f_tetrahedraInROI;
@@ -678,7 +678,7 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     ///draw hexahedra in ROI
     if( p_drawHexahedra.getValue())
     {
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         float linesWidth = _drawSize.getValue() ? (float)_drawSize.getValue() : 1;
         std::vector<sofa::defaulttype::Vector3> vertices;
         helper::ReadAccessor< Data<helper::vector<Hexa> > > hexahedraInROI = f_hexahedraInROI;
@@ -739,7 +739,7 @@ void BoxROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
     ///draw quads in ROI
     if( p_drawQuads.getValue())
     {
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         float linesWidth = _drawSize.getValue() ? (float)_drawSize.getValue() : 1;
         std::vector<sofa::defaulttype::Vector3> vertices;
         helper::ReadAccessor<Data<helper::vector<Quad> > > quadsInROI = f_quadInROI;

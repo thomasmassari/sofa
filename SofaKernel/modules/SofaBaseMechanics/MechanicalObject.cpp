@@ -256,7 +256,7 @@ template<>
 void MechanicalObject<defaulttype::Rigid3dTypes>::draw(const core::visual::VisualParams* vparams)
 {
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
 	if (showIndices.getValue())
 	{
@@ -454,7 +454,7 @@ template<>
 void MechanicalObject<defaulttype::Rigid3fTypes>::draw(const core::visual::VisualParams* vparams)
 {
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
 	if (showIndices.getValue())
 	{
@@ -514,7 +514,7 @@ template<>
 void MechanicalObject<defaulttype::LaparoscopicRigid3Types>::draw(const core::visual::VisualParams* vparams)
 {
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
 	if (showIndices.getValue())
 	{

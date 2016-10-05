@@ -2268,7 +2268,7 @@ void TriangleSetGeometryAlgorithms<DataTypes>::draw(const core::visual::VisualPa
         sofa::defaulttype::Vec<4,float> color;
         SReal normalLength = _drawNormalLength.getValue();
 
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
 
         sofa::helper::vector<sofa::defaulttype::Vector3> vertices;
         sofa::helper::vector<sofa::defaulttype::Vec4f> colors;

@@ -270,7 +270,7 @@ void ProximityROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
         return;
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     std::vector<defaulttype::Vector3> positions;
 

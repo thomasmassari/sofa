@@ -202,10 +202,10 @@ void TOBBModel<DataTypes>::draw(const core::visual::VisualParams* vparams){
         vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());
 
         const int npoints = _mstate->getSize();
-        vparams->drawTool()->setLightingEnabled(true); //Enable lightning
+        vparams->drawTool()->setLighting(true); //Enable lightning
         for(int i = 0 ; i < npoints ; ++i )
             draw(vparams,i);
-        vparams->drawTool()->setLightingEnabled(false); //Disable lightning
+        vparams->drawTool()->setLighting(false); //Disable lightning
     }
 
     if (getPrevious()!=NULL && vparams->displayFlags().getShowBoundingCollisionModels())

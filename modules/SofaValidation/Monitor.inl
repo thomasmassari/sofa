@@ -170,7 +170,7 @@ void Monitor<DataTypes>::handleEvent( core::objectmodel::Event* ev )
 template<class DataTypes>
 void Monitor<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
     if (showPositions.getValue())
     {
         helper::vector<defaulttype::Vector3> points;

@@ -361,7 +361,7 @@ void ClusteringEngine<DataTypes>::draw(const core::visual::VisualParams* vparams
         const unsigned int nbp = currentPositions.size();
 
         vparams->drawTool()->saveLastState();
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
         
         float r, g, b;
         std::vector<defaulttype::Vector3> positions;

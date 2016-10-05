@@ -366,7 +366,7 @@ void FixedConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
     }
     else // new drawing by spheres
     {
-        vparams->drawTool()->setLightingEnabled(true);
+        vparams->drawTool()->setLighting(true);
 
         std::vector< sofa::defaulttype::Vector3 > points;
         sofa::defaulttype::Vector3 point;

@@ -468,12 +468,12 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
                         radiusTetrahedra.push_back(radius*(float)container->getWeight(i));
                     }
                 }
-                vparams->drawTool()->setLightingEnabled(true); //Enable lightning
+                vparams->drawTool()->setLighting(true); //Enable lightning
                 vparams->drawTool()->drawSpheres(pointsVertices, radiusVertices,  defaulttype::Vec<4,float>(1.0f,0,0,1.0f));
                 vparams->drawTool()->drawSpheres(pointsEdges, radiusEdges,  defaulttype::Vec<4,float>(0,1.0f,0,1.0f));
                 vparams->drawTool()->drawSpheres(pointsTriangles, radiusTriangles,  defaulttype::Vec<4,float>(0,0,1.0f,1.0f));
                 vparams->drawTool()->drawSpheres(pointsTetrahedra, radiusTetrahedra,  defaulttype::Vec<4,float>(1,0,1.0f,1.0f));
-                vparams->drawTool()->setLightingEnabled(false); //Disable lightning
+                vparams->drawTool()->setLighting(false); //Disable lightning
             }
         }
         // Draw edges linking Bezier tetrahedra control points with a color code
@@ -503,9 +503,9 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
 
                     }
                 }
-                vparams->drawTool()->setLightingEnabled(true); //Enable lightning
+                vparams->drawTool()->setLighting(true); //Enable lightning
                 vparams->drawTool()->drawSpheres(pointsVertices, radiusVertices,  defaulttype::Vec<4,float>(1.0f,0,0,1.0f));
-                vparams->drawTool()->setLightingEnabled(false); //Disable lightning
+                vparams->drawTool()->setLighting(false); //Disable lightning
 
 #ifndef SOFA_NO_OPENGL
                 glDisable(GL_LIGHTING);

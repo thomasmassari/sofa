@@ -2771,7 +2771,7 @@ template <class DataTypes>
 inline void MechanicalObject<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     if (showIndices.getValue())
     {
@@ -2796,19 +2796,19 @@ inline void MechanicalObject<DataTypes>::draw(const core::visual::VisualParams* 
             vparams->drawTool()->drawPoints(positions,scale,defaulttype::Vec<4,float>(d_color.getValue()));
             break;
         case 1:
-            vparams->drawTool()->setLightingEnabled(true);
+            vparams->drawTool()->setLighting(true);
             vparams->drawTool()->drawSpheres(positions,scale,defaulttype::Vec<4,float>(d_color.getValue()));
             break;
         case 2:
-            vparams->drawTool()->setLightingEnabled(true);
+            vparams->drawTool()->setLighting(true);
             vparams->drawTool()->drawSpheres(positions,scale,defaulttype::Vec<4,float>(1.0,0.0,0.0,1.0));
             break;
         case 3:
-            vparams->drawTool()->setLightingEnabled(true);
+            vparams->drawTool()->setLighting(true);
             vparams->drawTool()->drawSpheres(positions,scale,defaulttype::Vec<4,float>(0.0,1.0,0.0,1.0));
             break;
         case 4:
-           vparams->drawTool()->setLightingEnabled(true);
+           vparams->drawTool()->setLighting(true);
             vparams->drawTool()->drawSpheres(positions,scale,defaulttype::Vec<4,float>(0.0,0.0,1.0,1.0));
             break;
         default:

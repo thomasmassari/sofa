@@ -434,7 +434,7 @@ void ValuesFromPositions<DataTypes>::draw(const core::visual::VisualParams* vpar
     if (p_drawVectors.getValue())
     {
         vparams->drawTool()->saveLastState();
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
 
         const VecCoord* x0 = &f_X0.getValue();
         helper::ReadAccessor< Data<helper::vector<Tetra> > > tetrahedra = f_tetrahedra;

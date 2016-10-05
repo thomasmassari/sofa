@@ -2475,20 +2475,20 @@ void HexahedronCompositeFEMForceFieldAndMass<T>::draw(const core::visual::Visual
 
     if( _drawType.getValue() == 0 )
     {
-        vparams->drawTool()->setLightingEnabled(true);
+        vparams->drawTool()->setLighting(true);
 
         for( SparseGridTopology::SeqEdges::const_iterator it = this->_sparseGrid->getEdges().begin() ; it != this->_sparseGrid->getEdges().end(); ++it)
         {
             vparams->drawTool()->drawCylinder( x[(*it)[0]], x[(*it)[1]], _drawSize.getValue(), colour );
         }
 
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
     }
     else
     {
         std::vector< defaulttype::Vector3 > points;
 
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
 
         for( SparseGridTopology::SeqEdges::const_iterator it = this->_sparseGrid->getEdges().begin() ; it != this->_sparseGrid->getEdges().end(); ++it)
         {

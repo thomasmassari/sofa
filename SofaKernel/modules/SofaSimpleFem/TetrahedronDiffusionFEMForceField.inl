@@ -452,7 +452,7 @@ void TetrahedronDiffusionFEMForceField<DataTypes>::draw(const core::visual::Visu
     {
         const typename TetrahedronDiffusionFEMForceField<DataTypes>::MechanicalTypes::VecCoord restPosition =
         this->mechanicalObject->read(core::ConstVecCoordId::restPosition())->getValue();
-        vparams->drawTool()->setLightingEnabled(false);
+        vparams->drawTool()->setLighting(false);
 
         unsigned int nbr = topology->getNbTriangles();
         sofa::helper::vector<unsigned int> surfaceTri;

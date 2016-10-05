@@ -277,7 +277,7 @@ void RandomPointDistributionInSurface<DataTypes>::draw(const core::visual::Visua
         return;
 
     vparams->drawTool()->saveLastState();
-    vparams->drawTool()->setLightingEnabled(false);
+    vparams->drawTool()->setLighting(false);
 
     if (vparams->displayFlags().getShowWireFrame())
         vparams->drawTool()->setPolygonMode(0, true);

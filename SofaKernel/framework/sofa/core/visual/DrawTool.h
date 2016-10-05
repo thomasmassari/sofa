@@ -181,12 +181,12 @@ public:
     virtual void resetMaterial() = 0 ;
 
     virtual void setPolygonMode(int _mode, bool _wireframe) = 0 ;
-
-    virtual void setLightingEnabled(bool _isAnabled) = 0 ;
     /// @}
 
-    virtual void enableBlending() = 0;
-    virtual void disableBlending() = 0;
+    /// @name Set rendering options.
+    virtual void setBlending(bool activated) = 0;
+    virtual void setDepthTest(bool activated) = 0;
+    virtual void setLighting(bool _isEnabled) = 0;
 
     /// @name States (save/restore)
     virtual void saveLastState() = 0;

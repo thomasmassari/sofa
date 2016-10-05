@@ -391,7 +391,7 @@ void JointSpringForceField<DataTypes>::draw(const core::visual::VisualParams* vp
     const VecCoord& p2 = this->mstate2->read(core::ConstVecCoordId::position())->getValue();
     vparams->drawTool()->saveLastState();
 
-    vparams->drawTool()->setLightingEnabled(true);
+    vparams->drawTool()->setLighting(true);
 
     bool external = (this->mstate1!=this->mstate2);
     const helper::vector<Spring>& springs = this->springs.getValue();
