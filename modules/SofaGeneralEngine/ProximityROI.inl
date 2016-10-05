@@ -280,7 +280,7 @@ void ProximityROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
         const helper::vector<Vec3>& c=centers.getValue();
         const helper::vector<Real>& r=radii.getValue();
         std::vector<float> tmpr;
-        std::vector<Vector3> tmpc;
+        std::vector<defaulttype::Vector3> tmpc;
 
         //convert to what drawtool wants
         tmpr.resize(r.size());

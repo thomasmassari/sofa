@@ -499,7 +499,7 @@ void SphereROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
 
         ///draw the boxes
         std::vector<float> tmpr;
-        std::vector<Vector3> tmpc;
+        std::vector<defaulttype::Vector3> tmpc;
 
         //convert to what drawtool wants        
         tmpr.resize(r.size());
