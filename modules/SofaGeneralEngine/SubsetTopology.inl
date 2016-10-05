@@ -871,7 +871,7 @@ void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
             positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
         }
 
-        vparams->drawTool()->drawPoints(positions, 5.0 , Vec4f(0.0, 1.0, 1.0, 1.0));
+        vparams->drawTool()->drawPoints(positions, 5.0 , defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
         positions.clear();
     }
     if( p_drawEdges.getValue())
@@ -887,7 +887,7 @@ void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        vparams->drawTool()->drawLines(positions, 1.0, Vec4f(0.0, 1.0, 1.0, 1.0));
+        vparams->drawTool()->drawLines(positions, 1.0, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
         positions.clear();
     }
     if( p_drawTriangles.getValue())
@@ -903,7 +903,7 @@ void SubsetTopology<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        vparams->drawTool()->drawTriangles(positions, Vec4f(0.0, 1.0, 1.0, 1.0));
+        vparams->drawTool()->drawTriangles(positions, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
         positions.clear();
     }
 

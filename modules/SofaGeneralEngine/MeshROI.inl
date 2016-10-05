@@ -579,7 +579,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 CPos p = DataTypes::getCPos(points_i[i]);
                 positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
-            vparams->drawTool()->drawPoints(positions, sizePoint, Vec4f(0.4, 0.4, 1.0, 1.0));
+            vparams->drawTool()->drawPoints(positions, sizePoint, defaulttype::Vec4f(0.4, 0.4, 1.0, 1.0));
             positions.clear();
         }
         /// draw ROI edges
@@ -596,7 +596,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                     positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
-            vparams->drawTool()->drawLines(positions, sizeLine, Vec4f(1.0, 0.4, 0.4, 1.0));
+            vparams->drawTool()->drawLines(positions, sizeLine, defaulttype::Vec4f(1.0, 0.4, 0.4, 1.0));
             positions.clear();
         }
         // draw ROI triangles
@@ -612,7 +612,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                     positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                 }
             }
-            vparams->drawTool()->drawTriangles(positions, Vec4f(1.0, 0.4, 0.4, 1.0));
+            vparams->drawTool()->drawTriangles(positions, defaulttype::Vec4f(1.0, 0.4, 0.4, 1.0));
             positions.clear();
         }
     }
@@ -649,7 +649,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
             }
         }
-        vparams->drawTool()->drawPoints(positions, sizePoint, Vec4f(1.0, 0.4, 0.4, 1.0));
+        vparams->drawTool()->drawPoints(positions, sizePoint, defaulttype::Vec4f(1.0, 0.4, 0.4, 1.0));
         positions.clear();
     }
     ///draw edges in ROI
@@ -683,7 +683,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 }
             }
         }
-        vparams->drawTool()->drawLines(positions, sizeLine, Vec4f(1.0, 0.4, 0.4, 1.0));
+        vparams->drawTool()->drawLines(positions, sizeLine, defaulttype::Vec4f(1.0, 0.4, 0.4, 1.0));
         positions.clear();
     }
     ///draw triangles in ROI
@@ -715,7 +715,7 @@ void MeshROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
                 }
             }
         }
-        vparams->drawTool()->drawTriangles(positions, Vec4f(1.0, 0.4, 0.4, 1.0));
+        vparams->drawTool()->drawTriangles(positions, defaulttype::Vec4f(1.0, 0.4, 0.4, 1.0));
         positions.clear();
     }
     ///draw tetrahedra in ROI

@@ -488,12 +488,12 @@ void SphereROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
             
             if (edgeAngle.getValue() > 0)
             {
-                vparams->drawTool()->drawCone(c[i], c[i] + direction.getValue()*(cos(edgeAngle.getValue()*M_PI / 180.0)*r[i]), 0, (float)sin(edgeAngle.getValue()*M_PI / 180.0)*((float)r[i]), Vec4f(0.0, 1.0, 1.0, 1.0));
+                vparams->drawTool()->drawCone(c[i], c[i] + direction.getValue()*(cos(edgeAngle.getValue()*M_PI / 180.0)*r[i]), 0, (float)sin(edgeAngle.getValue()*M_PI / 180.0)*((float)r[i]), defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
             }
 
             if (triAngle.getValue() > 0)
             {
-                vparams->drawTool()->drawCone(c[i], c[i] + normal.getValue()*(cos(triAngle.getValue()*M_PI / 180.0)*r[i]), 0, (float)sin(triAngle.getValue()*M_PI / 180.0)*((float)r[i]), Vec4f(0.0, 1.0, 1.0, 1.0));
+                vparams->drawTool()->drawCone(c[i], c[i] + normal.getValue()*(cos(triAngle.getValue()*M_PI / 180.0)*r[i]), 0, (float)sin(triAngle.getValue()*M_PI / 180.0)*((float)r[i]), defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
             }
         }
 
@@ -508,7 +508,7 @@ void SphereROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
         std::copy(c.begin(), c.end(), tmpc.begin());
 
         vparams->drawTool()->setPolygonMode(0, true);
-        vparams->drawTool()->drawSpheres(tmpc, tmpr, Vec4f(0.0, 1.0, 1.0, 1.0));
+        vparams->drawTool()->drawSpheres(tmpc, tmpr, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
         vparams->drawTool()->setPolygonMode(0, false);
        
     }

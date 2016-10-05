@@ -289,7 +289,7 @@ void ProximityROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
         std::copy(c.begin(), c.end(), tmpc.begin());
 
         vparams->drawTool()->setPolygonMode(0, true);
-        vparams->drawTool()->drawSpheres(tmpc, tmpr, Vec4f(0.0, 1.0, 1.0, 1.0));
+        vparams->drawTool()->drawSpheres(tmpc, tmpr, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
         vparams->drawTool()->setPolygonMode(0, false);
     }
 

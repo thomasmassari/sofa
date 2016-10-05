@@ -152,8 +152,8 @@ void SmoothMeshEngine<DataTypes>::draw(const core::visual::VisualParams* vparams
     {
         helper::ReadAccessor< Data<VecCoord> > in(input_position);
 
-        Vec4f color(1.0f, 0.76078431372f, 0.0f, 1.0f);
-        Vec4f specular(0.0f, 0.0f ,0.0f ,0.0f);
+        defaulttype::Vec4f color(1.0f, 0.76078431372f, 0.0f, 1.0f);
+        defaulttype::Vec4f specular(0.0f, 0.0f ,0.0f ,0.0f);
 
         vparams->drawTool()->setMaterial(color, specular, 0.0f);
 
@@ -192,8 +192,8 @@ void SmoothMeshEngine<DataTypes>::draw(const core::visual::VisualParams* vparams
     {
         helper::ReadAccessor< Data<VecCoord> > out(output_position);
 
-        Vec4f color(0.0f, 0.6f, 0.8f, 0.0f);
-        Vec4f specular(0.0f, 0.0f, 0.0f, 0.0f);
+        defaulttype::Vec4f color(0.0f, 0.6f, 0.8f, 0.0f);
+        defaulttype::Vec4f specular(0.0f, 0.0f, 0.0f, 0.0f);
 
         vparams->drawTool()->setMaterial(color, specular, 0.0f);
 
