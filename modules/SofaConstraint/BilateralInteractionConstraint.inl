@@ -29,7 +29,6 @@
 #include <sofa/core/visual/VisualParams.h>
 
 #include <sofa/defaulttype/Vec.h>
-#include <sofa/helper/gl/template.h>
 
 #include <algorithm> // for std::min
 
@@ -442,26 +441,35 @@ void BilateralInteractionConstraint<DataTypes>::addContact(Deriv /*norm*/, Coord
 template<class DataTypes>
 void BilateralInteractionConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowInteractionForceFields()) return;
 
-    glDisable(GL_LIGHTING);
-    glPointSize(10);
+    const VecCoord& x1 = this->mstate1->read(core::ConstVecCoordId::position())->getValue();
+    const VecCoord& x2 = this->mstate2->read(core::ConstVecCoordId::position())->getValue();
+    const helper::vector<int>& indices1 = m1.getValue();
+    const helper::vector<int>& indices2 = m2.getValue();
+
+    vparams->drawTool()->saveLastState();
+
+    vparams->drawTool()->setLighting(false);
+    defaulttype::Vec4f color;
+
     if (activated)
-        glColor4f(1,0,1,1);
+        color = defaulttype::Vec4f(1,0,1,1);
     else
-        glColor4f(0,1,0,1);
-    glBegin(GL_POINTS);
+        color = defaulttype::Vec4f(0,1,0,1);
 
     unsigned minp = std::min(m1.getValue().size(),m2.getValue().size());
+    std::vector<defaulttype::Vector3> positions;
     for (unsigned i=0; i<minp; i++)
     {
-        helper::gl::glVertexT(this->mstate1->read(core::ConstVecCoordId::position())->getValue()[m1.getValue()[i]]);
-        helper::gl::glVertexT(this->mstate2->read(core::ConstVecCoordId::position())->getValue()[m2.getValue()[i]]);
+        positions.push_back(defaulttype::Vector3(x1[indices1[i]][0], x1[indices1[i]][1], x1[indices1[i]][2]));
+        positions.push_back(defaulttype::Vector3(x2[indices2[i]][0], x2[indices2[i]][1], x2[indices2[i]][2]));
     }
-    glEnd();
-    glPointSize(1);
-#endif /* SOFA_NO_OPENGL */
+
+    vparams->drawTool()->drawPoints(positions, 10.0, color);
+
+    vparams->drawTool()->restoreLastState();
+
 }
 
 } // namespace constraintset

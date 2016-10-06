@@ -214,6 +214,9 @@ template <class DataTypes>
 void FixedLMConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
     if (!vparams->displayFlags().getShowBehaviorModels()) return;
+
+    vparams->drawTool()->saveLastState();
+
     const VecCoord& x =this->constrainedObject1->read(core::ConstVecCoordId::position())->getValue();
     //serr<<"FixedLMConstraint<DataTypes>::draw(), x.size() = "<<x.size()<<sendl;
 
@@ -229,6 +232,7 @@ void FixedLMConstraint<DataTypes>::draw(const core::visual::VisualParams* vparam
         point = DataTypes::getCPos(x[*it]);
         points.push_back(point);
     }
+
     if( _drawSize.getValue() == 0) // old classical drawing by points
     {
         vparams->drawTool()->drawPoints(points, 10, defaulttype::Vec<4,float>(1,0.5,0.5,1));
@@ -237,17 +241,18 @@ void FixedLMConstraint<DataTypes>::draw(const core::visual::VisualParams* vparam
     {
         vparams->drawTool()->drawSpheres(points, (float)_drawSize.getValue(), defaulttype::Vec<4,float>(1.0f,0.35f,0.35f,1.0f));
     }
+    vparams->drawTool()->restoreLastState();
 }
 
-// Specialization for rigids
-#ifndef SOFA_FLOAT
-template <>
-void FixedLMConstraint<defaulttype::Rigid3dTypes >::draw(const core::visual::VisualParams* vparams);
-#endif
-#ifndef SOFA_DOUBLE
-template <>
-void FixedLMConstraint<defaulttype::Rigid3fTypes >::draw(const core::visual::VisualParams* vparams);
-#endif
+//// Specialization for rigids
+//#ifndef SOFA_FLOAT
+//template <>
+//void FixedLMConstraint<defaulttype::Rigid3dTypes >::draw(const core::visual::VisualParams* vparams);
+//#endif
+//#ifndef SOFA_DOUBLE
+//template <>
+//void FixedLMConstraint<defaulttype::Rigid3fTypes >::draw(const core::visual::VisualParams* vparams);
+//#endif
 
 
 } // namespace constraintset

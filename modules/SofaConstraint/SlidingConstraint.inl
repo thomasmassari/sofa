@@ -31,7 +31,6 @@
 #include <SofaConstraint/UnilateralInteractionConstraint.h>
 
 #include <sofa/defaulttype/Vec.h>
-#include <sofa/helper/gl/template.h>
 
 namespace sofa
 {
@@ -165,30 +164,39 @@ void SlidingConstraint<DataTypes>::getConstraintResolution(const ConstraintParam
 template<class DataTypes>
 void SlidingConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowInteractionForceFields()) return;
 
-    glDisable(GL_LIGHTING);
-    glPointSize(10);
-    glBegin(GL_POINTS);
-    if(thirdConstraint<0)
-        glColor4f(1,1,0,1);
-    else if(thirdConstraint>0)
-        glColor4f(0,1,0,1);
-    else
-        glColor4f(1,0,1,1);
-    helper::gl::glVertexT((this->mstate1->read(core::ConstVecCoordId::position())->getValue())[m1.getValue()]);
-    //      helper::gl::glVertexT((*this->object2->read(sofa::core::ConstVecCoordId::position())->getValue())[m3]);
-    //      helper::gl::glVertexT(proj);
-    glEnd();
+    const VecCoord& x1 = this->mstate1->read(core::ConstVecCoordId::position())->getValue();
+    const VecCoord& x2 = this->mstate2->read(core::ConstVecCoordId::position())->getValue();
 
-    glBegin(GL_LINES);
-    glColor4f(0,0,1,1);
-    helper::gl::glVertexT((this->mstate2->read(core::ConstVecCoordId::position())->getValue())[m2a.getValue()]);
-    helper::gl::glVertexT((this->mstate2->read(core::ConstVecCoordId::position())->getValue())[m2b.getValue()]);
-    glEnd();
-    glPointSize(1);
-#endif /* SOFA_NO_OPENGL */
+    const int& index1 = m1.getValue();
+    const int& index2a = m1.getValue();
+    const int& index2b = m1.getValue();
+
+    vparams->drawTool()->saveLastState();
+
+    vparams->drawTool()->setLighting(false);
+
+    defaulttype::Vec4f color;
+
+    if(thirdConstraint<0)
+        color = defaulttype::Vec4f(1,1,0,1);
+    else if(thirdConstraint>0)
+        color = defaulttype::Vec4f(0,1,0,1);
+    else
+        color = defaulttype::Vec4f(1,0,1,1);
+
+    std::vector<defaulttype::Vector3> positions;
+    positions.push_back(defaulttype::Vector3(x1[index1][0], x1[index1][1], x1[index1][2]));
+    vparams->drawTool()->drawPoints(positions, 10.0, color);
+    positions.clear();
+
+    color = defaulttype::Vec4f(0, 0, 1, 1);
+    positions.push_back(defaulttype::Vector3(x2[index2a][0], x2[index2a][1], x2[index2a][2]));
+    positions.push_back(defaulttype::Vector3(x2[index2b][0], x2[index2b][1], x2[index2b][2]));
+    vparams->drawTool()->drawLines(positions, 1.0, color);
+
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace constraintset

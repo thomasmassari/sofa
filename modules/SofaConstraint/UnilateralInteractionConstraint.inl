@@ -356,61 +356,39 @@ bool UnilateralInteractionConstraint<DataTypes>::isActive() const
 template<class DataTypes>
 void UnilateralInteractionConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
-//	return; // TEMP
-    if (!vparams->displayFlags().getShowInteractionForceFields()) return;
-    if (!vparams->isSupported(sofa::core::visual::API_OpenGL)) return;
 
-    glDisable(GL_LIGHTING);
+    if (!vparams->displayFlags().getShowInteractionForceFields()) return;
+
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
+
+
+    std::vector<defaulttype::Vector3> positions;
+    std::vector<defaulttype::Vec4f> colors;
 
     for (unsigned int i=0; i<contacts.size(); i++)
     {
         const Contact& c = contacts[i];
+        defaulttype::Vec4f color = defaulttype::Vec4f(1, 0, 0, 1);
+        positions.push_back(defaulttype::Vector3(c.P[0], c.P[1], c.P[2]));
+        positions.push_back(defaulttype::Vector3(c.Q[0], c.Q[1], c.Q[2]));
+        vparams->drawTool()->drawLines(positions, 5.0, defaulttype::Vec4f(1, 0, 0, 1));
+        positions.clear();
+        
+        colors.push_back(defaulttype::Vec4f(1, 1, 1, 1));
+        colors.push_back(defaulttype::Vec4f(0, 0.5, 0.5, 1));
+        colors.push_back(defaulttype::Vec4f(0, 0, 0, 1));
+        colors.push_back(defaulttype::Vec4f(0, 0.5, 0.5, 1));
 
-//		if(contactsStatus && contactsStatus[i]) glColor4f(1,0,0,1); else
-//		if(c.dfree < 0) glColor4f(1,0,1,1); else
-//		glColor4f(1,0.5,0,1);
+        positions.push_back(defaulttype::Vector3(c.P[0], c.P[1], c.P[2]));
+        positions.push_back(defaulttype::Vector3((c.P+c.norm)[0], (c.P + c.norm)[1], (c.Q + c.norm)[2]));
+        positions.push_back(defaulttype::Vector3(c.Q[0], c.Q[1], c.Q[2]));
+        positions.push_back(defaulttype::Vector3((c.Q - c.norm)[0], (c.Q - c.norm)[1], (c.Q - c.norm)[2]));
 
-        glLineWidth(5);
-        glBegin(GL_LINES);
+        vparams->drawTool()->drawLines(positions, 3.0, defaulttype::Vec4f(1, 0, 0, 1));
 
-        glColor4f(1,0,0,1);
-        helper::gl::glVertexT(c.P);
-        helper::gl::glVertexT(c.Q);
-
-        glEnd();
-
-        glLineWidth(3);
-        glBegin(GL_LINES);
-
-        /*glColor4f(0,0,1,1);
-        helper::gl::glVertexT(c.Pfree);
-        helper::gl::glVertexT(c.Qfree);*/
-
-        glColor4f(1,1,1,1);
-        helper::gl::glVertexT(c.P);
-        glColor4f(0,0.5,0.5,1);
-        helper::gl::glVertexT(c.P + c.norm);
-
-        glColor4f(0,0,0,1);
-        helper::gl::glVertexT(c.Q);
-        glColor4f(0,0.5,0.5,1);
-        helper::gl::glVertexT(c.Q - c.norm);
-
-        glEnd();
-        /*
-        if (c.dfree < 0)
-        {
-        	glLineWidth(5);
-        	glColor4f(0,1,0,1);
-        	helper::gl::glVertexT(c.Pfree);
-        	helper::gl::glVertexT(c.Qfree);
-        }
-        */
-
-        glLineWidth(1);
     }
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace constraintset

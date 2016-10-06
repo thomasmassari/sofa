@@ -897,9 +897,10 @@ void PrecomputedConstraintCorrection<DataTypes>::resetContactForce()
 template< class DataTypes >
 void PrecomputedConstraintCorrection< DataTypes >::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowBehaviorModels() || !m_rotations.getValue())
         return;
+
+    vparams->drawTool()->saveLastState();
 
     using sofa::component::forcefield::TetrahedronFEMForceField;
     using sofa::core::behavior::RotationFinder;
@@ -950,9 +951,12 @@ void PrecomputedConstraintCorrection< DataTypes >::draw(const core::visual::Visu
 
         sofa::defaulttype::Quat q;
         q.fromMatrix(RotMat);
-        helper::gl::Axis::draw(DataTypes::getCPos(x[i]), q, this->debugViewFrameScale.getValue());
+        float s = this->debugViewFrameScale.getValue();
+        defaulttype::Vector3 p(DataTypes::getCPos(x[i])[0], DataTypes::getCPos(x[i])[1], DataTypes::getCPos(x[i])[2]);
+        vparams->drawTool()->drawFrame(p, q, defaulttype::Vec3f(s,s,s));
     }
-#endif /* SOFA_NO_OPENGL */
+
+    vparams->drawTool()->restoreLastState();
 }
 
 
