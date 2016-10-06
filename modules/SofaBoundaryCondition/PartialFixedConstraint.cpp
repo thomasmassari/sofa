@@ -84,10 +84,13 @@ template class SOFA_BOUNDARY_CONDITION_API PartialFixedConstraint<Rigid2fTypes>;
 template <>
 void PartialFixedConstraint<Rigid3dTypes>::draw(const core::visual::VisualParams* vparams)
 {
-    const SetIndexArray & indices = f_indices.getValue();
     if (!vparams->displayFlags().getShowBehaviorModels()) return;
-    std::vector< Vector3 > points;
 
+    vparams->drawTool()->saveLastState();
+
+    const SetIndexArray & indices = f_indices.getValue();
+    std::vector< defaulttype::Vector3 > points;
+    vparams->drawTool()->setLighting(false);
     const VecCoord& x =mstate->read(core::ConstVecCoordId::position())->getValue();
     if( f_fixAll.getValue()==true )
         for (unsigned i=0; i<x.size(); i++ )
@@ -100,29 +103,35 @@ void PartialFixedConstraint<Rigid3dTypes>::draw(const core::visual::VisualParams
         vparams->drawTool()->drawPoints(points, 10, Vec<4,float>(1,0.5,0.5,1));
     else
         vparams->drawTool()->drawSpheres(points, (float)_drawSize.getValue(), Vec<4,float>(1.0f,0.35f,0.35f,1.0f));
+
+    vparams->drawTool()->restoreLastState();
 }
 
 template <>
 void PartialFixedConstraint<Rigid2dTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
-    const SetIndexArray & indices = f_indices.getValue();
     if (!vparams->displayFlags().getShowBehaviorModels()) return;
 
+    const SetIndexArray & indices = f_indices.getValue();
+
+    vparams->drawTool()->saveLastState();
+    std::vector< defaulttype::Vector3 > points;
+
     const VecCoord& x =mstate->read(core::ConstVecCoordId::position())->getValue();
-    glDisable (GL_LIGHTING);
-    glPointSize(10);
-    glColor4f (1,0.5,0.5,1);
-    glBegin (GL_POINTS);
+    vparams->drawTool()->setLighting(false);
+
     if( f_fixAll.getValue()==true )
         for (unsigned i=0; i<x.size(); i++ )
-            gl::glVertexT(x[i].getCenter());
+        {
+            points.push_back(defaulttype::Vector3(x[i].getCenter()[0], x[i].getCenter()[1], 0.0));
+        }
     else
         for (SetIndex::const_iterator it = indices.begin(); it != indices.end(); ++it)
-            gl::glVertexT(x[*it].getCenter());
-    glEnd();
-    glPointSize(1);
-#endif /* SOFA_NO_OPENGL */
+            points.push_back(defaulttype::Vector3(x[*it].getCenter()[0], x[*it].getCenter()[1], 0.0));
+
+    vparams->drawTool()->drawPoints(points, 10, defaulttype::Vec4f(1, 0.5, 0.5, 1));
+
+    vparams->drawTool()->restoreLastState();
 }
 #endif
 
@@ -130,44 +139,54 @@ void PartialFixedConstraint<Rigid2dTypes>::draw(const core::visual::VisualParams
 template <>
 void PartialFixedConstraint<Rigid3fTypes>::draw(const core::visual::VisualParams* vparams)
 {
-    const SetIndexArray & indices = f_indices.getValue();
     if (!vparams->displayFlags().getShowBehaviorModels()) return;
-    std::vector< Vector3 > points;
 
-    const VecCoord& x =mstate->read(core::ConstVecCoordId::position())->getValue();
-    if( f_fixAll.getValue()==true )
-        for (unsigned i=0; i<x.size(); i++ )
+    vparams->drawTool()->saveLastState();
+
+    const SetIndexArray & indices = f_indices.getValue();
+    std::vector< defaulttype::Vector3 > points;
+    vparams->drawTool()->setLighting(false);
+    const VecCoord& x = mstate->read(core::ConstVecCoordId::position())->getValue();
+    if (f_fixAll.getValue() == true)
+        for (unsigned i = 0; i<x.size(); i++)
             points.push_back(x[i].getCenter());
     else
         for (SetIndex::const_iterator it = indices.begin(); it != indices.end(); ++it)
             points.push_back(x[*it].getCenter());
 
-    if( _drawSize.getValue() == 0) // old classical drawing by points
-        vparams->drawTool()->drawPoints(points, 10, Vec<4,float>(1,0.5,0.5,1));
+    if (_drawSize.getValue() == 0) // old classical drawing by points
+        vparams->drawTool()->drawPoints(points, 10, Vec<4, float>(1, 0.5, 0.5, 1));
     else
-        vparams->drawTool()->drawSpheres(points, (float)_drawSize.getValue(), Vec<4,float>(1.0f,0.35f,0.35f,1.0f));
+        vparams->drawTool()->drawSpheres(points, (float)_drawSize.getValue(), Vec<4, float>(1.0f, 0.35f, 0.35f, 1.0f));
+
+    vparams->drawTool()->restoreLastState();
 }
 
 template <>
 void PartialFixedConstraint<Rigid2fTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
-    const SetIndexArray & indices = f_indices.getValue();
     if (!vparams->displayFlags().getShowBehaviorModels()) return;
-    const VecCoord& x =mstate->read(core::ConstVecCoordId::position())->getValue();
-    glDisable (GL_LIGHTING);
-    glPointSize(10);
-    glColor4f (1,0.5,0.5,1);
-    glBegin (GL_POINTS);
-    if( f_fixAll.getValue()==true )
-        for (unsigned i=0; i<x.size(); i++ )
-            gl::glVertexT(x[i].getCenter());
+
+    const SetIndexArray & indices = f_indices.getValue();
+
+    vparams->drawTool()->saveLastState();
+    std::vector< defaulttype::Vector3 > points;
+
+    const VecCoord& x = mstate->read(core::ConstVecCoordId::position())->getValue();
+    vparams->drawTool()->setLighting(false);
+
+    if (f_fixAll.getValue() == true)
+        for (unsigned i = 0; i<x.size(); i++)
+        {
+            points.push_back(defaulttype::Vector3(x[i].getCenter()[0], x[i].getCenter()[1], 0.0));
+        }
     else
         for (SetIndex::const_iterator it = indices.begin(); it != indices.end(); ++it)
-            gl::glVertexT(x[*it].getCenter());
-    glEnd();
-    glPointSize(1);
-#endif /* SOFA_NO_OPENGL */
+            points.push_back(defaulttype::Vector3(x[*it].getCenter()[0], x[*it].getCenter()[1], 0.0));
+
+    vparams->drawTool()->drawPoints(points, 10, defaulttype::Vec4f(1, 0.5, 0.5, 1));
+
+    vparams->drawTool()->restoreLastState();
 }
 #endif
 

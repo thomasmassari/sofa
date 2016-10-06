@@ -29,7 +29,6 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/helper/system/config.h>
 #include <sofa/helper/rmath.h>
-#include <sofa/helper/system/gl.h>
 #include <assert.h>
 #include <iostream>
 #include <sofa/core/objectmodel/KeypressedEvent.h>
@@ -194,21 +193,22 @@ void VaccumSphereForceField<DataTypes>::handleEvent(sofa::core::objectmodel::Eve
 template<class DataTypes>
 void VaccumSphereForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!active.getValue()) return;
 
     if (!vparams->displayFlags().getShowForceFields()) return;
     if (!bDraw.getValue()) return;
 
+    vparams->drawTool()->saveLastState();
+
     defaulttype::Vec3d center;
     DataTypes::get(center[0], center[1], center[2], sphereCenter.getValue());
     const Real r = sphereRadius.getValue();
 
-	glEnable(GL_LIGHTING);
+    vparams->drawTool()->setLighting(true);
     vparams->drawTool()->drawSphere(center, (float)(r*0.99));
-	glDisable(GL_LIGHTING);
 
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
+
 }
 
 

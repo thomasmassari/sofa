@@ -30,7 +30,6 @@
 #include <SofaBaseTopology/CommonAlgorithms.h>
 #include <SofaBaseTopology/TopologySparseData.inl>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
 #include <vector>
 #include <set>
 
@@ -348,34 +347,37 @@ void TrianglePressureForceField<DataTypes>::selectTrianglesFromString()
 template<class DataTypes>
 void TrianglePressureForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!p_showForces.getValue())
         return;
 
+    vparams->drawTool()->saveLastState();
+
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        vparams->drawTool()->setPolygonMode(0, true);
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
-    glDisable(GL_LIGHTING);
+    vparams->drawTool()->setLighting(false);
 
-    glBegin(GL_TRIANGLES);
-    glColor4f(0,1,0,1);
+    defaulttype::Vec4f color(0,1,0,1);
+
+    std::vector<defaulttype::Vector3> positions;
 
     const sofa::helper::vector <unsigned int>& my_map = trianglePressureMap.getMap2Elements();
 
-    for (unsigned int i=0; i<my_map.size(); ++i)
+
+    for (unsigned int i = 0; i<my_map.size(); ++i)
     {
-        helper::gl::glVertexT(x[_topology->getTriangle(my_map[i])[0]]);
-        helper::gl::glVertexT(x[_topology->getTriangle(my_map[i])[1]]);
-        helper::gl::glVertexT(x[_topology->getTriangle(my_map[i])[2]]);
+        for (unsigned int j = 0; j < 3; j++)
+            positions.push_back(defaulttype::Vector3(x[_topology->getTriangle(my_map[i])[j]][0], x[_topology->getTriangle(my_map[i])[j]][1], x[_topology->getTriangle(my_map[i])[j]][2]));
     }
-    glEnd();
+    vparams->drawTool()->drawTriangles(positions, color);
 
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-#endif /* SOFA_NO_OPENGL */
+        vparams->drawTool()->setPolygonMode(0, false);
+
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace forcefield

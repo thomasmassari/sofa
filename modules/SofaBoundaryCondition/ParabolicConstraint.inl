@@ -27,7 +27,6 @@
 
 #include <SofaBoundaryCondition/ParabolicConstraint.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
 #include <SofaBaseTopology/TopologySubsetData.inl>
 
 namespace sofa
@@ -224,18 +223,25 @@ void ParabolicConstraint<DataTypes>::projectJacobianMatrix(const core::Mechanica
 template <class DataTypes>
 void ParabolicConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowBehaviorModels()) return;
+
+    vparams->drawTool()->saveLastState();
 
     Real dt = (Real) this->getContext()->getDt();
     Real t = m_tEnd.getValue() - m_tBegin.getValue();
     Real nbStep = t/dt;
 
-    glDisable (GL_LIGHTING);
-    glPointSize(5);
-    glColor4f (1,0.5,0.5,1);
+    vparams->drawTool()->setLighting(false);
 
-    glBegin (GL_LINES);
+    glPointSize(5);
+
+    std::vector<defaulttype::Vector3> positions;
+    defaulttype::Vec4f color(1, 0.5, 0.5, 1);
+
+    const Vec3R& p1 = m_P1.getValue();
+    const Vec3R& p2 = m_P2.getValue();
+    const Vec3R& p3 = m_P3.getValue();
+
     for (unsigned int i=0 ; i< nbStep ; i++)
     {
         //draw lines between each step of the parabolic trajectory
@@ -244,26 +250,29 @@ void ParabolicConstraint<DataTypes>::draw(const core::visual::VisualParams* vpar
         Real px = m_locP3.x()*relativeTime;
         Real py = (- m_locP2.y() / (m_locP3.x()*m_locP2.x() - m_locP2.x()*m_locP2.x())) * (px *px) + ( (m_locP3.x()*m_locP2.y()) / (m_locP3.x()*m_locP2.x() - m_locP2.x()*m_locP2.x())) * px;
         Vec3R locPos( px , py, 0.0);
-        Vec3R worldPos = m_P1.getValue() + m_projection.rotate(locPos);
+        Vec3R worldPos = p1 + m_projection.rotate(locPos);
 
-        helper::gl::glVertexT(worldPos);
+        positions.push_back(defaulttype::Vector3(worldPos[0], worldPos[1], worldPos[2]));
 
         relativeTime = (i+1)/nbStep;
         px = m_locP3.x()*relativeTime;
         py = (- m_locP2.y() / (m_locP3.x()*m_locP2.x() - m_locP2.x()*m_locP2.x())) * (px *px) + ( (m_locP3.x()*m_locP2.y()) / (m_locP3.x()*m_locP2.x() - m_locP2.x()*m_locP2.x())) * px;
         locPos = Vec3R( px , py, 0.0);
-        worldPos = m_P1.getValue() + m_projection.rotate(locPos);
-        helper::gl::glVertexT(worldPos);
+        worldPos = p1 + m_projection.rotate(locPos);
+        positions.push_back(defaulttype::Vector3(worldPos[0], worldPos[1], worldPos[2]));
     }
-    glEnd();
+    vparams->drawTool()->drawLines(positions, 1.0, color);
+    positions.clear();
+
 
     //draw points for the 3 control points
-    glBegin(GL_POINTS);
-    helper::gl::glVertexT(m_P1.getValue());
-    helper::gl::glVertexT(m_P2.getValue());
-    helper::gl::glVertexT(m_P3.getValue());
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+    positions.push_back(defaulttype::Vector3(p1[0], p1[1], p1[2]));
+    positions.push_back(defaulttype::Vector3(p2[0], p2[1], p2[2]));
+    positions.push_back(defaulttype::Vector3(p3[0], p3[1], p3[2]));
+    vparams->drawTool()->drawPoints(positions, 5.0, color);
+
+    vparams->drawTool()->restoreLastState();
+
 }
 
 

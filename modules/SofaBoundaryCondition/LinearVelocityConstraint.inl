@@ -28,7 +28,6 @@
 #include <SofaBoundaryCondition/LinearVelocityConstraint.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/core/topology/BaseMeshTopology.h>
-#include <sofa/helper/gl/template.h>
 #include <sofa/defaulttype/RigidTypes.h>
 #include <iostream>
 #include <SofaBaseTopology/TopologySubsetData.inl>
@@ -336,23 +335,32 @@ void LinearVelocityConstraint<TDataTypes>::projectJacobianMatrix(const core::Mec
 template <class TDataTypes>
 void LinearVelocityConstraint<TDataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowBehaviorModels() || m_keyTimes.getValue().size() == 0 ) return;
-    glDisable (GL_LIGHTING);
-    glPointSize(10);
-    glColor4f (1,0.5,0.5,1);
-    glBegin (GL_LINES);
+
+    vparams->drawTool()->saveLastState();
+    vparams->drawTool()->setLighting(false);
+
+    std::vector<defaulttype::Vector3> positions;
+    defaulttype::Vec4f color(1, 0.5, 0.5, 1);
+
     const SetIndexArray & indices = m_indices.getValue();
     for (unsigned int i=0 ; i<m_keyVelocities.getValue().size()-1 ; i++)
     {
+        defaulttype::Vector3 p0, p1;
+
         for (SetIndexArray::const_iterator it = indices.begin(); it != indices.end(); ++it)
         {
-            sofa::helper::gl::glVertexT(x0[*it]+m_keyVelocities.getValue()[i]);
-            sofa::helper::gl::glVertexT(x0[*it]+m_keyVelocities.getValue()[i+1]);
+            p0 = DataTypes::getCPos(x0[*it]) + DataTypes::getDPos(m_keyVelocities.getValue()[i]);
+            p1 = DataTypes::getCPos(x0[*it]) + DataTypes::getDPos(m_keyVelocities.getValue()[i+1]);
+
+            positions.push_back(p0);
+            positions.push_back(p1);
         }
     }
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->drawLines(positions, 1.0, color);
+
+    vparams->drawTool()->restoreLastState();
+
 }
 
 } // namespace constraint
