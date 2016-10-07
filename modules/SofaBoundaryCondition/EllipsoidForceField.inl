@@ -160,8 +160,8 @@ void EllipsoidForceField<DataTypes>::draw(const core::visual::VisualParams* vpar
 	sofa::defaulttype::Vector3 vCenter(cx, cy, cz);
 
     vparams->drawTool()->setLighting(true);
-    defaulttype::Vec4f color(color.getValue()[0], color.getValue()[1], color.getValue()[2], 1.0);
-	vparams->drawTool()->drawEllipsoid(vCenter, radii, color);
+    defaulttype::Vec4f tmpcolor(color.getValue()[0], color.getValue()[1], color.getValue()[2], 1.0);
+	vparams->drawTool()->drawEllipsoid(vCenter, radii, tmpcolor);
 
     vparams->drawTool()->restoreLastState();
 }

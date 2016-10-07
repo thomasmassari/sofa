@@ -29,8 +29,6 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <iostream>
 
-#include <sofa/helper/gl/template.h>
-
 #include <SofaBaseTopology/TopologyData.inl>
 
 #include <sofa/core/topology/TopologyChange.h>
@@ -800,99 +798,106 @@ void QuadularBendingSprings<DataTypes>::updateLameCoefficients()
 template<class DataTypes>
 void QuadularBendingSprings<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowForceFields()) return;
     if (!this->mstate) return;
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        vparams->drawTool()->setPolygonMode(0, true);
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
-    glDisable(GL_LIGHTING);
+    vparams->drawTool()->saveLastState();
+
+    vparams->drawTool()->setLighting(false);
 
     unsigned int nb_to_draw = 0;
 
     const helper::vector<EdgeInformation>& edgeInf = edgeInfo.getValue();
 
-    glBegin(GL_LINES);
+    std::vector<defaulttype::Vec4f> colors;
+    std::vector< defaulttype::Vector3 > positions;
+    defaulttype::Vec4f color;
+
     for(unsigned int i=0; i<edgeInf.size(); ++i)
     {
         if(edgeInf[i].is_activated)
         {
-
 
             bool external=true;
             Real d1 = (x[edgeInf[i].m2]-x[edgeInf[i].m1]).norm();
             if (external)
             {
                 if (d1<edgeInf[i].restlength1*0.9999)
-                    glColor4f(1,0,0,1);
+                    color = defaulttype::Vec4f(1,0,0,1);
                 else
-                    glColor4f(0,1,0,1);
+                    color = defaulttype::Vec4f(0,1,0,1);
             }
             else
             {
                 if (d1<edgeInf[i].restlength1*0.9999)
-                    glColor4f(1,0.5f,0,1);
+                    color = defaulttype::Vec4f(1,0.5f,0,1);
                 else
-                    glColor4f(0,1,0.5f,1);
+                    color = defaulttype::Vec4f(0,1,0.5f,1);
             }
 
 
             nb_to_draw+=1;
+            const DataTypes::CPos& p0 = DataTypes::getCPos((x[edgeInf[i].m1]));
+            const DataTypes::CPos& p1 = DataTypes::getCPos((x[edgeInf[i].m2]));
 
-            //glColor4f(0,1,0,1);
-            helper::gl::glVertexT(x[edgeInf[i].m1]);
-            helper::gl::glVertexT(x[edgeInf[i].m2]);
+            colors.push_back(color);
+            colors.push_back(color);
+            positions.push_back(defaulttype::Vector3(p0[0], p0[1], p0[2]));
+            positions.push_back(defaulttype::Vector3(p1[0], p1[1], p1[2]));
 
             Real d2 = (x[edgeInf[i].m4]-x[edgeInf[i].m3]).norm();
             if (external)
             {
                 if (d2<edgeInf[i].restlength2*0.9999)
-                    glColor4f(1,0,0,1);
+                    color = defaulttype::Vec4f(1,0,0,1);
                 else
-                    glColor4f(0,1,0,1);
+                    color = defaulttype::Vec4f(0,1,0,1);
             }
             else
             {
                 if (d2<edgeInf[i].restlength2*0.9999)
-                    glColor4f(1,0.5f,0,1);
+                    color = defaulttype::Vec4f(1,0.5f,0,1);
                 else
-                    glColor4f(0,1,0.5f,1);
+                    color = defaulttype::Vec4f(0,1,0.5f,1);
             }
 
 
             nb_to_draw+=1;
 
-            //glColor4f(0,1,0,1);
-            helper::gl::glVertexT(x[edgeInf[i].m3]);
-            helper::gl::glVertexT(x[edgeInf[i].m4]);
+            const DataTypes::CPos& p2 = DataTypes::getCPos((x[edgeInf[i].m3]));
+            const DataTypes::CPos& p3 = DataTypes::getCPos((x[edgeInf[i].m4]));
 
+            colors.push_back(color);
+            colors.push_back(color);
+            positions.push_back(defaulttype::Vector3(p2[0], p2[1], p2[2]));
+            positions.push_back(defaulttype::Vector3(p3[0], p3[1], p3[2]));
+            
         }
     }
-    glEnd();
 
+    vparams->drawTool()->drawLines(positions, 1.0, colors);
+    positions.clear();
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-    ////
-
-    glBegin(GL_QUADS);
-    glColor4f(1,0,0,1);
+        vparams->drawTool()->setPolygonMode(0, false);
+    
+    color = defaulttype::Vec4f(1,0,0,1);
     for(int i=0; i<_topology->getNbQuads(); ++i)
     {
-        helper::gl::glVertexT(x[_topology->getQuad(i)[0]]);
-        helper::gl::glVertexT(x[_topology->getQuad(i)[1]]);
-        helper::gl::glVertexT(x[_topology->getQuad(i)[2]]);
-        helper::gl::glVertexT(x[_topology->getQuad(i)[3]]);
+        for (unsigned int j = 0; j < 4;j++)
+        {
+            const DataTypes::CPos& p = DataTypes::getCPos(x[_topology->getQuad(i)[j]]);
+            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
+        }
     }
-    glEnd();
-
-    ////
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->drawQuads(positions, color);
+    
+    vparams->drawTool()->restoreLastState();
 }
 
 

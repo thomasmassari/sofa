@@ -29,9 +29,6 @@
 #include <SofaGeneralDeformable/FrameSpringForceField.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/helper/io/MassSpringLoader.h>
-#include <sofa/helper/gl/template.h>
-#include <sofa/helper/gl/Cylinder.h>
-#include <sofa/helper/gl/Axis.h>
 #include <sofa/helper/system/config.h>
 #include <cassert>
 #include <iostream>
@@ -190,12 +187,17 @@ void FrameSpringForceField<DataTypes>::addDForce(const core::MechanicalParams* /
 template<class DataTypes>
 void FrameSpringForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
+
     if ( ! ( ( this->mstate1 == this->mstate2 ) ?vparams->displayFlags().getShowForceFields() :vparams->displayFlags().getShowInteractionForceFields() ) ) return;
     const VecCoord& p1 =this->mstate1->read(core::ConstVecCoordId::position())->getValue();
     const VecCoord& p2 =this->mstate2->read(core::ConstVecCoordId::position())->getValue();
 
-    glDisable ( GL_LIGHTING );
+    vparams->drawTool()->saveLastState();
+
+    vparams->drawTool()->setLighting(false);
+
+    std::vector<defaulttype::Vec4f> colors;
+    std::vector< defaulttype::Vector3 > positions;
     bool external = ( this->mstate1!=this->mstate2 );
     const helper::vector<Spring>& springs = this->springs.getValue();
 
@@ -203,23 +205,28 @@ void FrameSpringForceField<DataTypes>::draw(const core::visual::VisualParams* vp
     {
         double restLength = (springs[i].vec1.norm() + springs[i].vec2.norm());
         Real d = ( p2[springs[i].m2].getCenter()-p1[springs[i].m1].getCenter()).norm();
+        defaulttype::Vec4f color;
         if ( external )
         {
             if ( d < restLength *0.9999 )
-                glColor4f ( 1,0,0,1 );
+                color = defaulttype::Vec4f( 1,0,0,1 );
             else
-                glColor4f ( 0,1,0,1 );
+                color = defaulttype::Vec4f( 0,1,0,1 );
         }
         else
         {
             if ( d < restLength *0.9999 )
-                glColor4f ( 1,0.5f,0,1 );
+                color = defaulttype::Vec4f( 1,0.5f,0,1 );
             else
-                glColor4f ( 0,1,0.5f,1 );
+                color = defaulttype::Vec4f( 0,1,0.5f,1 );
         }
-        glBegin ( GL_LINES );
-        helper::gl::glVertexT ( p1[springs[i].m1].getCenter() );
-        helper::gl::glVertexT ( p2[springs[i].m2].getCenter() );
+        DataTypes::CPos p0 = DataTypes::getCPos(p1[springs[i].m1]);
+        DataTypes::CPos p1 = DataTypes::getCPos(p2[springs[i].m2]);
+
+        colors.push_back(color);
+        colors.push_back(color);
+        positions.push_back(defaulttype::Vector3(p0[0], p0[1], p0[2]));
+        positions.push_back(defaulttype::Vector3(p1[0], p1[1], p1[2]));
 
         //Debug: display fT: the virtual displacement of the spring( see the model on top of FrameSpringForceField.h
         /*
@@ -227,9 +234,11 @@ void FrameSpringForceField<DataTypes>::draw(const core::visual::VisualParams* vp
         helper::gl::glVertexT ( p1[springs[i].m1].getCenter() + p1[springs[i].m1].getOrientation().rotate ( springs[i].initRot1.rotate ( VecN ( springs[i].initLength/2, 0, 0 ) ) ) );
         helper::gl::glVertexT ( p2[springs[i].m2].getCenter() + p2[springs[i].m2].getOrientation().rotate ( springs[i].initRot2.rotate ( VecN ( -springs[i].initLength/2, 0, 0 ) ) ) );
         //*/
-        glEnd();
     }
-#endif /* SOFA_NO_OPENGL */
+
+    vparams->drawTool()->drawLines(positions, 1.0, colors);
+
+    vparams->drawTool()->restoreLastState();
 }
 
 

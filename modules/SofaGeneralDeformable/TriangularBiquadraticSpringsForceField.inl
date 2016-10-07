@@ -29,7 +29,6 @@
 #include <sofa/core/visual/VisualParams.h>
 #include <fstream> // for reading the file
 #include <iostream> //for debugging
-#include <sofa/helper/gl/template.h>
 #include <SofaBaseTopology/TopologyData.inl>
 #include <SofaBaseTopology/TriangleSetGeometryAlgorithms.h>
 
@@ -526,38 +525,45 @@ void TriangularBiquadraticSpringsForceField<DataTypes>::updateLameCoefficients()
 template<class DataTypes>
 void TriangularBiquadraticSpringsForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowForceFields()) return;
     if (!this->mstate) return;
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        vparams->drawTool()->setPolygonMode(0, true);
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
     int nbTriangles=_topology->getNbTriangles();
 
-    glDisable(GL_LIGHTING);
+    vparams->drawTool()->saveLastState();
 
-    glBegin(GL_TRIANGLES);
+    vparams->drawTool()->setLighting(false);
+
+    std::vector<defaulttype::Vec4f> colors;
+    std::vector< defaulttype::Vector3 > positions;
+    defaulttype::Vec4f color0 = defaulttype::Vec4f(0, 1, 0, 1);
+    defaulttype::Vec4f color1 = defaulttype::Vec4f(0, 0.5, 0.5, 1);
+    defaulttype::Vec4f color2 = defaulttype::Vec4f(0, 0, 1, 1);
+
     for(int i=0; i<nbTriangles; ++i)
     {
         int a = _topology->getTriangle(i)[0];
         int b = _topology->getTriangle(i)[1];
         int c = _topology->getTriangle(i)[2];
 
-        glColor4f(0,1,0,1);
-        helper::gl::glVertexT(x[a]);
-        glColor4f(0,0.5,0.5,1);
-        helper::gl::glVertexT(x[b]);
-        glColor4f(0,0,1,1);
-        helper::gl::glVertexT(x[c]);
+        colors.push_back(color0);
+        colors.push_back(color1);
+        colors.push_back(color2);
+
+        positions.push_back(defaulttype::Vector3(x[a][0], x[a][1], x[a][2]));
+        positions.push_back(defaulttype::Vector3(x[b][0], x[b][1], x[b][2]));
+        positions.push_back(defaulttype::Vector3(x[c][0], x[c][1], x[c][2]));
     }
-    glEnd();
+    std::vector<defaulttype::Vector3> normals;
+    vparams->drawTool()->drawTriangles(positions, normals, colors);
 
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-#endif /* SOFA_NO_OPENGL */ 
+        vparams->drawTool()->setPolygonMode(0, false);
 }
 
 } // namespace forcefield

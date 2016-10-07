@@ -479,39 +479,37 @@ void FastTriangularBendingSprings<DataTypes>::addKToMatrix(sofa::defaulttype::Ba
 template<class DataTypes>
 void FastTriangularBendingSprings<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
+
     unsigned int i;
     if (!vparams->displayFlags().getShowForceFields()) return;
     if (!this->mstate) return;
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
-    //VecCoord& x_rest = this->mstate->read(core::ConstVecCoordId::restPosition())->getValue();
 
-    //int nbTriangles=_topology->getNbTriangles();
+    vparams->drawTool()->saveLastState();
 
-    glPushAttrib(GL_LIGHTING_BIT);
-    glDisable(GL_LIGHTING);
-
-    //unsigned int nb_to_draw = 0;
-
+    vparams->drawTool()->setLighting(false);
+    
     const helper::vector<EdgeSpring>& edgeInf = edgeSprings.getValue();
 
-    glColor4f(0,1,0,1);
-    glBegin(GL_LINES);
+    defaulttype::Vec4f color(0,1,0,1);
+    std::vector< defaulttype::Vector3 > positions;
+
     for(i=0; i<edgeInf.size(); ++i)
     {
+        const Coord& p0 = x[edgeInf[i].vid[EdgeSpring::A]];
+        const Coord& p1 = x[edgeInf[i].vid[EdgeSpring::B]];
+
         if(edgeInf[i].is_activated)
         {
-            //nb_to_draw+=1;
-            helper::gl::glVertexT(x[edgeInf[i].vid[EdgeSpring::A]]);
-            helper::gl::glVertexT(x[edgeInf[i].vid[EdgeSpring::B]]);
-
+            positions.push_back(defaulttype::Vector3(p0[0], p0[1], p0[2]));
+            positions.push_back(defaulttype::Vector3(p1[0], p1[1], p1[2]));
         }
     }
-    glEnd();
-    
-    glPopAttrib();
-#endif /* SOFA_NO_OPENGL */
+
+    vparams->drawTool()->drawLines(positions, 1.0, color);
+
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace forcefield
