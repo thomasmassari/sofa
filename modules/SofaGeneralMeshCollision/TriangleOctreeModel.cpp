@@ -60,32 +60,28 @@ TriangleOctreeModel::TriangleOctreeModel ()
 
 void TriangleOctreeModel::draw (const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     TriangleModel::draw(vparams);
     if (isActive () && vparams->displayFlags().getShowCollisionModels ())
     {
         if (vparams->displayFlags().getShowWireFrame ())
-            glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+            vparams->drawTool()->setPolygonMode(0, true);
 
-        glEnable (GL_LIGHTING);
-        //Enable<GL_BLEND> blending;
-        //glLightModeli(GL  _LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+        vparams->drawTool()->saveLastState();
 
-        glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, getColor4f());
-        static const float emissive[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-        static const float specular[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION, emissive);
-        glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-        glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 20);
+        vparams->drawTool()->setLighting(true);
+        static const defaulttype::Vec4f diffuse(getColor4f()[0], getColor4f()[1], getColor4f()[2], getColor4f()[3]);
+        static const defaulttype::Vec4f emissive( 0.0f, 0.0f, 0.0f, 0.0f );
+        static const defaulttype::Vec4f specular(1.0f, 1.0f, 1.0f, 1.0f );
+        vparams->drawTool()->setMaterial(diffuse, specular, 20, emissive);
+
         if(octreeRoot)
             octreeRoot->draw(vparams);
+        
+        vparams->drawTool()->restoreLastState();
 
-        glColor3f (1.0f, 1.0f, 1.0f);
-        glDisable (GL_LIGHTING);
         if (vparams->displayFlags().getShowWireFrame ())
-            glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+            vparams->drawTool()->setPolygonMode(0, false);
     }
-#endif /* SOFA_NO_OPENGL */
 }
 
 void TriangleOctreeModel::computeBoundingTree(int maxDepth)
