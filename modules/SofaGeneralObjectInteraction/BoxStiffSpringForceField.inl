@@ -31,7 +31,6 @@
 
 #include <SofaGeneralObjectInteraction/BoxStiffSpringForceField.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
 #include <sofa/defaulttype/Vec.h>
 #include <sofa/helper/vector.h>
 #include <map>
@@ -157,7 +156,6 @@ void BoxStiffSpringForceField<DataTypes>::bwdInit()
 template <class DataTypes>
 void BoxStiffSpringForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowInteractionForceFields())
         return;
 
@@ -175,7 +173,8 @@ void BoxStiffSpringForceField<DataTypes>::draw(const core::visual::VisualParams*
     //         gl::glVertexT(x[*it]);
     //     }
     //     glEnd();
-
+    vparams->drawTool()->saveLastState();
+        
     ///draw the constraint box
     const Vec6& b1=box_object1.getValue();
     const Real& Xmin1=b1[0];
@@ -184,6 +183,10 @@ void BoxStiffSpringForceField<DataTypes>::draw(const core::visual::VisualParams*
     const Real& Ymax1=b1[4];
     const Real& Zmin1=b1[2];
     const Real& Zmax1=b1[5];
+    defaulttype::Vector3 min1(Xmin1, Ymin1, Zmin1);
+    defaulttype::Vector3 max1(Xmax1, Ymax1, Zmax1);
+    defaulttype::Vec4f color1(0, 0.5, 0.5, 1);
+    vparams->drawTool()->drawBoundingBox(min1, max1, 1.0, color1);
 
     const Vec6& b2=box_object2.getValue();
     const Real& Xmin2=b2[0];
@@ -191,67 +194,13 @@ void BoxStiffSpringForceField<DataTypes>::draw(const core::visual::VisualParams*
     const Real& Ymin2=b2[1];
     const Real& Ymax2=b2[4];
     const Real& Zmin2=b2[2];
-    const Real& Zmax2=b2[5];
+    const Real& Zmax2=b2[5];    
+    defaulttype::Vector3 min2(Xmin2, Ymin2, Zmin2);
+    defaulttype::Vector3 max2(Xmax2, Ymax2, Zmax2);
+    defaulttype::Vec4f color2(0.5, 0.5, 0, 1);
+    vparams->drawTool()->drawBoundingBox(min2, max2, 1.0, color2);
 
-
-    glBegin(GL_LINES);
-
-
-    glColor4f (0,0.5,0.5,1);
-    glVertex3d(Xmin1,Ymin1,Zmin1);
-    glVertex3d(Xmin1,Ymin1,Zmax1);
-    glVertex3d(Xmin1,Ymin1,Zmin1);
-    glVertex3d(Xmax1,Ymin1,Zmin1);
-    glVertex3d(Xmin1,Ymin1,Zmin1);
-    glVertex3d(Xmin1,Ymax1,Zmin1);
-    glVertex3d(Xmin1,Ymax1,Zmin1);
-    glVertex3d(Xmax1,Ymax1,Zmin1);
-    glVertex3d(Xmin1,Ymax1,Zmin1);
-    glVertex3d(Xmin1,Ymax1,Zmax1);
-    glVertex3d(Xmin1,Ymax1,Zmax1);
-    glVertex3d(Xmin1,Ymin1,Zmax1);
-    glVertex3d(Xmin1,Ymin1,Zmax1);
-    glVertex3d(Xmax1,Ymin1,Zmax1);
-    glVertex3d(Xmax1,Ymin1,Zmax1);
-    glVertex3d(Xmax1,Ymax1,Zmax1);
-    glVertex3d(Xmax1,Ymin1,Zmax1);
-    glVertex3d(Xmax1,Ymin1,Zmin1);
-    glVertex3d(Xmin1,Ymax1,Zmax1);
-    glVertex3d(Xmax1,Ymax1,Zmax1);
-    glVertex3d(Xmax1,Ymax1,Zmin1);
-    glVertex3d(Xmax1,Ymin1,Zmin1);
-    glVertex3d(Xmax1,Ymax1,Zmin1);
-    glVertex3d(Xmax1,Ymax1,Zmax1);
-
-    glColor4f (0.5,0.5,0,1);
-
-    glVertex3d(Xmin2,Ymin2,Zmin2);
-    glVertex3d(Xmin2,Ymin2,Zmax2);
-    glVertex3d(Xmin2,Ymin2,Zmin2);
-    glVertex3d(Xmax2,Ymin2,Zmin2);
-    glVertex3d(Xmin2,Ymin2,Zmin2);
-    glVertex3d(Xmin2,Ymax2,Zmin2);
-    glVertex3d(Xmin2,Ymax2,Zmin2);
-    glVertex3d(Xmax2,Ymax2,Zmin2);
-    glVertex3d(Xmin2,Ymax2,Zmin2);
-    glVertex3d(Xmin2,Ymax2,Zmax2);
-    glVertex3d(Xmin2,Ymax2,Zmax2);
-    glVertex3d(Xmin2,Ymin2,Zmax2);
-    glVertex3d(Xmin2,Ymin2,Zmax2);
-    glVertex3d(Xmax2,Ymin2,Zmax2);
-    glVertex3d(Xmax2,Ymin2,Zmax2);
-    glVertex3d(Xmax2,Ymax2,Zmax2);
-    glVertex3d(Xmax2,Ymin2,Zmax2);
-    glVertex3d(Xmax2,Ymin2,Zmin2);
-    glVertex3d(Xmin2,Ymax2,Zmax2);
-    glVertex3d(Xmax2,Ymax2,Zmax2);
-    glVertex3d(Xmax2,Ymax2,Zmin2);
-    glVertex3d(Xmax2,Ymin2,Zmin2);
-    glVertex3d(Xmax2,Ymax2,Zmin2);
-    glVertex3d(Xmax2,Ymax2,Zmax2);
-
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
 }
 
 

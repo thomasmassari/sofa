@@ -27,7 +27,6 @@
 
 #include <SofaGeneralObjectInteraction/InteractionEllipsoidForceField.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
 #include <sofa/helper/system/config.h>
 #include <sofa/helper/rmath.h>
 #include <assert.h>
@@ -365,7 +364,6 @@ SReal InteractionEllipsoidForceField<DataTypes1, DataTypes2>::getPotentialEnergy
 template<class DataTypes1, class DataTypes2>
 void InteractionEllipsoidForceField<DataTypes1, DataTypes2>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowInteractionForceFields()) return;
     if (!bDraw.getValue()) return;
     Real1 cx2=0, cy2=0, cz2=0;
@@ -373,6 +371,12 @@ void InteractionEllipsoidForceField<DataTypes1, DataTypes2>::draw(const core::vi
     cx2=(Real1)vars.pos6D.getCenter()[0];
     cy2=(Real1)vars.pos6D.getCenter()[1];
     cz2=(Real1)vars.pos6D.getCenter()[2];
+
+    vparams->drawTool()->saveLastState();
+
+    defaulttype::Vec4f color1(color.getValue()[0], color.getValue()[1], color.getValue()[2], 1.0);
+    defaulttype::Vec4f color2(1, 0.5f, 0.5f, 1);
+    std::vector<defaulttype::Vector3> positions;
 
     for (unsigned int e=0; e<vars.nelems; ++e)
     {
@@ -382,66 +386,47 @@ void InteractionEllipsoidForceField<DataTypes1, DataTypes2>::draw(const core::vi
 
         Real1 rx=1, ry=1, rz=1;
         DataTypes1::get(rx, ry, rz, vars.vr[e]);
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_LIGHTING);
-        glEnable(GL_COLOR_MATERIAL);
-        glColor3f(color.getValue()[0],color.getValue()[1],color.getValue()[2]);
 
+        vparams->drawTool()->setLighting(true);
         sofa::defaulttype::Quat q=vars.pos6D.getOrientation();
-#ifdef SOFA_FLOAT
-        GLfloat R[4][4];
-#elif PS3
-		double R[4][4];
-#else
-        GLdouble R[4][4];
-#endif
 
-        glPushMatrix();
-        //if(!object2_invert.getValue())
+        double R[4][4];
+        float Rf[4][4];
+
+        vparams->drawTool()->pushMatrix();
         {
             sofa::defaulttype::Quat q1=q.inverse();
             q1.buildRotationMatrix(R);
-            helper::gl::glTranslate(cx2, cy2, cz2);
-            helper::gl::glMultMatrix( &(R[0][0]) );
+            vparams->drawTool()->translate(cx2, cy2, cz2);
+            for (unsigned int i = 0; i < 4; i++)
+                for (unsigned int j = 0; j < 4; j++)
+                    Rf[i][j] = R[i][j];
+            vparams->drawTool()->multMatrix(&(Rf[0][0]));
         }
 		sofa::defaulttype::Vector3 center(cx1, cy1, cz1);
 		sofa::defaulttype::Vector3 radii(rx, ry, (stiffness.getValue()>0 ? rz : -rz));
 		
-		vparams->drawTool()->drawEllipsoid(center, radii);
+		vparams->drawTool()->drawEllipsoid(center, radii, color1);
 
-        glTranslated(-cx2, -cy2, -cz2);
+        vparams->drawTool()->translate(-cx2, -cy2, -cz2);
+        vparams->drawTool()->popMatrix();
 
-        glPopMatrix();
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_LIGHTING);
-        glDisable(GL_COLOR_MATERIAL);
-
-        /*if(object2_invert.getValue())
-        {
-            glPushMatrix();
-            q.buildRotationMatrix(R);
-            helper::gl::glMultMatrix( &(R[0][0]) );
-            helper::gl::glTranslate(-cx2, -cy2, -cz2);
-        }*/
+        vparams->drawTool()->setLighting(false);
 
         const sofa::helper::vector<Contact>& contacts = this->contacts.getValue();
         const double fscale = 1000.0f/this->stiffness.getValue();
-        glColor4f (1,0.5f,0.5f,1);
-        glBegin (GL_LINES);
-        for (unsigned int i=0; i<contacts.size(); i++)
+
+        for (unsigned int i = 0; i < contacts.size(); i++)
         {
-            glVertex3d(contacts[i].pos[0],contacts[i].pos[1],contacts[i].pos[2] );
-            glVertex3d(contacts[i].pos[0]+contacts[i].force[0]*fscale,
-                    contacts[i].pos[1]+contacts[i].force[1]*fscale,
-                    contacts[i].pos[2]+contacts[i].force[2]*fscale );
+            positions.push_back(defaulttype::Vector3(contacts[i].pos[0], contacts[i].pos[1], contacts[i].pos[2]));
+            positions.push_back(defaulttype::Vector3(contacts[i].pos[0] + contacts[i].force[0] * fscale,
+                                                     contacts[i].pos[1] + contacts[i].force[1] * fscale,
+                                                     contacts[i].pos[2] + contacts[i].force[2] * fscale));
         }
-        glEnd();
-        /*if(object2_invert.getValue())
-        {
-            glPopMatrix();
-        }*/
+        vparams->drawTool()->drawLines(positions, 1.0, color2);
+
     }
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
 }
 
 

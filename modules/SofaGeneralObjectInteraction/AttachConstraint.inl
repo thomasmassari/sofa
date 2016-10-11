@@ -27,7 +27,6 @@
 
 #include <SofaGeneralObjectInteraction/AttachConstraint.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/gl/template.h>
 #include <sofa/defaulttype/RigidTypes.h>
 #include <iostream>
 #include <SofaBaseTopology/TopologySubsetData.inl>
@@ -789,7 +788,6 @@ void AttachConstraint<DataTypes>::applyConstraint(const core::MechanicalParams *
 template <class DataTypes>
 void AttachConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowBehaviorModels())
         return;
 
@@ -797,27 +795,32 @@ void AttachConstraint<DataTypes>::draw(const core::visual::VisualParams* vparams
     const SetIndexArray & indices2 = f_indices2.getValue();
     const VecCoord& x1 = this->mstate1->read(core::ConstVecCoordId::position())->getValue();
     const VecCoord& x2 = this->mstate2->read(core::ConstVecCoordId::position())->getValue();
-    glDisable (GL_LIGHTING);
-    glPointSize(10);
-    glColor4f (1,0.5,0.5,1);
-    glBegin (GL_POINTS);
+    vparams->drawTool()->saveLastState();
+
+    vparams->drawTool()->setLighting(false);
+    std::vector< defaulttype::Vector3 > positions;
+    defaulttype::Vec4f color(1,0.5,0.5,1);
     for (unsigned int i=0; i<indices1.size() && i<indices2.size(); ++i)
     {
         if (activeFlags.size() > i && !activeFlags[i]) continue;
-        sofa::helper::gl::glVertexT(x2[indices2[i]]);
+        const Coord& p = x2[indices2[i]];
+        positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
     }
-    glEnd();
-    glPointSize(1);
-    glColor4f (1,0.5,0.5,1);
-    glBegin (GL_LINES);
+    vparams->drawTool()->drawPoints(positions, 10.0, color);
+    positions.clear();
+
+    color = defaulttype::Vec4f(1,0.5,0.5,1);
     for (unsigned int i=0; i<indices1.size() && i<indices2.size(); ++i)
     {
         if (activeFlags.size() > i && !activeFlags[i]) continue;
-        sofa::helper::gl::glVertexT(x1[indices1[i]]);
-        sofa::helper::gl::glVertexT(x2[indices2[i]]);
+        const Coord& p0 = x1[indices1[i]];
+        const Coord& p1 = x2[indices2[i]];
+        positions.push_back(defaulttype::Vector3(p0[0], p0[1], p0[2]));
+        positions.push_back(defaulttype::Vector3(p1[0], p1[1], p1[2]));
     }
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->drawLines(positions, 1.0, color);
+
+    vparams->drawTool()->restoreLastState();
 }
 
 } // namespace constraint
