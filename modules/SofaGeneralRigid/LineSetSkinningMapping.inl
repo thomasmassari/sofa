@@ -199,12 +199,14 @@ void LineSetSkinningMapping<TIn, TOut>::reinit()
 template <class TIn, class TOut>
 void LineSetSkinningMapping<TIn, TOut>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowMappings()) return;
-    glDisable (GL_LIGHTING);
-    glLineWidth(1);
 
-    glBegin (GL_LINES);
+    vparams->drawTool()->saveLastState();
+
+    vparams->drawTool()->setLighting(false);
+    
+    std::vector<defaulttype::Vec4f> colors;
+    std::vector<defaulttype::Vector3> positions;
 
     const OutVecCoord& xto = this->toModel->read(core::ConstVecCoordId::position())->getValue();
     const InVecCoord& xfrom = this->fromModel->read(core::ConstVecCoordId::position())->getValue();
@@ -220,16 +222,17 @@ void LineSetSkinningMapping<TIn, TOut>::draw(const core::visual::VisualParams* v
             const sofa::core::topology::BaseMeshTopology::Line& l = t->getLine(linesInfluencedByVertice[verticeIndex][lineInfluencedIndex].lineIndex);
             defaulttype::Vec<3,Real> v = projectToSegment(xfrom[l[0]].getCenter(), xfrom[l[1]].getCenter(), xto[verticeIndex]);
 
-
-            glColor3f ((GLfloat) iline.weight, (GLfloat) 0, (GLfloat) (1.0-iline.weight));
-            helper::gl::glVertexT(xto[verticeIndex]);
-            helper::gl::glVertexT(v);
-
+            defaulttype::Vec4f color(iline.weight, 0.0, (1.0 - iline.weight), 1.0);
+            colors.push_back(color);
+            colors.push_back(color);
+            positions.push_back(defaulttype::Vector3(xto[verticeIndex][0], xto[verticeIndex][1], xto[verticeIndex][2]));
+            positions.push_back(defaulttype::Vector3(v[0], v[1], v[2]));
         }
     }
 
-    glEnd();
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->drawLines(positions, 1.0, colors);
+
+    vparams->drawTool()->restoreLastState();
 }
 
 template <class TIn, class TOut>
