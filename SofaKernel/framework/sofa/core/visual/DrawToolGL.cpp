@@ -710,6 +710,51 @@ void DrawToolGL::drawQuads(const std::vector<Vector3> &points, const Vec4f& colo
     resetMaterial(colour);
 }
 
+void DrawToolGL::drawQuads(const std::vector<Vector3> &points, const std::vector<Vec4f>& colours)
+{
+    this->drawQuads(points, std::vector<defaulttype::Vector3>() , colours);
+}
+
+void DrawToolGL::drawQuads(const std::vector<Vector3> &points, const std::vector<Vector3>& normals, const std::vector<Vec4f>& colours)
+{
+    const std::size_t nbQuads = points.size() / 4;
+    if (nbQuads == 0) return;
+    bool computeNormals = (normals.size() != nbQuads);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
+    setMaterial(colours[0]);
+    glBegin(GL_QUADS);
+    {
+        for (std::size_t i = 0; i<nbQuads; ++i)
+        {
+            if (!computeNormals)
+            {
+                drawQuad(points[4 * i + 0], points[4 * i + 1], points[4 * i + 2], points[4 * i + 3],
+                    normals[i],
+                    colours[4 * i + 0], colours[4 * i + 1], colours[4 * i + 2], colours[4 * i + 3]);
+            }
+            else
+            {
+                Vector3 n;
+
+                const Vector3& a = points[4 * i + 0];
+                const Vector3& b = points[4 * i + 1];
+                const Vector3& c = points[4 * i + 2];
+                n = cross((b - a), (c - a));
+                n.normalize();
+
+                drawQuad(points[4 * i + 0], points[4 * i + 1], points[4 * i + 2], points[4 * i + 3],
+                    n,
+                    colours[4 * i + 0], colours[4 * i + 1], colours[4 * i + 2], colours[4 * i + 3]);
+            }
+
+        }
+    } glEnd();
+    glDisable(GL_COLOR_MATERIAL);
+    resetMaterial(colours[0]);
+
+}
+
 void DrawToolGL::drawTetrahedron(const Vector3 &p0, const Vector3 &p1, const Vector3 &p2, const Vector3 &p3, const Vec4f &colour)
 {
     setMaterial(colour);
