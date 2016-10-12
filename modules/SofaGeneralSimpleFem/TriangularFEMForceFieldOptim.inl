@@ -84,9 +84,7 @@ TriangularFEMForceFieldOptim<DataTypes>::TriangularFEMForceFieldOptim()
     , edgeInfo(initData(&edgeInfo, "edgeInfo", "Internal edge data"))
     , _topology(NULL)
 #ifdef SIMPLEFEM_COLORMAP
-#ifndef SOFA_NO_OPENGL
-	, showStressColorMapReal(sofa::core::objectmodel::New< visualmodel::ColorMap >())
-#endif
+	, m_stressColorMap()
 #endif
     , f_poisson(initData(&f_poisson,(Real)(0.45),"poissonRatio","Poisson ratio in Hooke's law"))
     , f_young(initData(&f_young,(Real)(1000.0),"youngModulus","Young modulus in Hooke's law"))
@@ -259,17 +257,15 @@ void TriangularFEMForceFieldOptim<DataTypes>::reinit()
     vi.resize(nbPoints);
     vertexInfo.endEdit();
 
-#ifdef SIMPLEFEM_COLORMAP
-#ifndef SOFA_NO_OPENGL
-    // TODO: This is deprecated. Use ColorMap as a component.
-     visualmodel::ColorMap* colorMap = NULL;
-    this->getContext()->get(colorMap,sofa::core::objectmodel::BaseContext::Local);
-    if (colorMap)
-        showStressColorMapReal = colorMap;
-    else
-        showStressColorMapReal->initOld(showStressColorMap.getValue());
-#endif
-#endif
+//#ifdef SIMPLEFEM_COLORMAP
+//    // TODO: This is deprecated. Use ColorMap as a component.
+//     visualmodel::ColorMap* colorMap = NULL;
+//    this->getContext()->get(colorMap,sofa::core::objectmodel::BaseContext::Local);
+//    if (colorMap)
+//        showStressColorMapReal = colorMap;
+//    else
+//        showStressColorMapReal->initOld(showStressColorMap.getValue());
+//#endif
 
     data.reinit(this);
 }
@@ -642,7 +638,7 @@ void TriangularFEMForceFieldOptim<DataTypes>::draw(const core::visual::VisualPar
             maxStress = showStressMaxValue.getValue();
         }
 #ifdef SIMPLEFEM_COLORMAP
-        visualmodel::ColorMap::evaluator<Real> evalColor = showStressColorMapReal->getEvaluator(minStress, maxStress);
+        helper::ColorMap::evaluator<Real> evalColor = m_stressColorMap.getEvaluator(minStress, maxStress);
         if (showStressValue)
         {
             for (unsigned int i=0;i<pstresses.size();++i)

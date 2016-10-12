@@ -668,17 +668,28 @@ void HexahedralFEMForceField<DataTypes>::addKToMatrix(const core::MechanicalPara
 template<class DataTypes>
 void HexahedralFEMForceField<DataTypes>::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (!vparams->displayFlags().getShowForceFields()) return;
     if (!this->mstate) return;
     if (!f_drawing.getValue()) return;
 
+    vparams->drawTool()->saveLastState();
+
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        vparams->drawTool()->setPolygonMode(0, true);
 
-    glDisable(GL_LIGHTING);
+    vparams->drawTool()->setLighting(false);
+
+    std::vector<defaulttype::Vector3> positions; 
+    std::vector<defaulttype::Vec4f> colors;
+    defaulttype::Vec4f color[6];
+    color[0] = defaulttype::Vec4f(0.7f, 0.7f, 0.1f, 1.0f);
+    color[1] = defaulttype::Vec4f(0.7f, 0.0f, 0.0f, 1.0f);
+    color[2] = defaulttype::Vec4f(0.0f, 0.7f, 0.0f, 1.0f);
+    color[3] = defaulttype::Vec4f(0.0f, 0.0f, 0.7f, 1.0f);
+    color[4] = defaulttype::Vec4f(0.1f, 0.7f, 0.7f, 1.0f);
+    color[5] = defaulttype::Vec4f(0.7f, 0.1f, 0.7f, 1.0f);
 
     for(int i = 0 ; i<_topology->getNbHexahedra(); ++i)
     {
@@ -693,65 +704,65 @@ void HexahedralFEMForceField<DataTypes>::draw(const core::visual::VisualParams* 
         Index h = t[6];
         Index g = t[7];
 
-        Coord center = (x[a]+x[b]+x[c]+x[d]+x[e]+x[g]+x[f]+x[h])*0.125;
+        defaulttype::Vector3 center = (x[a]+x[b]+x[c]+x[d]+x[e]+x[g]+x[f]+x[h])*0.125;
         Real percentage = (Real) 0.15;
-        Coord p0 = x[a]-(x[a]-center)*percentage;
-        Coord p1 = x[b]-(x[b]-center)*percentage;
-        Coord p2 = x[c]-(x[c]-center)*percentage;
-        Coord p3 = x[d]-(x[d]-center)*percentage;
-        Coord p4 = x[e]-(x[e]-center)*percentage;
-        Coord p5 = x[f]-(x[f]-center)*percentage;
-        Coord p6 = x[g]-(x[g]-center)*percentage;
-        Coord p7 = x[h]-(x[h]-center)*percentage;
+        defaulttype::Vector3 p0 = x[a]-(x[a]-center)*percentage;
+        defaulttype::Vector3 p1 = x[b]-(x[b]-center)*percentage;
+        defaulttype::Vector3 p2 = x[c]-(x[c]-center)*percentage;
+        defaulttype::Vector3 p3 = x[d]-(x[d]-center)*percentage;
+        defaulttype::Vector3 p4 = x[e]-(x[e]-center)*percentage;
+        defaulttype::Vector3 p5 = x[f]-(x[f]-center)*percentage;
+        defaulttype::Vector3 p6 = x[g]-(x[g]-center)*percentage;
+        defaulttype::Vector3 p7 = x[h]-(x[h]-center)*percentage;
 
-        glColor4f(0.7f, 0.7f, 0.1f, (1.0f));
-        glBegin(GL_QUADS);
-        helper::gl::glVertexT(p5);
-        helper::gl::glVertexT(p1);
-        helper::gl::glVertexT(p3);
-        helper::gl::glVertexT(p7);
-        //glEnd();
-        glColor4f(0.7f, 0, 0, (1.0f));
-        //glBegin(GL_POLYGON);
-        helper::gl::glVertexT(p1);
-        helper::gl::glVertexT(p0);
-        helper::gl::glVertexT(p2);
-        helper::gl::glVertexT(p3);
-        //glEnd();
-        glColor4f(0, 0.7f, 0, (1.0f)); // ok
-        //glBegin(GL_POLYGON);
-        helper::gl::glVertexT(p0);
-        helper::gl::glVertexT(p4);
-        helper::gl::glVertexT(p6);
-        helper::gl::glVertexT(p2);
-        //glEnd();
-        glColor4f(0, 0, 0.7f, (1.0f));
-        //glBegin(GL_POLYGON);
-        helper::gl::glVertexT(p4);
-        helper::gl::glVertexT(p5);
-        helper::gl::glVertexT(p7);
-        helper::gl::glVertexT(p6);
-        //glEnd();
-        glColor4f(0.1f, 0.7f, 0.7f, (1.0f)); // ok
-        //glBegin(GL_POLYGON);
-        helper::gl::glVertexT(p7);
-        helper::gl::glVertexT(p3);
-        helper::gl::glVertexT(p2);
-        helper::gl::glVertexT(p6);
-        //glEnd();
-        glColor4f(0.7f, 0.1f, 0.7f, (1.0f));
-        //glBegin(GL_POLYGON);
-        helper::gl::glVertexT(p1);
-        helper::gl::glVertexT(p5);
-        helper::gl::glVertexT(p4);
-        helper::gl::glVertexT(p0);
-        glEnd();
+        //vparams->drawTool()->drawHexahedra(positions, color) but cant use it ...
+        
+        //fill colors
+        for (unsigned int i = 0; i < 6; i++)
+            for (unsigned int j = 0; j < 4;j++)
+            {
+                colors.push_back(color[i]);
+            }
+        //fill positions
+        //TODO: change for indices instead of (copied) positions ?
+        //0
+        positions.push_back(p5);
+        positions.push_back(p1);
+        positions.push_back(p3);
+        positions.push_back(p7);
+        //1
+        positions.push_back(p1);
+        positions.push_back(p0);
+        positions.push_back(p2);
+        positions.push_back(p3);
+        //2
+        positions.push_back(p0);
+        positions.push_back(p4);
+        positions.push_back(p6);
+        positions.push_back(p2);
+        //3
+        positions.push_back(p4);
+        positions.push_back(p5);
+        positions.push_back(p7);
+        positions.push_back(p6);
+        //4
+        positions.push_back(p7);
+        positions.push_back(p3);
+        positions.push_back(p2);
+        positions.push_back(p6);
+        //5
+        positions.push_back(p1);
+        positions.push_back(p5);
+        positions.push_back(p4);
+        positions.push_back(p0);
     }
+    vparams->drawTool()->drawQuads(positions, colors);
 
     if (vparams->displayFlags().getShowWireFrame())
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        vparams->drawTool()->setPolygonMode(0, false);
 
-#endif /* SOFA_NO_OPENGL */
+    vparams->drawTool()->restoreLastState();
+
 }
 
 } // namespace forcefield

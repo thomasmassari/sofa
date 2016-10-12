@@ -40,7 +40,7 @@
 //#define SIMPLEFEM_COLORMAP
 
 #ifdef SIMPLEFEM_COLORMAP
-#include <SofaOpenglVisual/ColorMap.h>
+#include <sofa/helper/ColorMap.h>
 #endif
 
 #include <map>
@@ -311,9 +311,8 @@ public:
     sofa::core::topology::BaseMeshTopology* _topology;
 
 #ifdef SIMPLEFEM_COLORMAP
-#ifndef SOFA_NO_OPENGL
-	visualmodel::ColorMap::SPtr showStressColorMapReal;
-#endif
+    helper::ColorMap m_stressColorMap;
+	//visualmodel::ColorMap::SPtr showStressColorMapReal;
 #endif
 
     template<class MatrixWriter>
