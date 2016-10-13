@@ -399,6 +399,8 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
 
     if ((degree>0) && (container) )
     {
+        vparams->drawTool()->saveLastState();
+
         TetrahedronSetGeometryAlgorithms<DataTypes>::draw(vparams);
         // Draw Tetra
         // reference radius
@@ -591,7 +593,9 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
                 vparams->drawTool()->drawLines(positions, 1.0, colors);
             }
         }
+        vparams->drawTool()->restoreLastState();
     }
+
 
 }
 

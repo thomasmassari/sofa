@@ -384,8 +384,13 @@ void BezierTriangleSetGeometryAlgorithms<DataTypes>::draw(const core::visual::Vi
 {
 
 	
-	if ((degree>0) && (container) ){
+	if ((degree>0) && (container) )
+    {
+
 		TriangleSetGeometryAlgorithms<DataTypes>::draw(vparams);	
+
+        vparams->drawTool()->saveLastState();
+
 		if (drawControlPoints.getValue())
 		{
 			size_t nbPoints=container->getNbPoints();
@@ -567,9 +572,10 @@ void BezierTriangleSetGeometryAlgorithms<DataTypes>::draw(const core::visual::Vi
 			}
 
 		}
+
+        vparams->drawTool()->restoreLastState();
 	}
 	
-
 }
 
 
