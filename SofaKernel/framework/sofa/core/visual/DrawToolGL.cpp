@@ -121,6 +121,8 @@ void DrawToolGL::drawLines(const std::vector<Vector3> &points, float size, const
     glLineWidth(size);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
+
+    if (points.size() != colours.size())
     {
         for (unsigned int i=0; i<points.size()/2; ++i)
         {
@@ -129,7 +131,19 @@ void DrawToolGL::drawLines(const std::vector<Vector3> &points, float size, const
             drawPoint(points[2*i+1], colours[i] );
             resetMaterial(colours[i]);
         }
-    } glEnd();
+    } 
+    else
+    {
+        for (unsigned int i = 0; i<points.size() / 2; ++i)
+        {
+            setMaterial(colours[2 * i]);
+            drawPoint(points[2 * i], colours[2 * i]);
+            setMaterial(colours[2 * i + 1]);
+            drawPoint(points[2 * i + 1], colours[2 * i + 1]);
+            resetMaterial(colours[2 * i + 1]);
+        }
+    }
+    glEnd();
     if (getLightEnabled()) glEnable(GL_LIGHTING);
     glLineWidth(1);
 }
@@ -226,40 +240,51 @@ void DrawToolGL::drawTriangles(const std::vector<Vector3> &points, const std::ve
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void DrawToolGL::drawTriangles(const std::vector<Vector3> &points,
-        const std::vector<Vector3> &normal, const std::vector< Vec<4,float> > &colour)
+        const std::vector<Vector3> &normal, const std::vector< Vec<4,float> > &colours)
 {
     const std::size_t nbTriangles=points.size()/3;
     bool computeNormals= (normal.size() != nbTriangles);
     if (nbTriangles == 0) return;
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
-    setMaterial(colour[0]);
+    setMaterial(colours[0]);
     glBegin(GL_TRIANGLES);
+
+    std::vector<Vector3> tmpNormals;
+    if (computeNormals)
     {
-        for (std::size_t i=0; i<nbTriangles; ++i)
+        for (std::size_t i = 0; i < nbTriangles; ++i)
         {
-            if (!computeNormals)
-            {
-                drawTriangle(points[3*i+0],points[3*i+1],points[3*i+2],normal[i],
-                        colour[3*i+0],colour[3*i+1],colour[3*i+2]);
-            }
-            else
-            {
-                const Vector3& a = points[ 3*i+0 ];
-                const Vector3& b = points[ 3*i+1 ];
-                const Vector3& c = points[ 3*i+2 ];
-                Vector3 n = cross((b-a),(c-a));
-                n.normalize();
-
-                drawPoint(a,n,colour[3*i+0]);
-                drawPoint(b,n,colour[3*i+1]);
-                drawPoint(c,n,colour[3*i+2]);
-
-            }
+            const Vector3& a = points[3 * i + 0];
+            const Vector3& b = points[3 * i + 1];
+            const Vector3& c = points[3 * i + 2];
+            Vector3 n = cross((b - a), (c - a));
+            n.normalize();
+            tmpNormals.push_back(n);
         }
-    } glEnd();
+    }
+
+    const std::vector<Vector3>& vnormals = (!computeNormals) ? normal : tmpNormals;
+    if (points.size() == colours.size())
+    {
+        for (std::size_t i = 0; i < nbTriangles; ++i)
+        {
+            drawTriangle(points[3 * i + 0], points[3 * i + 1], points[3 * i + 2], vnormals[i],
+                colours[3 * i + 0], colours[3 * i + 1], colours[3 * i + 2]);
+        }
+    }
+    else
+    {
+        for (std::size_t i = 0; i < nbTriangles; ++i)
+        {
+            drawTriangle(points[3 * i + 0], points[3 * i + 1], points[3 * i + 2], vnormals[i],
+                colours[i]);
+        }
+    }
+
+    glEnd();
     glDisable(GL_COLOR_MATERIAL);
-    resetMaterial(colour[0]);
+    resetMaterial(colours[0]);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -723,33 +748,43 @@ void DrawToolGL::drawQuads(const std::vector<Vector3> &points, const std::vector
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
     setMaterial(colours[0]);
-    glBegin(GL_QUADS);
+
+    std::vector<Vector3> tmpNormals;
+    if (computeNormals)
     {
-        for (std::size_t i = 0; i<nbQuads; ++i)
+        for (std::size_t i = 0; i < nbQuads; ++i)
         {
-            if (!computeNormals)
-            {
-                drawQuad(points[4 * i + 0], points[4 * i + 1], points[4 * i + 2], points[4 * i + 3],
-                    normals[i],
-                    colours[4 * i + 0], colours[4 * i + 1], colours[4 * i + 2], colours[4 * i + 3]);
-            }
-            else
-            {
-                Vector3 n;
-
-                const Vector3& a = points[4 * i + 0];
-                const Vector3& b = points[4 * i + 1];
-                const Vector3& c = points[4 * i + 2];
-                n = cross((b - a), (c - a));
-                n.normalize();
-
-                drawQuad(points[4 * i + 0], points[4 * i + 1], points[4 * i + 2], points[4 * i + 3],
-                    n,
-                    colours[4 * i + 0], colours[4 * i + 1], colours[4 * i + 2], colours[4 * i + 3]);
-            }
-
+            const Vector3& a = points[4 * i + 0];
+            const Vector3& b = points[4 * i + 1];
+            const Vector3& c = points[4 * i + 2];
+            Vector3 n = cross((b - a), (c - a));
+            n.normalize();
+            tmpNormals.push_back(n);
         }
-    } glEnd();
+    }
+
+    glBegin(GL_QUADS);
+    const std::vector<Vector3>& vnormals = (!computeNormals) ? normals : tmpNormals;
+    if (points.size() == colours.size())
+    {
+        for (std::size_t i = 0; i < nbQuads; ++i)
+        {
+            drawQuad(points[4 * i + 0], points[4 * i + 1], points[4 * i + 2], points[4 * i + 3],
+                normals[i],
+                colours[4 * i + 0], colours[4 * i + 1], colours[4 * i + 2], colours[4 * i + 3]);
+        }
+    }
+    else
+    {
+        for (std::size_t i = 0; i < nbQuads; ++i)
+        {
+            drawQuad(points[4 * i + 0], points[4 * i + 1], points[4 * i + 2], points[4 * i + 3],
+                normals[i],
+                colours[i]);
+        }
+    }
+    glEnd();
+
     glDisable(GL_COLOR_MATERIAL);
     resetMaterial(colours[0]);
 

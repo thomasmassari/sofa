@@ -70,6 +70,7 @@ public:
     virtual void drawPoints(const std::vector<Vector3> &points, float size, const std::vector<Vec4f>& colour) = 0;
 
     virtual void drawLines(const std::vector<Vector3> &points, float size, const Vec4f& colour) = 0 ;
+    //Notice: if colours.size == points.size(), then the color is for each vertex ; otherwise it is assumed that the color is for each line
     virtual void drawLines(const std::vector<Vector3> &points, float size, const std::vector<Vec4f>& colours) = 0 ;
     virtual void drawLines(const std::vector<Vector3> &points, const std::vector< Vec2i > &index , float size, const Vec4f& colour) = 0 ;
 
@@ -81,6 +82,7 @@ public:
             const std::vector< Vec3i > &index,
             const std::vector<Vector3>  &normal,
             const Vec4f& colour) = 0 ;
+    //Notice: if colours.size == points.size(), then the color is for each vertex ; otherwise it is assumed that the color is for each triangle
     virtual void drawTriangles(const std::vector<Vector3> &points,
             const std::vector<Vector3>  &normal,
             const std::vector< Vec4f > &colour) = 0 ;
@@ -145,6 +147,7 @@ public:
             const Vec4f &c1, const Vec4f &c2, const Vec4f &c3, const Vec4f &c4) = 0 ;
     virtual void drawQuads(const std::vector<Vector3> &points, const Vec4f& colour) = 0 ;
     virtual void drawQuads(const std::vector<Vector3> &points, const std::vector<Vec4f>& colours) = 0;
+    //Notice: if colours.size == points.size(), then the color is for each vertex ; otherwise it is assumed that the color is for each quad
     virtual void drawQuads(const std::vector<Vector3> &points, const std::vector<Vector3>& normals, const std::vector<Vec4f>& colours) = 0;
 
     virtual void drawTetrahedron(const Vector3 &p0, const Vector3 &p1, const Vector3 &p2, const Vector3 &p3, const Vec4f &colour) = 0 ;
