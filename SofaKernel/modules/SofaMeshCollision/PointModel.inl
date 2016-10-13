@@ -143,7 +143,7 @@ void TPointModel<DataTypes>::draw(const core::visual::VisualParams* vparams)
     if (vparams->displayFlags().getShowCollisionModels())
     {
         if (vparams->displayFlags().getShowWireFrame())
-            vparams->drawTool()->setPolygonMode(0,true);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,true);
 
         // Check topological modifications
         const int npoints = mstate->getSize();
@@ -188,7 +188,7 @@ void TPointModel<DataTypes>::draw(const core::visual::VisualParams* vparams)
         }
 
         if (vparams->displayFlags().getShowWireFrame())
-            vparams->drawTool()->setPolygonMode(0,false);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
     }
 
     if (getPrevious()!=NULL && vparams->displayFlags().getShowBoundingCollisionModels())

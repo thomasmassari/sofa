@@ -507,9 +507,9 @@ void SphereROI<DataTypes>::draw(const core::visual::VisualParams* vparams)
         std::copy(r.begin(), r.end(), tmpr.begin());
         std::copy(c.begin(), c.end(), tmpc.begin());
 
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
         vparams->drawTool()->drawSpheres(tmpc, tmpr, defaulttype::Vec4f(0.0, 1.0, 1.0, 1.0));
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
        
     }
 

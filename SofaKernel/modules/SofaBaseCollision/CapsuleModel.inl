@@ -162,7 +162,7 @@ void TCapsuleModel<DataTypes>::draw(const core::visual::VisualParams* vparams)
     if (vparams->displayFlags().getShowCollisionModels())
     {
         sofa::defaulttype::Vec<4,float> col4f(getColor4f());
-        vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());//maybe ??
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,vparams->displayFlags().getShowWireFrame());//maybe ??
         vparams->drawTool()->setLighting(true); //Enable lightning
 
         // Check topological modifications
@@ -178,7 +178,7 @@ void TCapsuleModel<DataTypes>::draw(const core::visual::VisualParams* vparams)
     if (getPrevious()!=NULL && vparams->displayFlags().getShowBoundingCollisionModels())
         getPrevious()->draw(vparams);
 
-    vparams->drawTool()->setPolygonMode(0,false);
+    vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
 }
 
 

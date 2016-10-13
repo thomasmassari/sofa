@@ -168,6 +168,11 @@ public:
     virtual void setDepthTest(bool activated);
     virtual void setLighting(bool _isEnabled);
 
+    virtual void setPolygonMode(FaceType _mode, bool _wireframe);
+
+    virtual void setPolygonOffset(PolygonMode mode, float factor, float units);
+    virtual void unsetPolygonOffset(PolygonMode mode);
+
     virtual void saveLastState();
     virtual void restoreLastState();
 
@@ -184,7 +189,6 @@ public:
 
     bool getLightEnabled() {return mLightEnabled;}
 
-    virtual void setPolygonMode(int _mode, bool _wireframe);
 
     int getPolygonMode() {return mPolygonMode;}
     bool getWireFrameEnabled() {return mWireFrameEnabled;}

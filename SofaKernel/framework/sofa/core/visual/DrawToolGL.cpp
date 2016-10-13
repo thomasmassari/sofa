@@ -310,12 +310,12 @@ void DrawToolGL::drawTriangleFan(const std::vector<Vector3> &points,
 
 void DrawToolGL::drawFrame(const Vector3& position, const Quaternion &orientation, const Vec<3,float> &size)
 {
-    setPolygonMode(0,false);
+    setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
     helper::gl::Axis::draw(position, orientation, size);
 }
 void DrawToolGL::drawFrame(const Vector3& position, const Quaternion &orientation, const Vec<3,float> &size, const Vec4f &colour)
 {
-    setPolygonMode(0,false);
+    setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
     helper::gl::Axis::draw(position, orientation, size, colour, colour, colour);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -975,25 +975,28 @@ void DrawToolGL::drawBoundingBox( const Vector3 &min, const Vector3 &max, const 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void DrawToolGL::setPolygonMode(int _mode, bool _wireframe)
+void DrawToolGL::setPolygonMode(FaceType faceType, bool _wireframe)
 {
-    mPolygonMode=_mode;
+    mPolygonMode= faceType;
     mWireFrameEnabled=_wireframe;
-    if (!mPolygonMode)
+
+    switch (faceType)
     {
-        if (mWireFrameEnabled) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        else                  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        case FACE_FRONT:
+            if (mWireFrameEnabled) glPolygonMode(GL_FRONT, GL_LINE);
+            else                  glPolygonMode(GL_FRONT, GL_FILL);
+            break;
+        case FACE_BACK:
+            if (mWireFrameEnabled) glPolygonMode(GL_BACK, GL_LINE);
+            else                  glPolygonMode(GL_BACK, GL_FILL);
+            break;
+        case FACE_FRONT_AND_BACK:
+        default:
+            if (mWireFrameEnabled) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            else                  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            break;
     }
-    else if (mPolygonMode == 1)
-    {
-        if (mWireFrameEnabled) glPolygonMode(GL_FRONT, GL_LINE);
-        else                  glPolygonMode(GL_FRONT, GL_FILL);
-    }
-    else if (mPolygonMode == 2)
-    {
-        if (mWireFrameEnabled) glPolygonMode(GL_BACK, GL_LINE);
-        else                  glPolygonMode(GL_BACK, GL_FILL);
-    }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1176,6 +1179,42 @@ void DrawToolGL::saveLastState()
 void DrawToolGL::restoreLastState()
 {
     glPopAttrib();
+}
+
+void DrawToolGL::setPolygonOffset(PolygonMode mode, float factor, float units)
+{
+    switch (mode)
+    {
+        case POLYGON_MODE_LINE:
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            break;
+        case POLYGON_MODE_POINT:
+            glEnable(GL_POLYGON_OFFSET_POINT);
+            break;
+        case POLYGON_MODE_FILL:
+        default:
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            break;
+    }
+
+    glPolygonOffset(factor, units);
+}
+
+void DrawToolGL::unsetPolygonOffset(PolygonMode mode)
+{
+    switch (mode)
+    {
+        case POLYGON_MODE_LINE:
+            glDisable(GL_POLYGON_OFFSET_LINE);
+            break;
+        case POLYGON_MODE_POINT:
+            glDisable(GL_POLYGON_OFFSET_POINT);
+            break;
+        case POLYGON_MODE_FILL:
+        default:
+            glDisable(GL_POLYGON_OFFSET_FILL);
+            break;
+    }
 }
 
 void DrawToolGL::readPixels(int x, int y, int w, int h, float* rgb, float* z)

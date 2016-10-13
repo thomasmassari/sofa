@@ -452,7 +452,7 @@ void TriangularQuadraticSpringsForceField<DataTypes>::draw(const core::visual::V
     if (!this->mstate) return;
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
     int nbTriangles=_topology->getNbTriangles();
@@ -486,7 +486,7 @@ void TriangularQuadraticSpringsForceField<DataTypes>::draw(const core::visual::V
 
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
     vparams->drawTool()->restoreLastState();
 }

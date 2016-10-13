@@ -879,7 +879,7 @@ void HexahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual::Visual
     if (d_drawHexahedra.getValue())
     {
         if (vparams->displayFlags().getShowWireFrame())
-            vparams->drawTool()->setPolygonMode(0, true);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
         const sofa::helper::vector<Hexahedron> &hexaArray = this->m_topology->getHexahedra();
 
@@ -910,7 +910,7 @@ void HexahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual::Visual
             vparams->drawTool()->drawScaledHexahedra(hexaCoords, color4, scale);
 
         if (vparams->displayFlags().getShowWireFrame())
-            vparams->drawTool()->setPolygonMode(0, false);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
            
     }
 }

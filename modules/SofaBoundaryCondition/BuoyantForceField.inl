@@ -394,7 +394,7 @@ void BuoyantForceField<DataTypes>::draw(const core::visual::VisualParams* vparam
     vparams->drawTool()->setLighting(false);
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
     
     std::vector<defaulttype::Vector3> positions;
     defaulttype::Vec4f color(1.0, 1.0, 1.0, 1.0);
@@ -587,7 +587,7 @@ void BuoyantForceField<DataTypes>::draw(const core::visual::VisualParams* vparam
         }
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
     vparams->drawTool()->restoreLastState();
 

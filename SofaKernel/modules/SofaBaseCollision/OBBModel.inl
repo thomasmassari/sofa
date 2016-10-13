@@ -199,7 +199,7 @@ template<class DataTypes>
 void TOBBModel<DataTypes>::draw(const core::visual::VisualParams* vparams){
     if (vparams->displayFlags().getShowCollisionModels())
     {
-        vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,vparams->displayFlags().getShowWireFrame());
 
         const int npoints = _mstate->getSize();
         vparams->drawTool()->setLighting(true); //Enable lightning
@@ -211,7 +211,7 @@ void TOBBModel<DataTypes>::draw(const core::visual::VisualParams* vparams){
     if (getPrevious()!=NULL && vparams->displayFlags().getShowBoundingCollisionModels())
         getPrevious()->draw(vparams);
 
-    vparams->drawTool()->setPolygonMode(0,false);
+    vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
 }
 
 

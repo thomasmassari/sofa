@@ -71,11 +71,11 @@ void TriangleOctree::draw (const core::visual::VisualParams* vparams)
         center = (defaulttype::Vector3 (x, y, z) + defaulttype::Vector3 (size / 2, size / 2, size / 2));
         vparams->drawTool()->pushMatrix();
         vparams->drawTool()->translate((float)center[0], (float)center[1], (float)center[2]);
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
         vparams->drawTool()->drawCube(size, sofa::defaulttype::Vec4f(0.5, 0.5, 0.5, 1.0));
         vparams->drawTool()->popMatrix();
 
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
     }
     for (int i = 0; i < 8; i++)
     {

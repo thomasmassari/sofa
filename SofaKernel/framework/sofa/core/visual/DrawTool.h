@@ -61,6 +61,9 @@ public:
     DrawTool() { clear(); }
     virtual ~DrawTool() {}
 
+    enum PolygonMode { POLYGON_MODE_FILL,  POLYGON_MODE_LINE,  POLYGON_MODE_POINT };
+    enum FaceType { FACE_FRONT_AND_BACK, FACE_FRONT, FACE_BACK};
+
     /// @name Primitive rendering methods
     /// @{
     virtual void drawPoints(const std::vector<Vector3> &points, float size,  const Vec4f& colour) = 0 ;
@@ -182,7 +185,9 @@ public:
     virtual void resetMaterial(const Vec4f &colour) = 0 ;
     virtual void resetMaterial() = 0 ;
 
-    virtual void setPolygonMode(int _mode, bool _wireframe) = 0 ;
+    virtual void setPolygonMode(FaceType faceType, bool _wireframe) = 0 ;
+    virtual void setPolygonOffset(PolygonMode mode, float factor, float units) = 0;
+    virtual void unsetPolygonOffset(PolygonMode mode) = 0;
     /// @}
 
     /// @name Set rendering options.

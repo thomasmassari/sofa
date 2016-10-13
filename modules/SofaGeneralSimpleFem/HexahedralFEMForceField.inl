@@ -676,7 +676,7 @@ void HexahedralFEMForceField<DataTypes>::draw(const core::visual::VisualParams* 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     vparams->drawTool()->setLighting(false);
 
@@ -758,7 +758,7 @@ void HexahedralFEMForceField<DataTypes>::draw(const core::visual::VisualParams* 
     vparams->drawTool()->drawQuads(positions, colors);
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
     vparams->drawTool()->restoreLastState();
 

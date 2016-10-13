@@ -234,10 +234,10 @@ void PlaneForceField<DataTypes>::drawPlane(const core::visual::VisualParams* vpa
     points.push_back(corners[2]);
     points.push_back(corners[3]);
 
-    vparams->drawTool()->setPolygonMode(2,false); //Cull Front face
+    vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_BACK,false); //Cull Front face
 
     vparams->drawTool()->drawTriangles(points, defaulttype::Vec<4,float>(color.getValue()[0],color.getValue()[1],color.getValue()[2],0.5));
-    vparams->drawTool()->setPolygonMode(0,false); //No Culling
+    vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false); //No Culling
 
     std::vector< defaulttype::Vector3 > pointsLine;
     // lines for points penetrating the plane

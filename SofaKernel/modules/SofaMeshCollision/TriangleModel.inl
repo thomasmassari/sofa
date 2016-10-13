@@ -553,7 +553,7 @@ void TTriangleModel<DataTypes>::draw(const core::visual::VisualParams* vparams ,
 //        helper::gl::glVertexT(t.p3());
 //        glEnd();
 
-    vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());
+    vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,vparams->displayFlags().getShowWireFrame());
     vparams->drawTool()->setLighting(true);
     vparams->drawTool()->drawTriangle( t.p1(), t.p2(), t.p3(), t.n() );
     vparams->drawTool()->setLighting(false);
@@ -570,11 +570,11 @@ void TTriangleModel<DataTypes>::draw(const core::visual::VisualParams* vparams)
         //  updateFromTopology();
 
         if (bothSide.getValue() || vparams->displayFlags().getShowWireFrame())
-            vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,vparams->displayFlags().getShowWireFrame());
         else
         {
-            vparams->drawTool()->setPolygonMode(2,true);
-            vparams->drawTool()->setPolygonMode(1,false);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_BACK,true);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT,false);
         }
 
         std::vector< defaulttype::Vector3 > points;
@@ -595,7 +595,7 @@ void TTriangleModel<DataTypes>::draw(const core::visual::VisualParams* vparams)
         vparams->drawTool()->setLighting(true);
         vparams->drawTool()->drawTriangles(points, indices, normals, defaulttype::Vec<4,float>(getColor4f()));
         vparams->drawTool()->setLighting(false);
-        vparams->drawTool()->setPolygonMode(0,false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
 
 
         if (vparams->displayFlags().getShowNormals())

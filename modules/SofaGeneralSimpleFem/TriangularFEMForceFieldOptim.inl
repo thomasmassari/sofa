@@ -754,11 +754,11 @@ void TriangularFEMForceFieldOptim<DataTypes>::draw(const core::visual::VisualPar
                 */
             }
             if (vparams->displayFlags().getShowWireFrame())
-                vparams->drawTool()->setPolygonMode(0,true);
+                vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,true);
             else
             {
-                vparams->drawTool()->setPolygonMode(2,true);
-                vparams->drawTool()->setPolygonMode(1,false);
+                vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_BACK,true);
+                vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT,false);
             }
 
             vparams->drawTool()->setLighting(true);
@@ -767,7 +767,7 @@ void TriangularFEMForceFieldOptim<DataTypes>::draw(const core::visual::VisualPar
             if (stressValueAlpha < 1.0f)
                 vparams->drawTool()->resetMaterial(Vec4f(1.0f,1.0f,1.0f,stressValueAlpha));
  
-            vparams->drawTool()->setPolygonMode(0,false);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
        }
 #endif
         if (showStressVector && maxStress > 0)

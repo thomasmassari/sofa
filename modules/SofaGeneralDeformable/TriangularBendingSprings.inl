@@ -726,7 +726,7 @@ void TriangularBendingSprings<DataTypes>::draw(const core::visual::VisualParams*
     if (!this->mstate) return;
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
@@ -777,7 +777,7 @@ void TriangularBendingSprings<DataTypes>::draw(const core::visual::VisualParams*
     vparams->drawTool()->drawLines(positions, 1.0, colors);
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
     vparams->drawTool()->restoreLastState();
 }

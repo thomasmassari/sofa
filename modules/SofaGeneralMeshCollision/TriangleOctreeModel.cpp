@@ -64,7 +64,7 @@ void TriangleOctreeModel::draw (const core::visual::VisualParams* vparams)
     if (isActive () && vparams->displayFlags().getShowCollisionModels ())
     {
         if (vparams->displayFlags().getShowWireFrame ())
-            vparams->drawTool()->setPolygonMode(0, true);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
         vparams->drawTool()->saveLastState();
 
@@ -80,7 +80,7 @@ void TriangleOctreeModel::draw (const core::visual::VisualParams* vparams)
         vparams->drawTool()->restoreLastState();
 
         if (vparams->displayFlags().getShowWireFrame ())
-            vparams->drawTool()->setPolygonMode(0, false);
+            vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
     }
 }
 

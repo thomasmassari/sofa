@@ -1461,7 +1461,7 @@ void TopologicalChangeProcessor::draw(const core::visual::VisualParams* vparams)
         return;
 
 //                if (vparams->displayFlags().getShowWireFrame())
-//                      vparams->drawTool()->setPolygonMode(0,true);
+//                      vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,true);
 
     unsigned int nbTriangles = m_topology->getNbTriangles();
 
@@ -1514,7 +1514,7 @@ void TopologicalChangeProcessor::draw(const core::visual::VisualParams* vparams)
                 Vec<4,float>(1.0f,(float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, 1.0f));
     }
 //                if (vparams->displayFlags().getShowWireFrame())
-//                      vparams->drawTool()->setPolygonMode(0,false);
+//                      vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
 }
 
 } // namespace misc

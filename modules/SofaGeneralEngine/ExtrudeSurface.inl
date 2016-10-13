@@ -231,7 +231,7 @@ void ExtrudeSurface<DataTypes>::draw(const core::visual::VisualParams* vparams)
         return;
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     const helper::vector<BaseMeshTopology::Triangle> &extrusionTriangles = f_extrusionTriangles.getValue();
     const VecCoord& extrusionVertices = f_extrusionVertices.getValue();
@@ -282,7 +282,7 @@ void ExtrudeSurface<DataTypes>::draw(const core::visual::VisualParams* vparams)
     vparams->drawTool()->drawTriangles(positions, defaulttype::Vec4f(0.0, 0.0, 1.0, 1.0));
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
     vparams->drawTool()->restoreLastState();
 

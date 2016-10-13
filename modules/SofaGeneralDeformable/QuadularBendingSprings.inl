@@ -802,7 +802,7 @@ void QuadularBendingSprings<DataTypes>::draw(const core::visual::VisualParams* v
     if (!this->mstate) return;
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
@@ -884,7 +884,7 @@ void QuadularBendingSprings<DataTypes>::draw(const core::visual::VisualParams* v
     positions.clear();
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
     
     color = defaulttype::Vec4f(1,0,0,1);
     for(int i=0; i<_topology->getNbQuads(); ++i)

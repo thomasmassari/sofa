@@ -1317,7 +1317,7 @@ void TetrahedralCorotationalFEMForceField<DataTypes>::draw(const core::visual::V
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0,true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,true);
 
 
     std::vector< defaulttype::Vector3 > points[4];
@@ -1362,7 +1362,7 @@ void TetrahedralCorotationalFEMForceField<DataTypes>::draw(const core::visual::V
     vparams->drawTool()->drawTriangles(points[3], drawColor4.getValue());
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0,false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,false);
 }
 
 

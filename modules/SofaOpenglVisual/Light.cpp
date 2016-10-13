@@ -487,12 +487,12 @@ void SpotLight::draw(const core::visual::VisualParams* vparams)
         Vector3 tip = this->getPosition() + direction*zNear;
         std::vector<Vector3> centers;
         centers.push_back(this->getPosition());
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
         vparams->drawTool()->setLighting(false);
         vparams->drawTool()->drawSpheres(centers, zNear*0.1,color4);
         vparams->drawTool()->drawCone(base, tip, baseLength, tipLength, color4);
         vparams->drawTool()->setLighting(true);
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
     }
 }
 

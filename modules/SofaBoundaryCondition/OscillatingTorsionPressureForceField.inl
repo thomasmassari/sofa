@@ -281,7 +281,7 @@ void OscillatingTorsionPressureForceField<DataTypes>::draw(const core::visual::V
     vparams->drawTool()->saveLastState();
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     const VecCoord& x = this->mstate->read(core::ConstVecCoordId::position())->getValue();
 
@@ -302,7 +302,7 @@ void OscillatingTorsionPressureForceField<DataTypes>::draw(const core::visual::V
     vparams->drawTool()->drawTriangles(positions, color);
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
 }
 

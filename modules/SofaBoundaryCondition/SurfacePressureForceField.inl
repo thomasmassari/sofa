@@ -488,7 +488,7 @@ void SurfacePressureForceField<DataTypes>::draw(const core::visual::VisualParams
     vparams->drawTool()->saveLastState();
 
     //if (vparams->displayFlags().getShowWireFrame())
-    //    vparams->drawTool()->setPolygonMode(0, true);
+    //    vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     vparams->drawTool()->setLighting(false);
 
@@ -520,7 +520,7 @@ void SurfacePressureForceField<DataTypes>::draw(const core::visual::VisualParams
     }
 
     //if (vparams->displayFlags().getShowWireFrame())
-    //    vparams->drawTool()->setPolygonMode(0, false);
+    //    vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
     vparams->drawTool()->restoreLastState();
 }

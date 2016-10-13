@@ -125,7 +125,7 @@ void OglLabel::drawVisual(const core::visual::VisualParams* vparams)
     glDepthMask(1);
 
     vparams->drawTool()->setLighting(false);
-	// vparams->drawTool()->setPolygonMode(1,true);
+	// vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT,true);
 
 	// color of the text
     Color color( r, g, b, a);

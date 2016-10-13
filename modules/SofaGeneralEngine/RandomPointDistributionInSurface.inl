@@ -280,7 +280,7 @@ void RandomPointDistributionInSurface<DataTypes>::draw(const core::visual::Visua
     vparams->drawTool()->setLighting(false);
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
 
     const VecCoord& in = f_inPoints.getValue();
     const VecCoord& out = f_outPoints.getValue();
@@ -325,7 +325,7 @@ void RandomPointDistributionInSurface<DataTypes>::draw(const core::visual::Visua
     //trianglesOctree.octreeRoot->draw(vparams);
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0, false);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
 
     vparams->drawTool()->restoreLastState();
 }

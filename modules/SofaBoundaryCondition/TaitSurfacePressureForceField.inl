@@ -423,7 +423,7 @@ void TaitSurfacePressureForceField<DataTypes>::draw(const core::visual::VisualPa
     if (!this->m_topology) return;
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0,vparams->displayFlags().getShowWireFrame());
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,vparams->displayFlags().getShowWireFrame());
 
     helper::ReadAccessor<DataVecCoord> x = this->mstate->read(core::ConstVecCoordId::position());
 
@@ -451,7 +451,7 @@ void TaitSurfacePressureForceField<DataTypes>::draw(const core::visual::VisualPa
     }
 
     if (vparams->displayFlags().getShowWireFrame())
-        vparams->drawTool()->setPolygonMode(0,true);
+        vparams->drawTool()->setPolygonMode(core::visual::DrawTool::FACE_FRONT_AND_BACK,true);
 }
 
 template <class DataTypes>
