@@ -469,10 +469,10 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
                     }
                 }
                 vparams->drawTool()->setLighting(true); //Enable lightning
-                vparams->drawTool()->drawSpheres(pointsVertices, radiusVertices,  defaulttype::Vec<4,float>(1.0f,0,0,1.0f));
-                vparams->drawTool()->drawSpheres(pointsEdges, radiusEdges,  defaulttype::Vec<4,float>(0,1.0f,0,1.0f));
-                vparams->drawTool()->drawSpheres(pointsTriangles, radiusTriangles,  defaulttype::Vec<4,float>(0,0,1.0f,1.0f));
-                vparams->drawTool()->drawSpheres(pointsTetrahedra, radiusTetrahedra,  defaulttype::Vec<4,float>(1,0,1.0f,1.0f));
+                vparams->drawTool()->drawSpheres(pointsVertices, radiusVertices,  defaulttype::Vec4f(1.0f,0,0,1.0f));
+                vparams->drawTool()->drawSpheres(pointsEdges, radiusEdges,  defaulttype::Vec4f(0,1.0f,0,1.0f));
+                vparams->drawTool()->drawSpheres(pointsTriangles, radiusTriangles,  defaulttype::Vec4f(0,0,1.0f,1.0f));
+                vparams->drawTool()->drawSpheres(pointsTetrahedra, radiusTetrahedra,  defaulttype::Vec4f(1,0,1.0f,1.0f));
                 vparams->drawTool()->setLighting(false); //Disable lightning
             }
         }
@@ -504,23 +504,17 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
                     }
                 }
                 vparams->drawTool()->setLighting(true); //Enable lightning
-                vparams->drawTool()->drawSpheres(pointsVertices, radiusVertices,  defaulttype::Vec<4,float>(1.0f,0,0,1.0f));
+                vparams->drawTool()->drawSpheres(pointsVertices, radiusVertices,  defaulttype::Vec4f(1.0f,0,0,1.0f));
                 vparams->drawTool()->setLighting(false); //Disable lightning
-
-#ifndef SOFA_NO_OPENGL
-                glDisable(GL_LIGHTING);
-
-                glColor3f(0.0f, 1.0f, 0.0f);
-                glLineWidth(3.0);
-                 glEnable(GL_DEPTH_TEST);
-                glEnable(GL_POLYGON_OFFSET_LINE);
-                glPolygonOffset(-1.0,100.0);
+                
+                vparams->drawTool()->setDepthTest(true);
+                vparams->drawTool()->setPolygonOffset(sofa::core::visual::DrawTool::POLYGON_MODE_FILL, -1.0, 100.0);
 
                 const unsigned int edgesInTetrahedronArray[6][2] = {{0,1}, {0,2}, {0,3}, {1,2}, {1,3}, {2,3}};
                 const unsigned int oppositeEdgesInTetrahedronArray[6][2] = {{2,3}, {1,3}, {1,2}, {0,3}, {0,2}, {0,1}};
                 // how many points is used to discretize the edge
                 const size_t edgeTesselation=9;
-                sofa::defaulttype::Vec3f p; //,p2;
+
                 for ( i = 0; i<tetraArray.size(); i++)
                 {
 
@@ -528,48 +522,48 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
 //					sofa::helper::vector <sofa::defaulttype::Vec3f> trianCoord;
                     // process each edge of the tetrahedron
                     for (size_t j = 0; j<6; j++) {
+                        std::vector<defaulttype::Vector3> positions;
                         Vec4 baryCoord;
                         baryCoord[oppositeEdgesInTetrahedronArray[j][0]]=0;
                         baryCoord[oppositeEdgesInTetrahedronArray[j][1]]=0;
-                        glBegin(GL_LINE_STRIP);
                         for (size_t k=0;k<=edgeTesselation;++k) {
                             baryCoord[edgesInTetrahedronArray[j][0]]=(Real)k/(Real)edgeTesselation;
                             baryCoord[edgesInTetrahedronArray[j][1]]=(Real)(edgeTesselation-k)/(Real)edgeTesselation;
-                            p=DataTypes::getCPos(computeNodalValue(i,baryCoord));
-                            glVertex3f(p[0],p[1],p[2]);
+                            const DataTypes::CPos& p=DataTypes::getCPos(computeNodalValue(i,baryCoord));
+                            positions.push_back(defaulttype::Vector3(p[0], p[1], p[2]));
                         }
-                        glEnd();
+                        vparams->drawTool()->drawLineStrip(positions, 3.0, defaulttype::Vec4f(0.0f, 1.0f, 0.0f, 1.0));
                     }
                 }
-                glDisable(GL_POLYGON_OFFSET_LINE);
-#endif // SOFA_NO_OPENGL
+                vparams->drawTool()->unsetPolygonOffset(sofa::core::visual::DrawTool::POLYGON_MODE_FILL);
             }
 
         }
 
         if (drawControlPointsEdges.getValue())
         {
-#ifndef SOFA_NO_OPENGL
             const sofa::helper::vector<Tetrahedron> &tetraArray = this->m_topology->getTetrahedra();
             if (!tetraArray.empty())
             {
-                glDisable(GL_LIGHTING);
+                vparams->drawTool()->setLighting(false);
                 const sofa::defaulttype::Vec4f& color =  this->_drawColor.getValue();
-                glColor3f(color[0], color[1], color[2]);
-                glBegin(GL_LINES);
                 const VecCoord& coords =(this->object->read(core::ConstVecCoordId::position())->getValue());
 
                 Vec4 baryCoord;
-                sofa::defaulttype::Vec3f p; //,p2;
+                defaulttype::Vec4f color0(0.0f, 1.0f, 0.0f, 1.0f);
+                defaulttype::Vec4f color1(0.0f, 0.0f, 1.0f, 1.0f);
+                defaulttype::Vec4f color2(1.0f, 0.0f, 1.0f, 1.0f);
+                std::vector<defaulttype::Vector3> positions;
+                std::vector<defaulttype::Vec4f> colors;
                 for (unsigned int i = 0; i<tetraArray.size(); i++)
                 {
 
                     const VecPointID &indexArray=container->getGlobalIndexArrayOfBezierPoints(i);
-                    sofa::helper::vector <sofa::defaulttype::Vec3f> tetraCoord;
+                    sofa::helper::vector <DataTypes::CPos> tetraCoord;
 
                     for (unsigned int j = 0; j<indexArray.size(); j++)
                     {
-                        p = DataTypes::getCPos(coords[indexArray[j]]);
+                        const DataTypes::CPos& p = DataTypes::getCPos(coords[indexArray[j]]);
                         tetraCoord.push_back(p);
                     }
 
@@ -578,21 +572,24 @@ void BezierTetrahedronSetGeometryAlgorithms<DataTypes>::draw(const core::visual:
                     for (; ite!=bezierTetrahedronEdgeSet.end(); ite++)
                     {
                         if ((*ite).second==2) {
-                            glColor3f(0.0f, 1.0f, 0.0f);
+                            colors.push_back(color0);
+                            colors.push_back(color0);
                         } else 	if ((*ite).second==1)  {
-                            glColor3f(0.0f, 0.0f, 1.0f );
+                            colors.push_back(color1);
+                            colors.push_back(color1);
                         } else {
-                            glColor3f(1.0f, 0.0f, 1.0f );
+                            colors.push_back(color2);
+                            colors.push_back(color2);
                         }
-                        glVertex3f(tetraCoord[(*ite).first[0]][0], tetraCoord[(*ite).first[0]][1], tetraCoord[(*ite).first[0]][2]);
-                        glVertex3f(tetraCoord[(*ite).first[1]][0], tetraCoord[(*ite).first[1]][1], tetraCoord[(*ite).first[1]][2]);
 
-
+                        Vector3 p0(tetraCoord[(*ite).first[0]][0], tetraCoord[(*ite).first[0]][1], tetraCoord[(*ite).first[0]][2]);
+                        Vector3 p1(tetraCoord[(*ite).first[1]][0], tetraCoord[(*ite).first[1]][1], tetraCoord[(*ite).first[1]][2]);
+                        positions.push_back(p0);
+                        positions.push_back(p1);
                     }
                 }
-                glEnd();
+                vparams->drawTool()->drawLines(positions, 1.0, colors);
             }
-#endif // SOFA_NO_OPENGL
         }
     }
 
