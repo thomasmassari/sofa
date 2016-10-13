@@ -663,62 +663,67 @@ void RecordedCamera::drawRotation()
     return;
 }
 
-void RecordedCamera::draw(const core::visual::VisualParams* /*vparams*/)
+void RecordedCamera::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     // Draw rotation path
     if(p_drawRotation.getValue())
     {
+        vparams->drawTool()->saveLastState();
+
         if (m_rotationPoints.empty())
             return;
 
-        glDisable(GL_LIGHTING);
-        glColor3f(0,1,0.5);
-
+        vparams->drawTool()->setLighting(false);
+        
+        std::vector<defaulttype::Vector3> positions;
         // Camera positions
-        glBegin(GL_LINES);
         for (unsigned int i=0; i<m_rotationPoints.size()-1; ++i)
         {
-            glVertex3f((float)m_rotationPoints[i  ][0], (float)m_rotationPoints[i  ][1], (float)m_rotationPoints[i  ][2]);
-            glVertex3f((float)m_rotationPoints[i+1][0], (float)m_rotationPoints[i+1][1], (float)m_rotationPoints[i+1][2]);
+            positions.push_back(defaulttype::Vector3(m_rotationPoints[i][0], m_rotationPoints[i][1], m_rotationPoints[i][2]));
+            positions.push_back(defaulttype::Vector3(m_rotationPoints[i+1][0], m_rotationPoints[i+1][1], m_rotationPoints[i+1][2]));
         }
-        glVertex3f((float)m_rotationPoints.back()[0], (float)m_rotationPoints.back()[1], (float)m_rotationPoints.back()[2]);
-        glVertex3f((float)m_rotationPoints[0    ][0], (float)m_rotationPoints[0    ][1], (float)m_rotationPoints[0    ][2]);
-        glEnd();
 
+        positions.push_back(defaulttype::Vector3(m_rotationPoints.back()[0], m_rotationPoints.back()[1], m_rotationPoints.back()[2]));
+        positions.push_back(defaulttype::Vector3(m_rotationPoints[0][0], m_rotationPoints[0][1], m_rotationPoints[0][2]));
+        
         Vec3 _lookAt = m_rotationLookAt.getValue();
         unsigned int dx = 4;
         std::size_t ratio = m_rotationPoints.size()/dx;
-        glBegin(GL_LINES);
+
         for (unsigned int i=0; i<dx; ++i)
         {
-            glVertex3f((float)m_rotationPoints[i*ratio][0], (float)m_rotationPoints[i*ratio][1], (float)m_rotationPoints[i*ratio][2]);
-            glVertex3f((float)_lookAt[0], (float)_lookAt[1], (float)_lookAt[2]);
+            positions.push_back(defaulttype::Vector3(m_rotationPoints[i*ratio][0], m_rotationPoints[i*ratio][1], m_rotationPoints[i*ratio][2]));
+            positions.push_back(defaulttype::Vector3(_lookAt[0], _lookAt[1], _lookAt[2]));
         }
-        glEnd();
+
+        vparams->drawTool()->drawLines(positions, 1.0, defaulttype::Vec4f(0, 1, 0.5, 1.0));
+
+        vparams->drawTool()->restoreLastState();
     }
 
     // Draw translation path
     if(p_drawTranslation.getValue())
     {
+        vparams->drawTool()->saveLastState();
+
         if (m_translationPositions.getValue().size() < 2)
             return;
 
-        glDisable(GL_LIGHTING);
-        glColor3f(0,1,0.5);
+        vparams->drawTool()->setLighting(false);
 
+        std::vector<defaulttype::Vector3> positions;
         // Camera positions
-        glBegin(GL_LINES);
         helper::vector <Vec3> _positions = m_translationPositions.getValue();
         for (unsigned int i=0; i < _positions.size()-1; ++i)
         {
-            glVertex3f((float)_positions[i  ][0], (float)_positions[i  ][1], (float)_positions[i  ][2]);
-            glVertex3f((float)_positions[i+1][0], (float)_positions[i+1][1], (float)_positions[i+1][2]);
+            positions.push_back(defaulttype::Vector3(_positions[i][0], _positions[i][1], _positions[i][2]));
+            positions.push_back(defaulttype::Vector3(_positions[i+1][0], _positions[i+1][1], _positions[i+1][2]));
         }
 
-        glEnd ();
+        vparams->drawTool()->drawLines(positions, 1.0, defaulttype::Vec4f(0, 1, 0.5, 1.0));
+
+        vparams->drawTool()->restoreLastState();
     }
-#endif /* SOFA_NO_OPENGL */
 }
 
 } // namespace visualmodel
