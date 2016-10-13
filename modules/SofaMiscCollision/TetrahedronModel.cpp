@@ -26,13 +26,11 @@
 #include <SofaMiscCollision/TetrahedronModel.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <SofaBaseCollision/CubeModel.h>
-#include <sofa/helper/gl/template.h>
 #include <sofa/simulation/Node.h>
 #include <SofaBaseTopology/RegularGridTopology.h>
 #include <sofa/core/CollisionElement.h>
 #include <sofa/core/ObjectFactory.h>
 #include <vector>
-#include <sofa/helper/system/gl.h>
 #include <iostream>
 #include <SofaMeshCollision/BarycentricContactMapper.inl>
 #include <sofa/helper/Factory.inl>
@@ -97,98 +95,82 @@ void TetrahedronModel::handleTopologyChange()
     resize(_topology->getNbTetrahedra());
 }
 
-void TetrahedronModel::draw(const core::visual::VisualParams* vparams,int index)
-{
-#ifndef SOFA_NO_OPENGL
-    Tetrahedron t(this,index);
-    glBegin(GL_TRIANGLES);
-    Coord p1 = t.p1();
-    Coord p2 = t.p2();
-    Coord p3 = t.p3();
-    Coord p4 = t.p4();
-    Coord c = (p1+p2+p3+p4)*0.25f;
-    p1 += (c-p1)*0.1f;
-    p2 += (c-p2)*0.1f;
-    p3 += (c-p3)*0.1f;
-    p4 += (c-p4)*0.1f;
-    Coord n1,n2,n3,n4;
-    n1 = cross(p3-p1,p2-p1); n1.normalize();
-    helper::gl::glNormalT(n1);
-    helper::gl::glVertexT(p1);
-    helper::gl::glVertexT(p3);
-    helper::gl::glVertexT(p2);
-
-    n2 = cross(p4-p1,p3-p1); n2.normalize();
-    helper::gl::glNormalT(n2);
-    helper::gl::glVertexT(p1);
-    helper::gl::glVertexT(p4);
-    helper::gl::glVertexT(p3);
-
-    n3 = cross(p2-p1,p4-p1); n3.normalize();
-    helper::gl::glNormalT(n3);
-    helper::gl::glVertexT(p1);
-    helper::gl::glVertexT(p2);
-    helper::gl::glVertexT(p4);
-
-    n4 = cross(p3-p2,p4-p2); n4.normalize();
-    helper::gl::glNormalT(n4);
-    helper::gl::glVertexT(p2);
-    helper::gl::glVertexT(p3);
-    helper::gl::glVertexT(p4);
-    glEnd();
-    if (vparams->displayFlags().getShowNormals())
-    {
-        Coord p;
-        glBegin(GL_LINES);
-        p = (p1+p2+p3)*(1.0/3.0);
-        helper::gl::glVertexT(p);
-        helper::gl::glVertexT(p+n1*0.1);
-        p = (p1+p3+p4)*(1.0/3.0);
-        helper::gl::glVertexT(p);
-        helper::gl::glVertexT(p+n2*0.1);
-        p = (p1+p4+p2)*(1.0/3.0);
-        helper::gl::glVertexT(p);
-        helper::gl::glVertexT(p+n3*0.1);
-        p = (p2+p3+p4)*(1.0/3.0);
-        helper::gl::glVertexT(p);
-        helper::gl::glVertexT(p+n4*0.1);
-        glEnd();
-    }
-#endif /* SOFA_NO_OPENGL */
-}
-
 void TetrahedronModel::draw(const core::visual::VisualParams* vparams)
 {
-#ifndef SOFA_NO_OPENGL
     if (mstate && _topology && vparams->displayFlags().getShowCollisionModels())
     {
-        if (vparams->displayFlags().getShowWireFrame())
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        vparams->drawTool()->saveLastState();
 
-        glEnable(GL_LIGHTING);
+        if (vparams->displayFlags().getShowWireFrame())
+            vparams->drawTool()->setPolygonMode(sofa::core::visual::DrawTool::FACE_FRONT_AND_BACK, true);
+
+        vparams->drawTool()->setLighting(true);
         //Enable<GL_BLEND> blending;
         //glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
-        glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, getColor4f());
-        static const float emissive[4] = { 0.0f, 0.0f, 0.0f, 0.0f};
-        static const float specular[4] = { 1.0f, 1.0f, 1.0f, 1.0f};
-        glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION, emissive);
-        glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-        glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 20);
+        defaulttype::Vec4f diffuse(getColor4f()[0], getColor4f()[1], getColor4f()[2], getColor4f()[3]);
+        defaulttype::Vec4f emissive(0.0f, 0.0f, 0.0f, 0.0f);
+        defaulttype::Vec4f specular(1.0f, 1.0f, 1.0f, 1.0f);
+
+        vparams->drawTool()->setMaterial(diffuse, specular, 20.0, emissive);;
+
+        std::vector<defaulttype::Vector3> positionsTetras;
+        std::vector<defaulttype::Vector3> positionsLines;
 
         for (int i=0; i<size; i++)
         {
-            draw(vparams,i);
+            Tetrahedron t(this, i);
+
+            glBegin(GL_TRIANGLES);
+            defaulttype::Vector3 p[4];
+            p[0] = defaulttype::Vector3(t.p1()[0], t.p1()[1], t.p1()[2]);
+            p[1] = defaulttype::Vector3(t.p2()[0], t.p2()[1], t.p2()[2]);
+            p[2] = defaulttype::Vector3(t.p3()[0], t.p3()[1], t.p3()[2]);
+            p[3] = defaulttype::Vector3(t.p4()[0], t.p4()[1], t.p4()[2]);
+
+            defaulttype::Vector3 c = (p[0] + p[1] + p[2] + p[3])*0.25f;
+            for (unsigned int j = 0; j < 4;j++)
+            {
+                p[j] += (c - p[j])*0.1f;
+                positionsTetras.push_back(p[j]);
+            }
+
+            defaulttype::Vector3 n[4];
+            n[0] = cross(p[2] - p[0], p[1] - p[0]); n[0].normalize();
+            n[1] = cross(p[3] - p[0], p[2] - p[0]); n[1].normalize();
+            n[2] = cross(p[1] - p[0], p[3] - p[0]); n[2].normalize();
+            n[3] = cross(p[2] - p[1], p[3] - p[1]); n[3].normalize();
+
+            if (vparams->displayFlags().getShowNormals())
+            {
+                defaulttype::Vector3 pn;
+                pn = (p[0] + p[1] + p[2])*(1.0 / 3.0);
+                positionsLines.push_back(pn);
+                positionsLines.push_back(pn + n[0] * 0.1);
+                pn = (p[0] + p[2] + p[3])*(1.0 / 3.0);
+                positionsLines.push_back(pn);
+                positionsLines.push_back(pn + n[1] * 0.1);
+                pn = (p[0] + p[3] + p[1])*(1.0 / 3.0);
+                positionsLines.push_back(pn);
+                positionsLines.push_back(pn + n[2] * 0.1);
+                pn = (p[1] + p[2] + p[3])*(1.0 / 3.0);
+                positionsLines.push_back(pn);
+                positionsLines.push_back(pn + n[3] * 0.1);
+            }
         }
 
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glDisable(GL_LIGHTING);
+        vparams->drawTool()->drawTetrahedra(positionsTetras, defaulttype::Vec4f(diffuse));
+        vparams->drawTool()->drawLines(positionsLines, 1.0, defaulttype::Vec4f(diffuse));
+
+        vparams->drawTool()->setLighting(false);
         if (vparams->displayFlags().getShowWireFrame())
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            vparams->drawTool()->setPolygonMode(sofa::core::visual::DrawTool::FACE_FRONT_AND_BACK, false);
+
+        vparams->drawTool()->restoreLastState();
+
     }
     if (getPrevious()!=NULL && vparams->displayFlags().getShowBoundingCollisionModels())
         getPrevious()->draw(vparams);
-#endif /* SOFA_NO_OPENGL */
 }
 
 void TetrahedronModel::computeBoundingTree(int maxDepth)
