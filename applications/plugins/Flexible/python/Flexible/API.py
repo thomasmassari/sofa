@@ -547,6 +547,7 @@ class Behavior:
         self.sampler = None
         self.dofs = None
         self.mapping = None
+        self.strainDofs = None
         self.strainMapping = None
         self.relativeStrainMapping = None
         self.forcefield = None
@@ -646,10 +647,18 @@ class Behavior:
             if printLog:
                 Sofa.msg_info("Flexible.API.Behavior",'Exported Gauss Points as a mesh: '+filename)
 
+    def writeStrains(self, filenamePrefix=None, directory=""):
+        if not self.strainDofs is None:
+            filename = self.getFilename(filenamePrefix,directory).replace(".json","_E.json")
+            data = {'type': self.type,'position': SofaPython.Tools.listListToStr(self.strainDofs.position) }
+            with open(filename, 'w') as f:
+                json.dump(data, f)
+                if printLog:
+                    Sofa.msg_info("Flexible.API.Behavior",'Exported Strains in: '+filename)
 
     def addHooke(self, strainMeasure="Corotational", youngModulus=0, poissonRatio=0, viscosity=0, useOffset=False, assemble=True):
         eNode = self.node.createChild("E")
-        eNode.createObject('MechanicalObject',  template="E"+self.type, name="E")
+        self.strainDofs = eNode.createObject('MechanicalObject',  template="E"+self.type, name="E")
         self.strainMapping = eNode.createObject(strainMeasure+'StrainMapping', template="F"+self.type+",E"+self.type, assemble=assemble)
         if useOffset:
             eOffNode = eNode.createChild("offsetE")
