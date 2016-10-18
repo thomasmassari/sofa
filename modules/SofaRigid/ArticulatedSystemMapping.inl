@@ -158,7 +158,13 @@ void ArticulatedSystemMapping<TIn, TInRoot, TOut>::apply( typename Out::VecCoord
         // and at the position compatible with the definition of the articulation center
         // (see initTranslateChild function for details...)
         sofa::defaulttype::Quat quat_child_buf = out[child].getOrientation();
-
+		sofa::defaulttype::Quat quat_parent_buf = out[parent].getOrientation();
+		/*sofa::defaulttype::Quat diff_q = quat_child_buf * quat_parent_buf.inverse();
+		sofa::defaulttype::Vector3 angle = diff_q.toEulerVector();*/
+		
+		/*std::cout << "Parent-> x: " << quat_parent_buf[0] << " y: " << quat_parent_buf[1] << "z: " << quat_parent_buf[2] << " w: " << quat_parent_buf[3] << std::endl;
+		std::cout << "Child-> x: " << quat_child_buf[0] << " y: " << quat_child_buf[1] << "z: " << quat_child_buf[2] << " w: " << quat_child_buf[3] <<"\n" <<std::endl;
+		*/
         // The position of the articulation center can be deduced using the 6D position of the parent:
         // only useful for visualisation of the mapping => NO ! Used in applyJ and applyJT
         (*ac)->globalPosition.setValue(out[parent].getCenter() +
@@ -175,38 +181,43 @@ void ArticulatedSystemMapping<TIn, TInRoot, TOut>::apply( typename Out::VecCoord
         case 0: // 0-(default) articulation are treated one by one, the axis of the second articulation is updated by the potential rotation of the first articulation
             //			   potential problems could arise when rotation exceed 90? (known problem of euler angles)
         {
+			
             // the position of the child is reset to its rest position (based on the postion of the articulation center)
             out[child].getOrientation() = out[parent].getOrientation();
             out[child].getCenter() = out[parent].getCenter() + (*ac)->initTranslateChild(out[parent].getOrientation());
 
             sofa::defaulttype::Vec<3,OutReal> APos;
             APos = (*ac)->globalPosition.getValue();
-            for (; a != aEnd; a++)
-            {
-                sofa::defaulttype::Vec<3,Real> axis = (*a)->axis.getValue();
-                axis.normalize();
-                (*a)->axis.setValue(axis);
+			for (; a != aEnd; a++)
+			{
+				sofa::defaulttype::Vec<3, Real> axis = (*a)->axis.getValue();
+				axis.normalize();
+				(*a)->axis.setValue(axis);
 
-                int ind = (*a)->articulationIndex.getValue();
-                InCoord value = in[ind];
-                axis = out[child].getOrientation().rotate((*a)->axis.getValue());
-                ArticulationAxis[ind] = axis;
+				int ind = (*a)->articulationIndex.getValue();
+				InCoord value = in[ind];
 
-                if ((*a)->rotation.getValue())
-                {
-                    sofa::defaulttype::Quat dq;
-                    dq.axisToQuat(axis, value.x());
-                    out[child].getCenter() += (*ac)->translateChild(dq, out[child].getOrientation());
-                    out[child].getOrientation() += dq;
 
-                }
-                if ((*a)->translation.getValue())
-                {
-                    out[child].getCenter() += axis*value.x();
-                    APos += axis*value.x();
-                }
+				axis = out[child].getOrientation().rotate((*a)->axis.getValue());
+				ArticulationAxis[ind] = axis;
 
-                ArticulationPos[ind]= APos;
+				if ((*a)->rotation.getValue())
+				{
+
+					sofa::defaulttype::Quat dq;
+					dq.axisToQuat(axis, value.x());
+					out[child].getCenter() += (*ac)->translateChild(dq, out[child].getOrientation());
+					out[child].getOrientation() += dq;
+				
+				}
+				if ((*a)->translation.getValue())
+				{
+					out[child].getCenter() += axis*value.x();
+					APos += axis*value.x();
+				}
+
+				ArticulationPos[ind] = APos;	
+			                
             }
             break;
         }
@@ -479,14 +490,16 @@ void ArticulatedSystemMapping<TIn, TInRoot, TOut>::applyJT( typename In::VecDeri
             OutDeriv T;
             getVCenter(T) = getVCenter(fObjects6DBuf[child]);
             getVOrientation(T) = getVOrientation(fObjects6DBuf[child]) + cross(C-A, getVCenter(fObjects6DBuf[child]));
-
+			//guarda qui
             if ((*a)->rotation.getValue())
             {
-                out[ind].x() += (InReal)dot(axis, getVOrientation(T));
+				out[ind].x() += (InReal)dot(axis, getVOrientation(T));
+		
             }
             if ((*a)->translation.getValue())
             {
-                out[ind].x() += (InReal)dot(axis, getVCenter(T));
+				out[ind].x() += (InReal)dot(axis, getVCenter(T));
+				
             }
         }
     }

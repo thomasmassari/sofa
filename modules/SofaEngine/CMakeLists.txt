@@ -16,6 +16,8 @@ set(HEADER_FILES
     ExtrudeQuadsAndGenerateHexas.inl
     ExtrudeSurface.h
     ExtrudeSurface.inl
+    FilterEngine.h
+    FilterEngine.inl
     GenerateCylinder.h
     GenerateCylinder.inl
     GenerateGrid.h
@@ -115,6 +117,7 @@ set(SOURCE_FILES
     ExtrudeEdgesAndGenerateQuads.cpp
     ExtrudeQuadsAndGenerateHexas.cpp
     ExtrudeSurface.cpp
+    FilterEngine.cpp
     GenerateCylinder.cpp
     GenerateGrid.cpp
     GenerateRigidMass.cpp

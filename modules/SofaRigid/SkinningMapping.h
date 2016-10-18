@@ -35,6 +35,9 @@
 #include <sofa/defaulttype/Mat.h>
 #include <SofaEigen2Solver/EigenSparseMatrix.h>
 
+#define SOFA_DEV
+
+
 #ifdef SOFA_DEV
 #include <sofa/helper/DualQuat.h>
 #endif

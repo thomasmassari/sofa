@@ -248,6 +248,14 @@ public:
     *	This is global index to number the articulations
     */
     Data<int> articulationIndex;
+	/**
+	*	this variable defines the minimum possible value
+	*/
+	Data<float> minArticulation;
+	/**
+	*	this variable defines the maximum possible value
+	*/
+	Data<float> maxArticulation;
 
     std::vector<double> motion;
 

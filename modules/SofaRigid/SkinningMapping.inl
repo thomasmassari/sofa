@@ -97,6 +97,11 @@ void SkinningMapping<TIn, TOut>::init()
 
     reinit();
     Inherit::init();
+	//sofa::helper::WriteAccessor<Data<vector<sofa::helper::SVector<unsigned int> > > > index(f_index);
+	//int i = 1603;
+	//std::cout << i << "  " << index[i] << std::endl;
+	//i = 325;
+	//std::cout << i << "  " << index[i] << std::endl;
 }
 
 template <class TIn, class TOut>
@@ -106,7 +111,7 @@ void SkinningMapping<TIn, TOut>::reinit()
 
     sofa::helper::ReadAccessor<Data<OutVecCoord> > out (*this->toModel->read(core::ConstVecCoordId::position()));
     sofa::helper::ReadAccessor<Data<OutVecCoord> > xto (this->f_initPos);
-    sofa::helper::ReadAccessor<Data<InVecCoord> > xfrom = *this->fromModel->read(core::ConstVecCoordId::restPosition());
+    sofa::helper::ReadAccessor<Data<InVecCoord> > xfrom = *this->fromModel->read(core::ConstVecCoordId::position());
     sofa::helper::WriteAccessor<Data<vector<sofa::helper::SVector<InReal> > > > m_weights  ( weight );
     sofa::helper::ReadAccessor<Data<vector<sofa::helper::SVector<unsigned int> > > > index ( this->f_index );
 
@@ -183,7 +188,7 @@ void SkinningMapping<TIn, TOut>::updateWeights ()
     sout << "UPDATE WEIGHTS" << sendl;
 
     sofa::helper::ReadAccessor<Data<OutVecCoord> > xto (this->f_initPos);
-    sofa::helper::ReadAccessor<Data<InVecCoord> > xfrom = *this->fromModel->read(core::ConstVecCoordId::restPosition());
+    sofa::helper::ReadAccessor<Data<InVecCoord> > xfrom = *this->fromModel->read(core::ConstVecCoordId::position());
     sofa::helper::WriteAccessor<Data<vector<sofa::helper::SVector<InReal> > > > m_weights  ( weight );
     sofa::helper::WriteAccessor<Data<vector<sofa::helper::SVector<unsigned int> > > > index ( f_index );
 
@@ -191,9 +196,13 @@ void SkinningMapping<TIn, TOut>::updateWeights ()
     m_weights.resize ( xto.size() );
     unsigned int nbref=nbRef.getValue()[0];
 
+	helper::vector<unsigned int> fromExclude;
+	fromExclude.push_back(0);
+
     // compute 1/d^2 weights with Euclidean distance
     for (unsigned int i=0; i<xto.size(); i++ )
     {
+
         sofa::defaulttype::Vec<3,InReal> cto; Out::get( cto[0],cto[1],cto[2], xto[i] );
 
         // get the nbRef closest primitives
@@ -206,21 +215,24 @@ void SkinningMapping<TIn, TOut>::updateWeights ()
         }
         for (unsigned int j=0; j<xfrom.size(); j++ )
         {
-            sofa::defaulttype::Vec<3,InReal> cfrom; In::get( cfrom[0],cfrom[1],cfrom[2], xfrom[j] );
-            InReal w=(cto-cfrom)*(cto-cfrom);
-            if(w!=0) w=1.0f/w;
-            else w=std::numeric_limits<InReal>::max();
-            unsigned int m=0; while (m!=nbref && m_weights[i][m]>w) m++;
-            if(m!=nbref)
-            {
-                for (unsigned int k=nbref-1; k>m; k--)
-                {
-                    m_weights[i][k]=m_weights[i][k-1];
-                    index[i][k]=index[i][k-1];
-                }
-                m_weights[i][m]=w;
-                index[i][m]=j;
-            }
+			if (j != fromExclude[0])
+			{
+				sofa::defaulttype::Vec<3, InReal> cfrom; In::get(cfrom[0], cfrom[1], cfrom[2], xfrom[j]);
+				InReal w = (cto - cfrom)*(cto - cfrom);
+				if (w != 0) w = 1.0f / w;
+				else w = std::numeric_limits<InReal>::max();
+				unsigned int m = 0; while (m != nbref && m_weights[i][m]>w) m++;
+				if (m != nbref)
+				{
+					for (unsigned int k = nbref - 1; k > m; k--)
+					{
+						m_weights[i][k] = m_weights[i][k - 1];
+						index[i][k] = index[i][k - 1];
+					}
+					m_weights[i][m] = w;
+					index[i][m] = j;
+				}
+			}
         }
 
         // normalization
@@ -299,7 +311,7 @@ void SkinningMapping<TIn, TOut>::apply( const sofa::core::MechanicalParams* mpar
     else
 #endif
     {
-        _J.clear();
+        /*_J.clear();*/
         for ( unsigned int i = 0 ; i < out.size(); i++ )
         {
             out[i] = OutCoord ();
@@ -307,7 +319,7 @@ void SkinningMapping<TIn, TOut>::apply( const sofa::core::MechanicalParams* mpar
             if(nbRef.getValue().size() == m_weights.size())
                 nbref = nbRef.getValue()[i];
 
-            _J.beginBlockRow(i);
+            //_J.beginBlockRow(i);
             for ( unsigned int j=0; j<nbref && m_weights[i][j]>0.; j++ )
             {
                 f_rotatedPos[i][j]=in[index[i][j]].rotate(f_localPos[i][j]);
@@ -321,11 +333,11 @@ void SkinningMapping<TIn, TOut>::apply( const sofa::core::MechanicalParams* mpar
                 matblock[0][3] = (Real) 0                       ;    matblock[1][3] = (Real)-f_rotatedPos[i][j][2]  ;    matblock[2][3] = (Real) f_rotatedPos[i][j][1]  ;
                 matblock[0][4] = (Real) f_rotatedPos[i][j][2]   ;    matblock[1][4] = (Real) 0                      ;    matblock[2][4] = (Real)-f_rotatedPos[i][j][0]  ;
                 matblock[0][5] = (Real)-f_rotatedPos[i][j][1]   ;    matblock[1][5] = (Real) f_rotatedPos[i][j][0]  ;    matblock[2][5] = (Real) 0                      ;
-                _J.createBlock(index[i][j],matblock);
+                //_J.createBlock(index[i][j],matblock);
             }
-            _J.endBlockRow();
+            //_J.endBlockRow();
         }
-         _J.compress();
+         //_J.compress();
     }
     outData.endEdit(mparams);
 }
@@ -408,7 +420,7 @@ void SkinningMapping<TIn, TOut>::applyJT( const sofa::core::MechanicalParams* mp
             {
                 getLinear(out[index[i][j]])  += f_Pt[i][j].transposed() * in[i];
                 getAngular(out[index[i][j]]) += f_Pa[i][j].transposed() * in[i];
-                mask[index[i][j]] = true;
+                mask.insertEntry(index[i][j]);
             }
         }
     }
@@ -537,6 +549,10 @@ void SkinningMapping<TIn, TOut>::draw(const core::visual::VisualParams* vparams)
                 glColor4d ( m_weights[i][m],m_weights[i][m],0,1 );
                 helper::gl::glVertexT ( xfrom[index[i][m]].getCenter() );
                 helper::gl::glVertexT ( xto[i] );
+				if (i == 325)
+				{
+					std::cout << xfrom[index[i][m]].getCenter() << std::endl;
+				}
             }
         }
         glEnd();

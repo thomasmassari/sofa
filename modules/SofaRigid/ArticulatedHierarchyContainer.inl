@@ -44,7 +44,9 @@ Articulation::Articulation():
     axis(initData(&axis, defaulttype::Vector3(1,0,0), "axis", "Set the rotation axis for the articulation")),
     rotation(initData(&rotation, (bool) false, "rotation", "Rotation")),
     translation(initData(&translation, (bool) false, "translation", "Translation")),
-    articulationIndex(initData(&articulationIndex, (int) 0, "articulationIndex", "Articulation index"))
+    articulationIndex(initData(&articulationIndex, (int) 0, "articulationIndex", "Articulation index")),
+	minArticulation(initData(&minArticulation, (float)0.0, "minArticulation", "Minimum value of rotation accepted")),
+	maxArticulation(initData(&maxArticulation, (float)0.0, "maxArticulation", "Maximum value of rotation accepted"))
 {
     this->addAlias(&axis, "rotationAxis");
 }
@@ -122,7 +124,7 @@ void ArticulatedHierarchyContainer::buildCenterArticulationsTree(sofa::helper::i
     sofa::helper::io::bvh::BVHMotion* motion = bvhjoint->getMotion();
 
     sout<<"num Frames found in BVH ="<<motion->frameCount<<sendl;
-
+	
     Articulation::SPtr a;
 
     for (unsigned int j=0; j<channels->channels.size(); j++)
