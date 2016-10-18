@@ -32,41 +32,66 @@
 namespace sofa
 {
 
-namespace helper
-{
+	namespace helper
+	{
 
-//    static boost::hash<StateMask::InternalStorage> s_maskHash;
+#ifdef SOFA_USE_MASK
 
-    void StateMask::resize( size_t size )
-    {
-        mask.resize( size );
-        /*assign( size, true );*/
-    }
+		//    static boost::hash<StateMask::InternalStorage> s_maskHash;
 
-    void StateMask::assign( size_t size, bool value )
-    {
-        mask.assign( size, value );
-    }
+		void StateMask::resize(size_t size)
+		{
+			mask.resize(size);
+			/*assign( size, true );*/
+		}
 
-    void StateMask::activate( bool a )
-    {
-        activated = a;
-    }
+		void StateMask::assign(size_t size, bool value)
+		{
+			mask.assign(size, value);
+		}
 
-    size_t StateMask::nbActiveDofs() const
-    {
-        size_t t = 0;
-        for( size_t i = 0 ; i<size() ; ++i )
-            if( getEntry(i) ) t++;
-        return t;
-    }
+		void StateMask::activate(bool a)
+		{
+			activated = a;
+		}
 
-//    size_t StateMask::getHash() const
-//    {
-//        return s_maskHash(mask);
-//    }
+		size_t StateMask::nbActiveDofs() const
+		{
+			size_t t = 0;
+			for (size_t i = 0; i<size(); ++i)
+				if (getEntry(i)) t++;
+			return t;
+		}
 
+		//    size_t StateMask::getHash() const
+		//    {
+		//        return s_maskHash(mask);
+		//    }
 
-} // namespace helper
+#else
+
+		void StateMask::resize(size_t size)
+		{
+			m_size = size;
+		}
+
+		void StateMask::assign(size_t size, bool /*value*/)
+		{
+			m_size = size;
+		}
+
+		void StateMask::activate(bool a)
+		{
+			activated = a;
+		}
+
+		size_t StateMask::nbActiveDofs() const
+		{
+			return m_size;
+		}
+
+#endif
+
+	} // namespace helper
 
 } // namespace sofa
