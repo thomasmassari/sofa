@@ -86,22 +86,22 @@ void MechanicalStateFilter<DataTypes>::onBeginAnimationStep(const double /*dt*/)
 		helper::WriteAccessor<Data<VecCoord> > xfree = *this->mState->write(core::VecCoordId::freePosition());
 		
 		//std::cout << indices.getValue().size() << std::endl;
+		/*std::cout << "Articulation 3: " << x[3].x() * 180 / M_PI << std::endl;
+		std::cout << "Articulation 4: " << x[4].x() * 180 / M_PI << std::endl;
+		std::cout << "Articulation 5: " << x[5].x() * 180 / M_PI << std::endl;*/
 
 		for(int i = 0; i < indices.getValue().size(); i++)
 		{
-			std::cout << "Articolazione: " << indices.getValue()[i] << " Min: " << range.getValue()[2 * i] << " Max: " << range.getValue()[2 * i +1] << std::endl;
-
 			//Max
 			if ((x[indices.getValue()[i]].x() * 180 / M_PI) < range.getValue()[2 * i + 1])
 				x[indices.getValue()[i]].x() = (range.getValue()[2 * i + 1]) * M_PI / 180;
 
 			//Min
 			if ((x[indices.getValue()[i]].x() * 180 / M_PI) > range.getValue()[2 * i])
-				x[indices.getValue()[i]].x() = range.getValue()[2 * i];
-
-
+				x[indices.getValue()[i]].x() = (range.getValue()[2 * i]) * M_PI / 180;
+	
 		}
-
+		
 
 		
 

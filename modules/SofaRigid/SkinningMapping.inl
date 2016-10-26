@@ -312,12 +312,15 @@ void SkinningMapping<TIn, TOut>::apply( const sofa::core::MechanicalParams* mpar
 #endif
     {
         /*_J.clear();*/
+		const vector<unsigned int> &vecNbRef = nbRef.getValue();
+		unsigned int nbRefSize = vecNbRef.size();
+		unsigned int nbWeights = m_weights.size();
         for ( unsigned int i = 0 ; i < out.size(); i++ )
         {
             out[i] = OutCoord ();
 
-            if(nbRef.getValue().size() == m_weights.size())
-                nbref = nbRef.getValue()[i];
+            if(nbRefSize == nbWeights)
+                nbref = vecNbRef[i];
 
             //_J.beginBlockRow(i);
             for ( unsigned int j=0; j<nbref && m_weights[i][j]>0.; j++ )

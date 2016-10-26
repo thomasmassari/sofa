@@ -197,9 +197,26 @@ void ArticulatedSystemMapping<TIn, TInRoot, TOut>::apply( typename Out::VecCoord
 				int ind = (*a)->articulationIndex.getValue();
 				InCoord value = in[ind];
 
-
 				axis = out[child].getOrientation().rotate((*a)->axis.getValue());
 				ArticulationAxis[ind] = axis;
+
+				if (ind == 32)
+				{
+					/*std::cout << "Axis: " << axis << std::endl;
+					std::cout << "Previous: " << axis_previous << std::endl;
+					std::cout << std::endl;*/
+					//std::cout << "Product: "<< dot(axis, axis_previous) << std::endl;
+					if (dot(axis, axis_previous) < 0.98)
+					{
+						//std::cout << "Axis: " << axis << std::endl;
+						//std::cout << "Previous: " << axis_previous << std::endl;
+
+					}
+						//std::cout << "Too much change" << std::endl;
+
+					axis_previous = axis;
+
+				}
 
 				if ((*a)->rotation.getValue())
 				{

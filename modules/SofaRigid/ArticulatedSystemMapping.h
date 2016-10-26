@@ -99,6 +99,8 @@ public:
     using Inherit::apply;
     using Inherit::applyJ;
     using Inherit::applyJT;
+	sofa::defaulttype::Vec<3, Real> axis_previous;
+
 
     //Apply
     void apply( OutVecCoord& out, const InVecCoord& in, const InRootVecCoord* inroot  );

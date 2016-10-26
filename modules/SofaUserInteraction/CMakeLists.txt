@@ -45,6 +45,7 @@ set(HEADER_FILES
     SuturePointPerformer.h
     SuturePointPerformer.inl
     TopologicalChangeManager.h
+    ZygoteBodyDisplayController.h
     config.h
     initUserInteraction.h
 )
@@ -81,6 +82,7 @@ set(SOURCE_FILES
     StartNavigationPerformer.cpp
     SuturePointPerformer.cpp
     TopologicalChangeManager.cpp
+    ZygoteBodyDisplayController.cpp
     initUserInteraction.cpp
 )
 
