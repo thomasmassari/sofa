@@ -68,7 +68,7 @@ void MechanicalStateFilter<DataTypes>::init()
 {
     using core::behavior::MechanicalState;
     mState = dynamic_cast<MechanicalState<DataTypes> *> (this->getContext()->getMechanicalState());
-	f_listening.setValue(TRUE);
+	f_listening.setValue(true);
     if (!mState)
         serr << "MechanicalStateFilter has no binding MechanicalState" << sendl;
 }

@@ -140,7 +140,7 @@ void SkinningMapping<TIn, TOut>::reinit()
             if(nbRef.getValue().size() == m_weights.size())
                 nbref = nbRef.getValue()[i];
 
-            Vec<3,InReal> cto; Out::get( cto[0],cto[1],cto[2], xto[i] );
+            defaulttype::Vec<3,InReal> cto; Out::get( cto[0],cto[1],cto[2], xto[i] );
             f_T0[i].resize(nbref);
             f_TE[i].resize(nbref);
             f_Pa[i].resize(nbref);

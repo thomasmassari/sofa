@@ -22,86 +22,55 @@
 *                                                                             *
 * Contact information: contact@sofa-framework.org                             *
 ******************************************************************************/
-#ifndef SOFA_COMPONENT_ENGINE_FILTERENGINE_INL
-#define SOFA_COMPONENT_ENGINE_FILTERENGINE_INL
 
-#include <sofa/core/objectmodel/Base.h>
-#include <sofa/simulation/common/AnimateBeginEvent.h>
-#include <SofaEngine/FilterEngine.h>
+
+#include <sofa/core/behavior/BaseController.h>
+#include <SofaOpenglVisual/OglModel.h>
+#include <SofaUserInteraction/Controller.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/helper/rmath.h> //M_PI
+//#include <SofaBaseVisual/VisualModelImpl.h>
+#include <sofa/defaulttype/VecTypes.h>
+#include <sofa/core/ObjectFactory.h>
 
-#include <cassert>
 
 namespace sofa
 {
+namespace simulation { class Node; }
 
 namespace component
 {
 
-namespace engine
+namespace controller
 {
 
-template <class DataTypes>
-FilterEngine<DataTypes>::FilterEngine()
-    : f_inputX ( initData (&f_inputX, "input_position", "input array of 1d points") )
-    , f_outputX( initData (&f_outputX, "output_position", "output array of 1d points") )
+using namespace sofa::defaulttype;
 
+class ZygoteBodyDisplayController : public Controller
 {
-    addInput(&f_inputX);
-    addOutput(&f_outputX);
-	f_listening.setValue(true);
-	setDirtyValue();
-}
 
-template <class DataTypes>
-void FilterEngine<DataTypes>::init()
-{
+public:
+    SOFA_CLASS(ZygoteBodyDisplayController, Controller);
+	Data<double> scale;
+	int visualization_flag;
+    ZygoteBodyDisplayController();
+
+    void init();
+    void bwdInit();
+    void reset();
+    void reinit();
 	
-}
+	void draw(const sofa::core::visual::VisualParams* vparams);
 
-template <class DataTypes>
-void FilterEngine<DataTypes>::reinit()
-{
-    update();
-}
+private:
+    void handleEvent(core::objectmodel::Event *);
+	Data<bool> verbose;
+    SReal transparencyLevel;
+    sofa::component::visualmodel::VisualModelImpl* oglModel;
+    void getTaggedOglModel(std::string tagName);
+};
 
-template <class DataTypes>
-void FilterEngine<DataTypes>::handleEvent(core::objectmodel::Event *event)
-{
-	if (sofa::simulation::AnimateBeginEvent::checkEventType(event))
-		this->update();
-}
-
-
-template <class DataTypes>
-void FilterEngine<DataTypes>::update()
-{
-    //Get input
-    const VecCoord& in = f_inputX.getValue();
-
-    cleanDirty();
-
-    VecCoord& out = *(f_outputX.beginWriteOnly());
-
-    //Set Output
-    out.resize(in.size());
-	//Set the output to the input
-	std::copy(in.begin(), in.end(), out.begin());
-	std::cout << "Passage" << std::endl;
-	//Block articulation
-	if ((in[6].x() * 180 / M_PI) < -45.0)
-		{
-			out[6].x() = -45.0*M_PI / 180;	
-		}
-    f_outputX.endEdit();
-
-}
-
-} // namespace engine
+} // namespace controller
 
 } // namespace component
 
 } // namespace sofa
-
-#endif
