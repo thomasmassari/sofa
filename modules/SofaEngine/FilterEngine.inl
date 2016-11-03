@@ -36,71 +36,71 @@
 namespace sofa
 {
 
-namespace component
-{
+	namespace component
+	{
 
-namespace engine
-{
-
-template <class DataTypes>
-FilterEngine<DataTypes>::FilterEngine()
-    : f_inputX ( initData (&f_inputX, "input_position", "input array of 1d points") )
-    , f_outputX( initData (&f_outputX, "output_position", "output array of 1d points") )
-
-{
-    addInput(&f_inputX);
-    addOutput(&f_outputX);
-	f_listening.setValue(TRUE);
-	setDirtyValue();
-}
-
-template <class DataTypes>
-void FilterEngine<DataTypes>::init()
-{
-	
-}
-
-template <class DataTypes>
-void FilterEngine<DataTypes>::reinit()
-{
-    update();
-}
-
-template <class DataTypes>
-void FilterEngine<DataTypes>::handleEvent(core::objectmodel::Event *event)
-{
-	if (sofa::simulation::AnimateBeginEvent::checkEventType(event))
-		this->update();
-}
-
-
-template <class DataTypes>
-void FilterEngine<DataTypes>::update()
-{
-    //Get input
-    const VecCoord& in = f_inputX.getValue();
-
-    cleanDirty();
-
-    VecCoord& out = *(f_outputX.beginWriteOnly());
-
-    //Set Output
-    out.resize(in.size());
-	//Set the output to the input
-	std::copy(in.begin(), in.end(), out.begin());
-	std::cout << "Passage" << std::endl;
-	//Block articulation
-	if ((in[6].x() * 180 / M_PI) < -45.0)
+		namespace engine
 		{
-			out[6].x() = -45.0*M_PI / 180;	
-		}
-    f_outputX.endEdit();
 
-}
+			template <class DataTypes>
+			FilterEngine<DataTypes>::FilterEngine()
+				: f_inputX(initData(&f_inputX, "input_position", "input array of 1d points"))
+				, f_outputX(initData(&f_outputX, "output_position", "output array of 1d points"))
 
-} // namespace engine
+			{
+				addInput(&f_inputX);
+				addOutput(&f_outputX);
+				f_listening.setValue(true);
+				setDirtyValue();
+			}
 
-} // namespace component
+			template <class DataTypes>
+			void FilterEngine<DataTypes>::init()
+			{
+
+			}
+
+			template <class DataTypes>
+			void FilterEngine<DataTypes>::reinit()
+			{
+				update();
+			}
+
+			template <class DataTypes>
+			void FilterEngine<DataTypes>::handleEvent(core::objectmodel::Event *event)
+			{
+				if (sofa::simulation::AnimateBeginEvent::checkEventType(event))
+					this->update();
+			}
+
+
+			template <class DataTypes>
+			void FilterEngine<DataTypes>::update()
+			{
+				//Get input
+				const VecCoord& in = f_inputX.getValue();
+
+				cleanDirty();
+
+				VecCoord& out = *(f_outputX.beginWriteOnly());
+
+				//Set Output
+				out.resize(in.size());
+				//Set the output to the input
+				std::copy(in.begin(), in.end(), out.begin());
+				std::cout << "Passage" << std::endl;
+				//Block articulation
+				if ((in[6].x() * 180 / M_PI) < -45.0)
+				{
+					out[6].x() = -45.0*M_PI / 180;
+				}
+				f_outputX.endEdit();
+
+			}
+
+		} // namespace engine
+
+	} // namespace component
 
 } // namespace sofa
 

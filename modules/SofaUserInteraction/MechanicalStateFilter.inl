@@ -48,106 +48,106 @@
 namespace sofa
 {
 
-namespace component
-{
-
-namespace controller
-{
-
-template <class DataTypes>
-MechanicalStateFilter<DataTypes>::MechanicalStateFilter()
-    : indices(initData(&indices, "indices", "indices of the constraint articulation"))
-	, range(initData(&range, "range", "range of freedom beetwen a max e min value for each articulation in index"))
-    //, mainDirection( initData(&mainDirection, sofa::defaulttype::Vec<3,Real>((Real)0.0, (Real)0.0, (Real)-1.0), "mainDirection", "Main direction and orientation of the controlled DOF") )
-{
- 
-}
-
-template <class DataTypes>
-void MechanicalStateFilter<DataTypes>::init()
-{
-    using core::behavior::MechanicalState;
-    mState = dynamic_cast<MechanicalState<DataTypes> *> (this->getContext()->getMechanicalState());
-	f_listening.setValue(TRUE);
-    if (!mState)
-        serr << "MechanicalStateFilter has no binding MechanicalState" << sendl;
-}
-
-
-template <class DataTypes>
-void MechanicalStateFilter<DataTypes>::onBeginAnimationStep(const double /*dt*/)
-{
-	using sofa::defaulttype::Vec;
-
-
-	if (mState)
+	namespace component
 	{
-		helper::WriteAccessor<Data<VecCoord> > x = *this->mState->write(core::VecCoordId::position());
-		helper::WriteAccessor<Data<VecCoord> > xfree = *this->mState->write(core::VecCoordId::freePosition());
-		
-		//std::cout << indices.getValue().size() << std::endl;
-		/*std::cout << "Articulation 3: " << x[3].x() * 180 / M_PI << std::endl;
-		std::cout << "Articulation 4: " << x[4].x() * 180 / M_PI << std::endl;
-		std::cout << "Articulation 5: " << x[5].x() * 180 / M_PI << std::endl;*/
 
-		for(int i = 0; i < indices.getValue().size(); i++)
+		namespace controller
 		{
-			//Max
-			if ((x[indices.getValue()[i]].x() * 180 / M_PI) < range.getValue()[2 * i + 1])
-				x[indices.getValue()[i]].x() = (range.getValue()[2 * i + 1]) * M_PI / 180;
 
-			//Min
-			if ((x[indices.getValue()[i]].x() * 180 / M_PI) > range.getValue()[2 * i])
-				x[indices.getValue()[i]].x() = (range.getValue()[2 * i]) * M_PI / 180;
-	
-		}
-		
+			template <class DataTypes>
+			MechanicalStateFilter<DataTypes>::MechanicalStateFilter()
+				: indices(initData(&indices, "indices", "indices of the constraint articulation"))
+				, range(initData(&range, "range", "range of freedom beetwen a max e min value for each articulation in index"))
+				//, mainDirection( initData(&mainDirection, sofa::defaulttype::Vec<3,Real>((Real)0.0, (Real)0.0, (Real)-1.0), "mainDirection", "Main direction and orientation of the controlled DOF") )
+			{
 
-		
+			}
 
-	}
-
-
-	sofa::simulation::Node *node = static_cast<sofa::simulation::Node*> (this->getContext());
-	sofa::simulation::MechanicalPropagatePositionAndVelocityVisitor mechaVisitor(core::MechanicalParams::defaultInstance()); mechaVisitor.execute(node);
-	sofa::simulation::UpdateMappingVisitor updateVisitor(core::ExecParams::defaultInstance()); updateVisitor.execute(node);
-}
-
+			template <class DataTypes>
+			void MechanicalStateFilter<DataTypes>::init()
+			{
+				using core::behavior::MechanicalState;
+				mState = dynamic_cast<MechanicalState<DataTypes> *> (this->getContext()->getMechanicalState());
+				f_listening.setValue(true);
+				if (!mState)
+					serr << "MechanicalStateFilter has no binding MechanicalState" << sendl;
+			}
 
 
-template <class DataTypes>
-core::behavior::MechanicalState<DataTypes> *MechanicalStateFilter<DataTypes>::getMechanicalState() const
-{
-    return mState;
-}
+			template <class DataTypes>
+			void MechanicalStateFilter<DataTypes>::onBeginAnimationStep(const double /*dt*/)
+			{
+				using sofa::defaulttype::Vec;
+
+
+				if (mState)
+				{
+					helper::WriteAccessor<Data<VecCoord> > x = *this->mState->write(core::VecCoordId::position());
+					helper::WriteAccessor<Data<VecCoord> > xfree = *this->mState->write(core::VecCoordId::freePosition());
+
+					//std::cout << indices.getValue().size() << std::endl;
+
+					for (int i = 0; i < indices.getValue().size(); i++)
+					{
+						std::cout << "Articolazione: " << indices.getValue()[i] << " Min: " << range.getValue()[2 * i] << " Max: " << range.getValue()[2 * i + 1] << std::endl;
+
+						//Max
+						if ((x[indices.getValue()[i]].x() * 180 / M_PI) < range.getValue()[2 * i + 1])
+							x[indices.getValue()[i]].x() = (range.getValue()[2 * i + 1]) * M_PI / 180;
+
+						//Min
+						if ((x[indices.getValue()[i]].x() * 180 / M_PI) > range.getValue()[2 * i])
+							x[indices.getValue()[i]].x() = range.getValue()[2 * i];
+
+
+					}
 
 
 
-template <class DataTypes>
-void MechanicalStateFilter<DataTypes>::setMechanicalState(core::behavior::MechanicalState<DataTypes> *_mState)
-{
-    mState = _mState;
-}
+
+				}
+
+
+				sofa::simulation::Node *node = static_cast<sofa::simulation::Node*> (this->getContext());
+				sofa::simulation::MechanicalPropagatePositionAndVelocityVisitor mechaVisitor(core::MechanicalParams::defaultInstance()); mechaVisitor.execute(node);
+				sofa::simulation::UpdateMappingVisitor updateVisitor(core::ExecParams::defaultInstance()); updateVisitor.execute(node);
+			}
 
 
 
-template <class DataTypes>
-unsigned int MechanicalStateFilter<DataTypes>::getIndex() const
-{
-    return index.getValue();
-}
+			template <class DataTypes>
+			core::behavior::MechanicalState<DataTypes> *MechanicalStateFilter<DataTypes>::getMechanicalState() const
+			{
+				return mState;
+			}
 
 
 
-template <class DataTypes>
-void MechanicalStateFilter<DataTypes>::setIndex(const unsigned int _index)
-{
-    index.setValue(_index);
-}
+			template <class DataTypes>
+			void MechanicalStateFilter<DataTypes>::setMechanicalState(core::behavior::MechanicalState<DataTypes> *_mState)
+			{
+				mState = _mState;
+			}
 
-} // namespace controller
 
-} // namespace component
+
+			template <class DataTypes>
+			unsigned int MechanicalStateFilter<DataTypes>::getIndex() const
+			{
+				return index.getValue();
+			}
+
+
+
+			template <class DataTypes>
+			void MechanicalStateFilter<DataTypes>::setIndex(const unsigned int _index)
+			{
+				index.setValue(_index);
+			}
+
+		} // namespace controller
+
+	} // namespace component
 
 } // namespace sofa
 

@@ -28,50 +28,53 @@
 #include <SofaOpenglVisual/OglModel.h>
 #include <SofaUserInteraction/Controller.h>
 #include <sofa/core/visual/VisualParams.h>
-
+//#include <SofaBaseVisual/VisualModelImpl.h>
 #include <sofa/defaulttype/VecTypes.h>
-#include <sofa/defaulttype/RigidTypes.h>
 #include <sofa/core/ObjectFactory.h>
 
 
 namespace sofa
 {
-namespace simulation { class Node; }
+	namespace simulation { class Node; }
 
-namespace component
-{
+	namespace component
+	{
 
-namespace controller
-{
+		namespace controller
+		{
 
-using namespace sofa::defaulttype;
+			using namespace sofa::defaulttype;
 
-class ZygoteBodyDisplayController : public Controller
-{
+			class ZygoteBodyDisplayController : public Controller
+			{
 
-public:
-    SOFA_CLASS(ZygoteBodyDisplayController, Controller);
-	Data<double> scale;
-	int visualization_flag = 5;
-    ZygoteBodyDisplayController();
+			public:
+				SOFA_CLASS(ZygoteBodyDisplayController, Controller);
+				Data<double> scale;
+				int visualization_flag;
+				int old_visualization_flag;
+				ZygoteBodyDisplayController();
+				SReal transparencyLevel;
+				SReal levelAlpha;
+				bool key_just_pressed;
 
-    void init();
-    void bwdInit();
-    void reset();
-    void reinit();
-	
-	void draw(const sofa::core::visual::VisualParams* vparams);
+				void init();
+				void bwdInit();
+				void reset();
+				void reinit();
 
-private:
-    void handleEvent(core::objectmodel::Event *);
-	sofa::simulation::Node* gnode;
-	Data<bool> verbose;
-	
+				void draw(const sofa::core::visual::VisualParams* vparams);
 
-};
+			private:
+				void handleEvent(core::objectmodel::Event *);
+				Data<bool> verbose;
+				//SReal transparencyLevel;
+				sofa::component::visualmodel::VisualModelImpl* oglModel;
+				void getTaggedOglModel(std::string tagName, SReal transparencyLevel);
+			};
 
-} // namespace controller
+		} // namespace controller
 
-} // namespace component
+	} // namespace component
 
 } // namespace sofa
