@@ -1,6 +1,6 @@
 /******************************************************************************
 *       SOFA, Simulation Open-Framework Architecture, development version     *
-*                (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH                    *
+*                (c) 2006-2016 INRIA, USTL, UJF, CNRS, MGH                    *
 *                                                                             *
 * This library is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU Lesser General Public License as published by    *
@@ -30,14 +30,13 @@
 #include <sofa/defaulttype/Vec.h>
 #include <sofa/defaulttype/Mat.h>
 #include <sofa/helper/Quater.h>
-#include <sofa/helper/gl/Trackball.h>
-#include <sofa/helper/gl/Transformation.h>
 
 #include <sofa/core/objectmodel/KeypressedEvent.h>
 #include <sofa/core/objectmodel/KeyreleasedEvent.h>
 #include <sofa/core/objectmodel/MouseEvent.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/helper/system/config.h>
+#include <sofa/helper/OptionsGroup.h>
 
 namespace sofa
 {
@@ -88,15 +87,16 @@ public:
 
     Data<double> p_fieldOfView;
     Data<double> p_zNear, p_zFar;
+    Data<bool> p_computeZClip;
     Data<Vec3> p_minBBox, p_maxBBox;
     Data<unsigned int> p_widthViewport, p_heightViewport;
-    Data<int> p_type;
+    Data<sofa::helper::OptionsGroup> p_type;
 
     Data<bool> p_activated;
 	Data<bool> p_fixedLookAtPoint;
-
-    Data<bool> d_computeProjectionMatrix;
-    Data<Mat3> d_intrinsicParameters;
+    
+    Data<helper::vector<float> > p_modelViewMatrix;
+    Data<helper::vector<float> > p_projectionMatrix;
 
     BaseCamera();
     virtual ~BaseCamera();
@@ -125,7 +125,6 @@ public:
     Vec3 cameraToWorldTransform(const Vec3& v);
     Vec3 worldToCameraTransform(const Vec3& v);
     Vec3 screenToWorldCoordinates(int x, int y);
-
 
     void fitSphere(const Vec3& center, SReal radius);
     void fitBoundingBox(const Vec3& min,const Vec3& max);
@@ -167,31 +166,32 @@ public:
 
     double getHorizontalFieldOfView()
     {
-#ifndef SOFA_NO_OPENGL
-        GLint viewport[4];
-        glGetIntegerv( GL_VIEWPORT, viewport );
+        const sofa::core::visual::VisualParams* vp = sofa::core::visual::VisualParams::defaultInstance();
+        const core::visual::VisualParams::Viewport viewport = vp->viewport();
+
         float screenwidth = (float)viewport[2];
         float screenheight = (float)viewport[3];
         float aspectRatio = screenwidth / screenheight;
         float fov_radian = (float)getFieldOfView()* (float)(M_PI/180);
         float hor_fov_radian = 2.0f * atan ( tan(fov_radian/2.0f) * aspectRatio );
         return hor_fov_radian*(180/M_PI);
-#else
-	    return 0.0;
-#endif /* SOFA_NO_OPENGL */
     }
 
-    int getCameraType() const
+    unsigned int getCameraType() const
     {
-        return p_type.getValue();
+        return p_type.getValue().getSelectedId();
     }
 
-    void setCameraType(int type)
+    void setCameraType(unsigned int type)
     {
+        sofa::helper::OptionsGroup* optionsGroup = p_type.beginEdit();
+
         if (type == core::visual::VisualParams::ORTHOGRAPHIC_TYPE)
-            p_type.setValue(core::visual::VisualParams::ORTHOGRAPHIC_TYPE);
+            optionsGroup->setSelectedItem(core::visual::VisualParams::ORTHOGRAPHIC_TYPE);
         else
-            p_type.setValue(core::visual::VisualParams::PERSPECTIVE_TYPE);
+            optionsGroup->setSelectedItem(core::visual::VisualParams::PERSPECTIVE_TYPE);
+
+        p_type.endEdit();
     }
 
 
@@ -225,12 +225,11 @@ public:
     //be according to the gravity.
     void setDefaultView(const Vec3& gravity = Vec3(0, -9.81, 0));
 
-    void getProjectionMatrix(Mat4 &projectionMatrix);
+    virtual void getModelViewMatrix(double mat[16]);
+    virtual void getProjectionMatrix(double mat[16]);
+    void getOpenGLModelViewMatrix(double mat[16]);
+    void getOpenGLProjectionMatrix(double mat[16]);
 
-#ifndef SOFA_NO_OPENGL
-    void getOpenGLMatrix(GLdouble mat[16]);
-    void getOpenGLProjectionMatrix(GLdouble oglProjectionMatrix[]);
-#endif // SOFA_NO_OPENGL
     Quat getOrientationFromLookAt(const Vec3 &pos, const Vec3& lookat);
     Vec3 getLookAtFromOrientation(const Vec3 &pos, const double &distance,const Quat & orientation);
     Vec3 getPositionFromOrientation(const Vec3 &lookAt, const double &distance, const Quat& orientation);
@@ -287,9 +286,12 @@ public:
     }
 
 protected:
+    void updateOutputData();
+
     Vec3 sceneCenter;
     SReal sceneRadius;
 
+    bool b_setDefaultParameters;
 
     //need to keep "internal" lookAt and distance for updating Data
     //better way to do that ?

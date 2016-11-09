@@ -1,6 +1,6 @@
 /******************************************************************************
 *       SOFA, Simulation Open-Framework Architecture, development version     *
-*                (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH                    *
+*                (c) 2006-2016 INRIA, USTL, UJF, CNRS, MGH                    *
 *                                                                             *
 * This library is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU Lesser General Public License as published by    *
@@ -66,6 +66,8 @@ struct SOFA_HELPER_API fboParameters
 class SOFA_HELPER_API FrameBufferObject
 {
 private:
+    GLint m_defaultWindowFramebufferID;
+
     unsigned int width, height;
     GLuint id;
     GLuint depthTextureID, colorTextureID;
@@ -74,12 +76,15 @@ private:
     bool depthTexture;
     bool enableDepth;
     bool enableColor;
+    bool enableMipMap;
+
+    static GLint getCurrentFramebufferID();
 
 public:
-    FrameBufferObject(bool depthTexture = false, bool enableDepth = true, bool enableColor = true);
+    FrameBufferObject(bool depthTexture = false, bool enableDepth = true, bool enableColor = true, bool enableMipMap = false, GLint defaultWindowFramebuffer = getCurrentFramebufferID());
     virtual ~FrameBufferObject();
 
-    FrameBufferObject(const fboParameters& FboFormat, bool depthTexture = false, bool enableDepth = true, bool enableColor = true);
+    FrameBufferObject(const fboParameters& FboFormat, bool depthTexture = false, bool enableDepth = true, bool enableColor = true, bool enableMipMap = false, GLint defaultWindowFramebuffer = getCurrentFramebufferID() );
     void setFormat(const fboParameters& fboParams) { _fboParams = fboParams; }
 
     void init(unsigned int width, unsigned height);

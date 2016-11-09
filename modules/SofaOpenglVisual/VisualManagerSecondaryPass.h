@@ -1,6 +1,6 @@
 /******************************************************************************
 *       SOFA, Simulation Open-Framework Architecture, development version     *
-*                (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH                    *
+*                (c) 2006-2016 INRIA, USTL, UJF, CNRS, MGH                    *
 *                                                                             *
 * This library is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU Lesser General Public License as published by    *
@@ -59,7 +59,8 @@ public:
     sofa::core::objectmodel::DataFileName fragFilename;
 
 protected:
-    OglShader::SPtr shader_postproc;
+    OglShader::SPtr m_shaderPostproc;
+    SingleLink<VisualManagerSecondaryPass, OglShader, BaseLink::FLAG_STOREPATH | BaseLink::FLAG_STRONGLINK> l_shader;
 
     VisualManagerSecondaryPass();
     virtual ~VisualManagerSecondaryPass();

@@ -1,6 +1,6 @@
 /******************************************************************************
 *       SOFA, Simulation Open-Framework Architecture, development version     *
-*                (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH                    *
+*                (c) 2006-2016 INRIA, USTL, UJF, CNRS, MGH                    *
 *                                                                             *
 * This program is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU General Public License as published by the Free  *
@@ -46,10 +46,9 @@
 
 
 #include <sofa/helper/gl/glText.inl>
+#include <sofa/helper/gl/Axis.h>
 #include <sofa/helper/gl/RAII.h>
-#ifdef SOFA_HAVE_GLEW
-#include <sofa/helper/gl/GLSLShader.h>
-#endif
+
 #include <sofa/helper/io/ImageBMP.h>
 
 #include <sofa/defaulttype/RigidTypes.h>
@@ -94,7 +93,31 @@ bool QtViewer::_mouseTrans = false;
 bool QtViewer::_mouseRotate = false;
 Quaternion QtViewer::_mouseInteractorNewQuat;
 
+#if defined(QT_VERSION) && QT_VERSION >= 0x050400
+QSurfaceFormat QtViewer::setupGLFormat(const unsigned int nbMSAASamples)
+{
+    QSurfaceFormat f = QSurfaceFormat::defaultFormat();
 
+    //Multisampling
+    if(nbMSAASamples > 1)
+    {
+        std::cout <<"QtViewer: Set multisampling anti-aliasing (MSSA) with " << nbMSAASamples << " samples." << std::endl;
+        f.setSamples(nbMSAASamples);
+    }
+
+    //VSync
+    std::cout << "QtViewer: disabling vertical refresh sync" << std::endl;
+    f.setSwapInterval(0); // disable vertical refresh sync
+
+    int vmajor = 3, vminor = 2;
+    f.setVersion(vmajor,vminor);
+    f.setProfile(QSurfaceFormat::CompatibilityProfile);
+
+    f.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+
+    return f;
+}
+#else
 QGLFormat QtViewer::setupGLFormat(const unsigned int nbMSAASamples)
 {
     QGLFormat f = QGLFormat::defaultFormat();
@@ -130,17 +153,23 @@ QGLFormat QtViewer::setupGLFormat(const unsigned int nbMSAASamples)
     return f;
 }
 
+#endif // defined(QT_VERSION) && QT_VERSION >= 0x050400
+
 // ---------------------------------------------------------
 // --- Constructor
 // ---------------------------------------------------------
 QtViewer::QtViewer(QWidget* parent, const char* name, const unsigned int nbMSAASamples)
-    : QGLWidget(setupGLFormat(nbMSAASamples), parent)
+#if defined(QT_VERSION) && QT_VERSION >= 0x050400
+    : QOpenGLWidget(parent)
+ #else
+    : QOpenGLWidget(setupGLFormat(nbMSAASamples), parent)
+#endif // defined(QT_VERSION) && QT_VERSION >= 0x050400
 {
     this->setObjectName(name);
 
-#if defined(QT_VERSION) && QT_VERSION >= 0x040700
-    std::cout << "QtViewer: OpenGL " << format().majorVersion() << "." << format().minorVersion() << " context created." << std::endl;
-#endif
+#if defined(QT_VERSION) && QT_VERSION >= 0x050400
+    this->setFormat(setupGLFormat(nbMSAASamples));
+#endif // defined(QT_VERSION) && QT_VERSION >= 0x050400
 
     groot = NULL;
     initTexturesDone = false;
@@ -196,6 +225,8 @@ QtViewer::~QtViewer()
 // -----------------------------------------------------------------
 void QtViewer::initializeGL(void)
 {
+    std::cout << "QtViewer: OpenGL " << glGetString(GL_VERSION) << " context created." << std::endl;
+
     static GLfloat specref[4];
     static GLfloat ambientLight[4];
     static GLfloat diffuseLight[4];
@@ -510,7 +541,7 @@ void QtViewer::DrawXYPlane(double zo, double xmin, double xmax, double ymin,
 void QtViewer::DrawYZPlane(double xo, double ymin, double ymax, double zmin,
         double zmax, double step)
 {
-    register double y, z;
+    double y, z;
     Enable<GL_DEPTH_TEST> depth;
 
     glBegin(GL_LINES);
@@ -538,7 +569,7 @@ void QtViewer::DrawYZPlane(double xo, double ymin, double ymax, double zmin,
 void QtViewer::DrawXZPlane(double yo, double xmin, double xmax, double zmin,
         double zmax, double step)
 {
-    register double x, z;
+    double x, z;
     Enable<GL_DEPTH_TEST> depth;
 
     glBegin(GL_LINES);
@@ -675,28 +706,41 @@ void QtViewer::DisplayOBJs()
 
         if (_axis)
         {
+
             SReal* minBBox = vparams->sceneBBox().minBBoxPtr();
             SReal* maxBBox = vparams->sceneBBox().maxBBoxPtr();
+            SReal maxDistance = std::numeric_limits<SReal>::min();
 
-
-            SReal minDistance = std::numeric_limits<SReal>::max();
-
-            minDistance = maxBBox[0] - minBBox[0];
-
+            maxDistance = maxBBox[0] - minBBox[0];
             for (int i=1;i<3;i++)
             {
-                if(minDistance > (maxBBox[i] - minBBox[i]))
-                    minDistance = (maxBBox[i] - minBBox[i]);
+                if(maxDistance < (maxBBox[i] - minBBox[i]))
+                    maxDistance = (maxBBox[i] - minBBox[i]);
             }
 
-            if(minDistance == 0 )
-                minDistance = 1.0;
+            if(maxDistance == 0 )
+                maxDistance = 1.0;
 
-            // Arrows of axis are defined as 1/4 of the min BBOX
-            DrawAxis(0.0, 0.0, 0.0,(minDistance/4.0));
+            // World Axis: Arrows of axis are defined as 10% of maxBBox
+            DrawAxis(0.0, 0.0, 0.0,(maxDistance*0.1));
+
             if (vparams->sceneBBox().minBBox().x() < vparams->sceneBBox().maxBBox().x())
-                DrawBox(vparams->sceneBBox().minBBoxPtr(),
-                        vparams->sceneBBox().maxBBoxPtr());
+                DrawBox(vparams->sceneBBox().minBBoxPtr(), vparams->sceneBBox().maxBBoxPtr());
+
+            // 2D Axis: project current world orientation in the lower left part of the screen
+            glMatrixMode(GL_PROJECTION);
+            glPushMatrix();
+            glLoadIdentity();
+            glOrtho(0.0,vparams->viewport()[2],0,vparams->viewport()[3],-30,30);
+            glMatrixMode(GL_MODELVIEW);
+            glPushMatrix();
+            glLoadIdentity();
+            helper::gl::Axis::draw(sofa::defaulttype::Vector3(30.0,30.0,0.0),currentCamera->getOrientation().inverse(), 25.0);
+            glMatrixMode(GL_PROJECTION);
+            glPopMatrix();
+            glMatrixMode(GL_MODELVIEW);
+            glPopMatrix();
+
         }
     }
 
@@ -868,12 +912,12 @@ void QtViewer::drawScene(void)
 
     GLdouble mat[16];
 
-    currentCamera->getOpenGLMatrix(mat);
+    //std::cout << "Default" << this->defaultFramebufferObject() << std::endl;
+    currentCamera->getOpenGLModelViewMatrix(mat);
     glMultMatrixd(mat);
 
     glGetDoublev(GL_MODELVIEW_MATRIX, lastModelviewMatrix);
     vparams->setModelViewMatrix(lastModelviewMatrix);
-    vparams->setProjectionMatrix(lastProjectionMatrix);
 
     if(supportStereo)
     {
@@ -974,6 +1018,7 @@ void QtViewer::drawScene(void)
         }
     }
     DisplayMenu(); // always needs to be the last object being drawn
+
 }
 
 
@@ -1004,7 +1049,6 @@ void QtViewer::calcProjection(int width, int height)
 {
     if (!width) width = _W;
     if (!height) height = _H;
-    double xFactor = 1.0, yFactor = 1.0;
 
     /// Camera part
     if (!currentCamera)
@@ -1016,56 +1060,25 @@ void QtViewer::calcProjection(int width, int height)
         currentCamera->setBoundingBox(vparams->sceneBBox().minBBox(), vparams->sceneBBox().maxBBox());
     }
     currentCamera->computeZ();
+    currentCamera->p_widthViewport.setValue(width);
+    currentCamera->p_heightViewport.setValue(height);
 
-    vparams->zNear() = currentCamera->getZNear();
-    vparams->zFar() = currentCamera->getZFar();
-
-    if ((height != 0) && (width != 0))
-    {
-        if (height > width)
-        {
-            xFactor = 1.0;
-            yFactor = (double) height / (double) width;
-        }
-        else
-        {
-            xFactor = (double) width / (double) height;
-            yFactor = 1.0;
-        }
-    }
-
-    double orthoCoef = tan( (float)(M_PI/180.0) * currentCamera->getFieldOfView()/2.0);
-    double zDist = orthoCoef * fabs(currentCamera->worldToCameraCoordinates(currentCamera->getLookAt())[2]);
-
-    double halfWidth  = zDist * xFactor;
-    double halfHeight = zDist * yFactor;
-
-    vparams->viewport() = sofa::helper::make_array(0,0,width,height);
-
+    GLdouble projectionMatrix[16];
+    currentCamera->getOpenGLProjectionMatrix(projectionMatrix);
+    
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    if(!currentCamera->d_computeProjectionMatrix.getValue())
-    {
-        if (currentCamera->getCameraType() == core::visual::VisualParams::PERSPECTIVE_TYPE)
-            gluPerspective(currentCamera->getFieldOfView(), (double) width / (double) height, vparams->zNear(), vparams->zFar());
-        else
-        {
-            glOrtho( -halfWidth, halfWidth, -halfHeight, halfHeight, vparams->zNear(), vparams->zFar());
-        }
-    }
-    else
-    {
-        GLdouble projectionMatrix[16];
-        currentCamera->getOpenGLProjectionMatrix(projectionMatrix);
-
-        glMultMatrixd(projectionMatrix);
-    }
-
+    glMultMatrixd(projectionMatrix);
+    
+    glMatrixMode(GL_MODELVIEW);
     glGetDoublev(GL_PROJECTION_MATRIX, lastProjectionMatrix);
 
-    glMatrixMode(GL_MODELVIEW);
+    //Update vparams
+    vparams->zNear() = currentCamera->getZNear();
+    vparams->zFar() = currentCamera->getZFar();
+    vparams->viewport() = sofa::helper::make_array(0, 0, width, height);
+    vparams->setProjectionMatrix(projectionMatrix);
 }
 
 // ---------------------------------------------------------
@@ -1098,7 +1111,7 @@ void QtViewer::paintGL()
 
 void QtViewer::paintEvent(QPaintEvent* qpe)
 {
-    QGLWidget::paintEvent(qpe );
+    QOpenGLWidget::paintEvent(qpe );
 /*
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -1634,13 +1647,13 @@ void QtViewer::saveView()
 void QtViewer::setSizeW(int size)
 {
     resizeGL(size, _H);
-    updateGL();
+    update();
 }
 
 void QtViewer::setSizeH(int size)
 {
     resizeGL(_W, size);
-    updateGL();
+    update();
 }
 
 //void QtViewer::setCameraMode(core::visual::VisualParams::CameraType mode)
