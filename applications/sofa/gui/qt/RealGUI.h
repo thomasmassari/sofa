@@ -142,6 +142,7 @@ public slots:
     virtual void changeHtmlPage( const QUrl&);
 
 protected:
+
 #ifdef SOFA_GUI_INTERACTION
     void mouseMoveEvent( QMouseEvent * e);
     void wheelEvent( QWheelEvent * event );

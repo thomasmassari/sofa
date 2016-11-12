@@ -461,6 +461,7 @@ RealGUI::~RealGUI()
 
 
 //======================= OPTIONS DEFINITIONS ========================= {
+
 #ifdef SOFA_DUMP_VISITOR_INFO
 void RealGUI::setTraceVisitors(bool b)
 {
