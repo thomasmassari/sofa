@@ -216,6 +216,8 @@ protected:
     void initializeGL();
     void paintGL();
     void paintEvent(QPaintEvent* qpe);
+	void drawOverpaint(QPainter * painter, float x, float y, const QString & fileName);
+	void drawTextAnatomime(QPainter * painter);
     void resizeGL( int w, int h );
     /// Overloaded from SofaViewer
     virtual void viewAll() {}
