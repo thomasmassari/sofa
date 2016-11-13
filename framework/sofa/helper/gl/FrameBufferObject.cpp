@@ -1,6 +1,6 @@
 /******************************************************************************
 *       SOFA, Simulation Open-Framework Architecture, development version     *
-*                (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH                    *
+*                (c) 2006-2016 INRIA, USTL, UJF, CNRS, MGH                    *
 *                                                                             *
 * This library is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU Lesser General Public License as published by    *
@@ -40,9 +40,10 @@ namespace helper
 
 namespace gl
 {
-
-FrameBufferObject::FrameBufferObject(bool depthTexture, bool enableDepth, bool enableColor)
-    :width(0)
+    
+FrameBufferObject::FrameBufferObject(bool depthTexture, bool enableDepth, bool enableColor, bool enableMipMap, GLint defaultWindowFramebuffer)
+    :m_defaultWindowFramebufferID(defaultWindowFramebuffer)
+    ,width(0)
     ,height(0)
     ,depthTextureID(0)
     ,colorTextureID(0)
@@ -50,12 +51,13 @@ FrameBufferObject::FrameBufferObject(bool depthTexture, bool enableDepth, bool e
     ,depthTexture(depthTexture)
     ,enableDepth(enableDepth)
     ,enableColor(enableColor)
+    ,enableMipMap(enableMipMap)
 {
-
 }
 
-FrameBufferObject::FrameBufferObject(const fboParameters& fboParams, bool depthTexture, bool enableDepth, bool enableColor)
-    :width(0)
+FrameBufferObject::FrameBufferObject(const fboParameters& fboParams, bool depthTexture, bool enableDepth, bool enableColor, bool enableMipMap, GLint defaultWindowFramebuffer)
+    :m_defaultWindowFramebufferID(defaultWindowFramebuffer)
+    ,width(0)
     ,height(0)
     ,depthTextureID(0)
     ,colorTextureID(0)
@@ -64,6 +66,7 @@ FrameBufferObject::FrameBufferObject(const fboParameters& fboParams, bool depthT
     ,depthTexture(depthTexture)
     ,enableDepth(enableDepth)
     ,enableColor(enableColor)
+    ,enableMipMap(enableMipMap)
 {
 }
 
@@ -71,6 +74,14 @@ FrameBufferObject::FrameBufferObject(const fboParameters& fboParams, bool depthT
 FrameBufferObject::~FrameBufferObject()
 {
     destroy();
+}
+
+GLint FrameBufferObject::getCurrentFramebufferID()
+{
+    GLint windowId;
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &windowId);
+
+    return windowId;
 }
 
 void FrameBufferObject::destroy()
@@ -144,7 +155,7 @@ bool FrameBufferObject::checkFBO()
 void FrameBufferObject::init(unsigned int width, unsigned height)
 {
     if (!initialized)
-    {
+    {        
         this->width = width;
         this->height = height;
         glGenFramebuffersEXT(1, &id);
@@ -169,7 +180,7 @@ void FrameBufferObject::init(unsigned int width, unsigned height)
             glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, colorTextureID, 0);
         }
 
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_defaultWindowFramebufferID);
 
         if(enableColor)
         {
@@ -181,6 +192,7 @@ void FrameBufferObject::init(unsigned int width, unsigned height)
         checkFBO();
 #endif
         initialized=true;
+        glDisable(GL_TEXTURE_2D);
     }
     else
         setSize(width, height);
@@ -218,7 +230,7 @@ void FrameBufferObject::stop()
 {
     if (initialized)
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_defaultWindowFramebufferID);
 
         if(enableColor)
         {
@@ -301,12 +313,17 @@ void FrameBufferObject::initDepthBuffer()
 void FrameBufferObject::initColorBuffer()
 {
     glBindTexture(GL_TEXTURE_2D, colorTextureID);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    if(enableMipMap)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    else
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
     glTexImage2D(GL_TEXTURE_2D, 0, _fboParams.colorInternalformat,  width, height, 0, _fboParams.colorFormat, _fboParams.colorType, NULL);
+    if(enableMipMap)
+        glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 
 }

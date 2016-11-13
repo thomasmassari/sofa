@@ -1,6 +1,6 @@
 /******************************************************************************
 *       SOFA, Simulation Open-Framework Architecture, development version     *
-*                (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH                    *
+*                (c) 2006-2016 INRIA, USTL, UJF, CNRS, MGH                    *
 *                                                                             *
 * This program is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU General Public License as published by the Free  *
@@ -36,6 +36,13 @@
 #include <string.h>
 #include <fstream>
 
+#include <QtGlobal>
+
+#if defined(QT_VERSION) && QT_VERSION >= 0x050400
+#include <QOpenGLWidget>
+#include <QSurfaceFormat>
+#include <QOpenGLContext>
+#endif // defined(QT_VERSION) && QT_VERSION >= 0x050400
 
 #include <sofa/gui/qt/viewer/SofaViewer.h>
 
@@ -75,8 +82,15 @@ using namespace sofa::helper::gl;
 using namespace sofa::helper::system::thread;
 using namespace sofa::component::collision;
 
+#if defined(QT_VERSION) && QT_VERSION >= 0x050400
+typedef QOpenGLWidget QOpenGLWidget;
+#else
+typedef QGLWidget QOpenGLWidget;
+#endif // defined(QT_VERSION) && QT_VERSION >= 0x050400
 
-class QtViewer : public QGLWidget,  public sofa::gui::qt::viewer::OglModelSofaViewer
+class QtViewer
+        : public QOpenGLWidget
+        , public sofa::gui::qt::viewer::OglModelSofaViewer
 {
     Q_OBJECT
 
@@ -161,7 +175,11 @@ public:
     /// and can be used to unregister classes associated with in the the ObjectFactory.
     static int DisableViewer();
 
+#if defined(QT_VERSION) && QT_VERSION >= 0x050400
+    static QSurfaceFormat setupGLFormat(const unsigned int nbMSAASamples = 1);
+#else
     static QGLFormat setupGLFormat(const unsigned int nbMSAASamples = 1);
+#endif // defined(QT_VERSION) && QT_VERSION >= 0x050400
     QtViewer( QWidget* parent, const char* name="", const unsigned int nbMSAASamples = 1 );
     ~QtViewer();
 
@@ -198,8 +216,6 @@ protected:
     void initializeGL();
     void paintGL();
     void paintEvent(QPaintEvent* qpe);
-	void drawOverpaint(QPainter *painterint, float x, float y, const QString& fileName);
-	void drawTextAnatomime(QPainter *painter);
     void resizeGL( int w, int h );
     /// Overloaded from SofaViewer
     virtual void viewAll() {}
@@ -215,11 +231,11 @@ public:
     int GetWidth()
     {
         return _W;
-    };
+    }
     int GetHeight()
     {
         return _H;
-    };
+    }
 
     void	UpdateOBJ(void);
     void moveRayPickInteractor(int eventX, int eventY);

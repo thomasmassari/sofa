@@ -1,6 +1,6 @@
 /******************************************************************************
 *       SOFA, Simulation Open-Framework Architecture, development version     *
-*                (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH                    *
+*                (c) 2006-2016 INRIA, USTL, UJF, CNRS, MGH                    *
 *                                                                             *
 * This library is free software; you can redistribute it and/or modify it     *
 * under the terms of the GNU Lesser General Public License as published by    *
@@ -39,6 +39,7 @@
 #include <sofa/core/objectmodel/KeyreleasedEvent.h>
 #include <sofa/core/objectmodel/Data.h>
 
+
 namespace sofa
 {
 
@@ -65,7 +66,7 @@ VisualManagerPass::VisualManagerPass()
 {
     if(factor.getValue()==0.0)
     {
-        cerr<<this->getName()<<":\"factor\" attribute shall not be null. Using 1.0 instead..."<<endl;
+        serr << ("VisualManagerPass") << this->getName() << ":\"factor\" attribute shall not be null. Using 1.0 instead..." << sendl;
         factor.setValue(1.0);
     }
 
@@ -97,7 +98,7 @@ void VisualManagerPass::init()
 {
     sofa::core::objectmodel::BaseContext* context = this->getContext();
     multiPassEnabled=checkMultipass(context);
-    fbo = new FrameBufferObject(true, true, true);
+    fbo = new FrameBufferObject(true, true, true, true);
 }
 
 /* herited from VisualModel */
@@ -106,8 +107,8 @@ void VisualManagerPass::initVisual()
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
 
-    passWidth = viewport[2]*(GLint)factor.getValue();
-    passHeight = viewport[3]*(GLint)factor.getValue();
+    passWidth = (GLint) ((float)viewport[2]*factor.getValue());
+    passHeight = (GLint)((float)viewport[3] * factor.getValue());
 
     fbo->init(passWidth, passHeight);
 }

@@ -27,6 +27,7 @@
 #include "config.h"
 
 #include <SofaBaseVisual/BaseCamera.h>
+#include <sofa/helper/gl/Trackball.h>
 
 namespace sofa
 {
@@ -71,7 +72,7 @@ private:
     int currentMode;
     bool isMoving;
     int lastMousePosX, lastMousePosY;
-    helper::gl::Trackball currentTrackball;
+    sofa::helper::gl::Trackball currentTrackball;
 
     void moveCamera_rotation();
     void moveCamera_translation();
