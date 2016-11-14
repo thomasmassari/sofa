@@ -209,6 +209,13 @@ QtViewer::QtViewer(QWidget* parent, const char* name, const unsigned int nbMSAAS
     _mouseInteractorTrackball.ComputeQuaternion(0.0, 0.0, 0.0, 0.0);
     _mouseInteractorNewQuat = _mouseInteractorTrackball.GetQuaternion();
 
+	//Charge images for button interface
+	icon_man = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\man.png");
+	icon_muscle = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\muscle_transparent.png");
+	icon_vessels = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\veins_transparent.png");
+	icon_organs = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\organs.png");
+	icon_bones = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\bones.png");
+
     connect( &captureTimer, SIGNAL(timeout()), this, SLOT(captureEvent()) );
 }
 
@@ -225,7 +232,7 @@ QtViewer::~QtViewer()
 // -----------------------------------------------------------------
 void QtViewer::initializeGL(void)
 {
-    std::cout << "QtViewer: OpenGL " << glGetString(GL_VERSION) << " context created." << std::endl;
+    //std::cout << "QtViewer: OpenGL " << glGetString(GL_VERSION) << " context created." << std::endl;
 
     static GLfloat specref[4];
     static GLfloat ambientLight[4];
@@ -354,7 +361,6 @@ void QtViewer::initializeGL(void)
 
         //printf("GL initialized\n");
     }
-
 
 
     // switch to preset view
@@ -1111,80 +1117,64 @@ void QtViewer::paintGL()
 
 void QtViewer::paintEvent(QPaintEvent* qpe)
 {
-	//QGLWidget::paintEvent(qpe);
-	Q_UNUSED(qpe)
-		QPainter painter;
+	Q_UNUSED(qpe);
+
+	QPainter painter;
 	painter.begin(this);
+	painter.beginNativePainting();
+	QOpenGLWidget::paintEvent(qpe);
+	painter.endNativePainting();
+
+	//// Save current OpenGL state
+	//glPushAttrib(GL_ALL_ATTRIB_BITS);
+	//glMatrixMode(GL_PROJECTION);
+	//glPushMatrix();
+	//glMatrixMode(GL_MODELVIEW);
+	//glPushMatrix();
+
+	//// Reset OpenGL parameters
+	//glShadeModel(GL_SMOOTH);
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
+	//glEnable(GL_MULTISAMPLE);
+	//static GLfloat lightPosition[4] = { 0, 0, 20, 1.0 };
+	//glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+	//// Classical 3D drawing, usually performed by paintGL().
+	//initializeGL();
+	//paintGL();
+	//// Restore OpenGL state
+	//glMatrixMode(GL_MODELVIEW);
+	//glPopMatrix();
+	//glMatrixMode(GL_PROJECTION);
+	//glPopMatrix();
+	//glPopAttrib();
+
 	painter.setRenderHint(QPainter::Antialiasing);
+	painter.save();
+	drawOverpaint(&painter, 30, 10,	icon_man);
+	drawOverpaint(&painter, 30, 8, icon_muscle );
+	drawOverpaint(&painter, 30, 6.66, icon_vessels);
+	drawOverpaint(&painter, 30, 5.714, icon_organs);
+	drawOverpaint(&painter, 30, 5, icon_bones);
 
-	// Save current OpenGL state
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-
-	// Reset OpenGL parameters
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_MULTISAMPLE);
-	static GLfloat lightPosition[4] = { 0, 0, 20, 1.0 };
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
-	// Classical 3D drawing, usually performed by paintGL().
-	initializeGL();
-	paintGL();
-	// Restore OpenGL state
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-
-	drawOverpaint(&painter, 30, 10, "C:\\Users\\Thomas\\Downloads\\Barra_Lato\\man.png");
-	drawOverpaint(&painter, 30, 6.66, "C:\\Users\\Thomas\\Downloads\\Barra_Lato\\muscle_transparent.png");
-	drawOverpaint(&painter, 30, 5, "C:\\Users\\Thomas\\Downloads\\Barra_Lato\\veins_transparent.png");
-	drawOverpaint(&painter, 30, 4, "C:\\Users\\Thomas\\Downloads\\Barra_Lato\\organs.png");
-	drawOverpaint(&painter, 30, 3.33, "C:\\Users\\Thomas\\Downloads\\Barra_Lato\\bones.png");
-
-	drawTextAnatomime(&painter);
+	painter.restore();
 	painter.end();
 
 }
 
-void QtViewer::drawOverpaint(QPainter *painter, float x, float y, const QString& fileName)
+void QtViewer::drawOverpaint(QPainter *painter, float x, float y, const QPixmap& fileName)
 {
-	painter->save();
+	
 	//painter->translate(width() / multiple_w, height() / multiple_h);
 	QRadialGradient radialGrad(QPointF(-40, -40), 100);
 	radialGrad.setColorAt(1, QColor(255, 255, 255, 100));
 	painter->setBrush(QBrush(radialGrad));
-	painter->drawRoundRect(width() / x, height() / y, width() / 5, height() / 20);
-	painter->drawPixmap(width() / x, height() / y, width() / 5, height() / 20, QPixmap(fileName));
-	painter->restore();
-}
-
-void QtViewer::drawTextAnatomime(QPainter *painter)
-{
-	QString text = tr("");
-	QFontMetrics metrics = QFontMetrics(font());
-	int border = qMax(4, metrics.leading());
-
-	QRect rect = metrics.boundingRect(0, 0, width() - 20 * border, int(height()*0.125),
-		Qt::AlignCenter | Qt::TextWordWrap, text);
-	painter->setRenderHint(QPainter::TextAntialiasing);
-	painter->fillRect(QRect(0, 0, width(), rect.height() + 20 * border),
-		QColor(0, 0, 0, 127));
-	painter->setPen(Qt::white);
-	painter->fillRect(QRect(0, 0, width(), rect.height() + 20 * border),
-		QColor(0, 0, 0, 127));
-	painter->drawPixmap(0, 0, width(), rect.height() + 20 * border, QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\titolo.png"));
-	painter->drawText((width() - rect.width()) / 2, border,
-		rect.width(), rect.height(),
-		Qt::AlignCenter | Qt::TextWordWrap, text);
+	painter->drawRoundRect(width() / x, height() / y, width() / 10, height() / 40);
+	painter->drawPixmap(width() / x, height() / y, width() / 10, height() / 40, fileName);
+	
 }
 
 // ---------------------------------------------------------

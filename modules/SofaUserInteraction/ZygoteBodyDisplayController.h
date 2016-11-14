@@ -31,6 +31,7 @@
 //#include <SofaBaseVisual/VisualModelImpl.h>
 #include <sofa/defaulttype/VecTypes.h>
 #include <sofa/core/ObjectFactory.h>
+#include <SofaOpenglVisual/OglVariable.h>
 
 
 namespace sofa
@@ -55,7 +56,7 @@ namespace sofa
 				int old_visualization_flag;
 				ZygoteBodyDisplayController();
 				SReal transparencyLevel;
-				SReal levelAlpha;
+				SReal levelAlphaTime;
 				bool key_just_pressed;
 
 				void init();
@@ -69,8 +70,7 @@ namespace sofa
 				void handleEvent(core::objectmodel::Event *);
 				Data<bool> verbose;
 				//SReal transparencyLevel;
-				sofa::component::visualmodel::VisualModelImpl* oglModel;
-				void getTaggedOglModel(std::string tagName, SReal transparencyLevel);
+				void setLayersCoeff(std::string layerName, float alphaLevel);
 			};
 
 		} // namespace controller
