@@ -1,31 +1,21 @@
+Anatomime
+===================
+(version sans support de la Kinect)
 
-   SOFA, Simulation Open-Framework Architecture
-     (c) 2006-2015 INRIA, USTL, UJF, CNRS, MGH
+Installation
+-------------
 
-Authors: See Authors.txt
+### Compilation de Sofa
+Pour récupérer les sources de Sofa (avec les patchs nécessaires):
+git clone https://github.com/thomasmassari/sofa.git Sofa_Anatomime
 
-Licence: See LICENCE.txt
+Puis suivre la documentation sur : https://www.sofa-framework.org/community/doc/getting-started/build/windows/
 
-Contact information: contact@sofa-framework.org
+### Récupération des données
+Télécharger l'archive.
+Elle contient la scène, ses données et un fichier avec des mouvements pré-enregistrés.
+(sans Kinect pour l'instant)
 
-SOFA is an Open Source framework primarily targeted at real-time simulation, 
-with an emphasis on medical simulation. It is mainly intended for the 
-research community to help foster newer algorithms, but can also be used as 
-an efficient prototyping tool. SOFA's advanced software architecture allows:
-(1) the creation of complex and evolving simulations by combining new algorithms
-    with existing algorithms; 
-(2) the modification of key parameters of the simulation  such as deformable
-    behavior, surface representation, solvers, constraints, collision algorithm,
-    etc. by simply editing an XML file; 
-(3) the synthesis of complex models from simpler ones using a scene-graph
-    description; 
-(4) the efficient simulation of the dynamics of interacting objects using
-    abstract equation solvers; and 
-(5) the comparison of various algorithms available in SOFA. 
-
------------------------------------------------------------------------------
-
-INSTALLATION
-
-For up-to-date instructions, please refer to the SOFA documentation:
-  https://www.sofa-framework.org/documentation/online-documentation/
+Lancement d'une scène
+-------------
+Avec runSofa.exe, choisir la scène DEMO.scn.
