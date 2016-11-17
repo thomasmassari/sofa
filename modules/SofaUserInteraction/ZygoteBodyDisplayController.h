@@ -55,8 +55,8 @@ namespace sofa
 				int visualization_flag;
 				int old_visualization_flag;
 				ZygoteBodyDisplayController();
-				SReal transparencyLevel;
 				SReal levelAlphaTime;
+				SReal levelAlphaTimeMuscle;
 				bool key_just_pressed;
 
 				void init();
@@ -70,7 +70,7 @@ namespace sofa
 				void handleEvent(core::objectmodel::Event *);
 				Data<bool> verbose;
 				//SReal transparencyLevel;
-				void setLayersCoeff(std::string layerName, float alphaLevel);
+				void setLayersCoeff(std::string layerName, float alphaLevel, float maxAlphaLevel, float minAlphaLevel);
 			};
 
 		} // namespace controller

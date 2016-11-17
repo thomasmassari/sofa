@@ -130,7 +130,7 @@ private:
     GLboolean		_facetNormal;
     float			_zoom;
     int				_renderingMode;
-
+	int		m_visualization_flag;
     bool _waitForRender;
 
     //GLuint			_logoTexture;
@@ -216,7 +216,7 @@ protected:
     void initializeGL();
     void paintGL();
     void paintEvent(QPaintEvent* qpe);
-	void drawOverpaint(QPainter * painter, float x, float y, const QPixmap & fileName);
+	void drawOverpaint(QPainter * painter, float x, float y, const QPixmap & fileName, int r, int g, int b);
 	QPixmap title;
 	QPixmap icon_man;
 	QPixmap icon_muscle;

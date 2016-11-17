@@ -61,17 +61,18 @@ namespace controller
 		old_visualization_flag = 0;
 		key_just_pressed = false;
 		levelAlphaTime = 1.0;
+		levelAlphaTimeMuscle = 0.7;
 	}
 
 
 
 	void ZygoteBodyDisplayController::init()
 	{
-		setLayersCoeff("organsCoeff", 0.0);
-		setLayersCoeff("bonesCoeff", 0.0);
-		setLayersCoeff("arteryCoeff", 0.0);
-		setLayersCoeff("musclesCoeff", 0.0);
-		//getTaggedOglModel("organs", 0.0);
+		setLayersCoeff("organsCoeff", 0.0, 1.0, -0.01);
+		setLayersCoeff("bonesCoeff", 0.0, 1.0, -0.01);
+		setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+		setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+		//getTaggedOglModel("organs", -0.01);
 
 	}
 
@@ -98,7 +99,7 @@ namespace controller
 
 	}
 
-	void ZygoteBodyDisplayController::setLayersCoeff(std::string layerName, float alphaLevel)
+	void ZygoteBodyDisplayController::setLayersCoeff(std::string layerName, float alphaLevel, float maxAlphaLevel, float minAlphaLevel)
 	{
 		sofa::helper::vector<sofa::component::visualmodel::OglFloatVariable::SPtr> vectorVariables;
 
@@ -107,9 +108,9 @@ namespace controller
 
 		for (int i = 0; i < vectorVariables.size(); i++)
 		{
-			if (vectorVariables[i]->getName() == layerName)
-				vectorVariables[i]->value.setValue(alphaLevel);
-
+			if(alphaLevel<maxAlphaLevel&&alphaLevel>minAlphaLevel)
+				if (vectorVariables[i]->getName() == layerName)
+					vectorVariables[i]->value.setValue(alphaLevel);
 		}
 	}
 
@@ -144,51 +145,51 @@ namespace controller
 				{
 					switch (visualization_flag) {
 					case 1:
-						setLayersCoeff("organsCoeff", 0.0);
-						setLayersCoeff("bonesCoeff", 0.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 1.0);
+						setLayersCoeff("organsCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 1.0, 1.0, -0.01);
 						break;
 
 					case 2:
-						setLayersCoeff("organsCoeff", 0.0);
-						setLayersCoeff("bonesCoeff", 0.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", 1.0-levelAlphaTime);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 1.0-levelAlphaTime, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, -0.01);
 						break;
 
 					case 3:
-						setLayersCoeff("organsCoeff", 1.0 - levelAlphaTime);
-						setLayersCoeff("bonesCoeff", 1.0 - levelAlphaTime);
-						setLayersCoeff("arteryCoeff", 1.0 - levelAlphaTime);
-						setLayersCoeff("musclesCoeff", levelAlphaTime);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", 1.0 - levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 1.0 - levelAlphaTime, 0.3, -0.01);
+						setLayersCoeff("arteryCoeff", 1.0 - levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", levelAlphaTime, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, 1.0);
 						break;
 
 					case 4:
-						setLayersCoeff("organsCoeff", 1.0);
-						setLayersCoeff("bonesCoeff", 1.0);
-						setLayersCoeff("arteryCoeff", levelAlphaTime);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", 1.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.3, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, 1.0);
 						break;
 
 					case 5:
-						setLayersCoeff("organsCoeff", levelAlphaTime);
-						setLayersCoeff("bonesCoeff", 1.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 1.3 - levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, 1.0);
 						break;
 
 					default:
-						setLayersCoeff("organsCoeff", 0.0);
-						setLayersCoeff("bonesCoeff", 0.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 1.0);
+						setLayersCoeff("organsCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 1.0, 1.0);
 						break;
 					}
 				}
@@ -197,51 +198,51 @@ namespace controller
 				{
 					switch (visualization_flag) {
 					case 1:
-						setLayersCoeff("organsCoeff", 0.0);
-						setLayersCoeff("bonesCoeff", 0.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", levelAlphaTime);
-						//setLayersCoeff("skinCoeff", levelAlphaTime);
+						setLayersCoeff("organsCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", levelAlphaTime, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", levelAlphaTime, 1.0);
 						break;
 
 					case 2:
-						setLayersCoeff("organsCoeff", levelAlphaTime);
-						setLayersCoeff("bonesCoeff", levelAlphaTime);
-						setLayersCoeff("arteryCoeff", levelAlphaTime);
-						setLayersCoeff("musclesCoeff", 1.0-levelAlphaTime);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", -0.7 + levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 1.0-levelAlphaTime, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, 1.0);
 						break;
 
 					case 3:
-						setLayersCoeff("organsCoeff", 1.0);
-						setLayersCoeff("bonesCoeff", 1.0);
-						setLayersCoeff("arteryCoeff", 1.0-levelAlphaTime);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", 1.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.3, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 1.0-levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, 1.0);
 						break;
 
 					case 4:
-						setLayersCoeff("organsCoeff", 1.0- levelAlphaTime);
-						setLayersCoeff("bonesCoeff", 1.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", 1.0- levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.3+ levelAlphaTime, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, 1.0);
 						break;
 
 					case 5:
-						setLayersCoeff("organsCoeff", 0.0);
-						setLayersCoeff("bonesCoeff", 1.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 0.0);
+						setLayersCoeff("organsCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 1.0, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 0.0, 1.0);
 						break;
 
 					default:
-						setLayersCoeff("organsCoeff", 0.0);
-						setLayersCoeff("bonesCoeff", 0.0);
-						setLayersCoeff("arteryCoeff", 0.0);
-						setLayersCoeff("musclesCoeff", 0.0);
-						//setLayersCoeff("skinCoeff", 1.0);
+						setLayersCoeff("organsCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("bonesCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("arteryCoeff", 0.0, 1.0, -0.01);
+						setLayersCoeff("musclesCoeff", 0.0, 1.0, -0.01);
+						//setLayersCoeff("skinCoeff", 1.0, 1.0);
 						break;
 					}
 				}
@@ -256,12 +257,13 @@ namespace controller
 			if (key_just_pressed == true)
 			{
 				levelAlphaTime -= 0.04;
-				//std::cout << "Alpha level: " << 1.0-levelAlpha << std::endl;
+				//std::cout << "Alpha level: " << 1.0- levelAlphaTime << std::endl;
 				if (levelAlphaTime < -0.01)
 				{
 					key_just_pressed = false;
 					levelAlphaTime = 1.0;
 				}
+
 			}
 
 

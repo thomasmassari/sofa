@@ -38,6 +38,8 @@
 
 #include <qevent.h>
 
+#include<SofaUserInteraction\ZygoteBodyDisplayController.h>
+
 #ifdef __APPLE__
 #include <OpenGL/OpenGL.h>
 #endif
@@ -360,6 +362,7 @@ void QtViewer::initializeGL(void)
         _beginTime = CTime::getTime();
 
         //printf("GL initialized\n");
+		m_visualization_flag = 1;
     }
 
 
@@ -1154,23 +1157,68 @@ void QtViewer::paintEvent(QPaintEvent* qpe)
 
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.save();
-	drawOverpaint(&painter, 30, 10,	icon_man);
-	drawOverpaint(&painter, 30, 8, icon_muscle );
-	drawOverpaint(&painter, 30, 6.66, icon_vessels);
-	drawOverpaint(&painter, 30, 5.714, icon_organs);
-	drawOverpaint(&painter, 30, 5, icon_bones);
+
+	switch (m_visualization_flag) {
+	case 1:
+		drawOverpaint(&painter, 30, 10, icon_man, 3, 192, 60);
+		drawOverpaint(&painter, 30, 8, icon_muscle, 255, 255, 255);
+		drawOverpaint(&painter, 30, 6.66, icon_vessels, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5.714, icon_organs, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5, icon_bones, 255, 255, 255);
+		break;
+
+	case 2:
+		drawOverpaint(&painter, 30, 10, icon_man, 255, 255, 255);
+		drawOverpaint(&painter, 30, 8, icon_muscle, 3, 192, 60);
+		drawOverpaint(&painter, 30, 6.66, icon_vessels, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5.714, icon_organs, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5, icon_bones, 255, 255, 255);
+		break;
+
+	case 3:
+		drawOverpaint(&painter, 30, 10, icon_man, 255, 255, 255);
+		drawOverpaint(&painter, 30, 8, icon_muscle, 255, 255, 255);
+		drawOverpaint(&painter, 30, 6.66, icon_vessels, 3, 192, 60);
+		drawOverpaint(&painter, 30, 5.714, icon_organs, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5, icon_bones, 255, 255, 255);
+		break;
+
+	case 4:
+		drawOverpaint(&painter, 30, 10, icon_man, 255, 255, 255);
+		drawOverpaint(&painter, 30, 8, icon_muscle, 255, 255, 255);
+		drawOverpaint(&painter, 30, 6.66, icon_vessels, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5.714, icon_organs, 3, 192, 60);
+		drawOverpaint(&painter, 30, 5, icon_bones, 255, 255, 255);
+		break;
+
+	case 5:
+		drawOverpaint(&painter, 30, 10, icon_man, 255, 255, 255);
+		drawOverpaint(&painter, 30, 8, icon_muscle, 255, 255, 255);
+		drawOverpaint(&painter, 30, 6.66, icon_vessels, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5.714, icon_organs, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5, icon_bones, 3, 192, 60);
+		break;
+
+	default:
+		drawOverpaint(&painter, 30, 10, icon_man, 3, 192, 60);
+		drawOverpaint(&painter, 30, 8, icon_muscle, 255, 255, 255);
+		drawOverpaint(&painter, 30, 6.66, icon_vessels, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5.714, icon_organs, 255, 255, 255);
+		drawOverpaint(&painter, 30, 5, icon_bones, 255, 255, 255);
+		break;
+	}
 
 	painter.restore();
 	painter.end();
 
 }
 
-void QtViewer::drawOverpaint(QPainter *painter, float x, float y, const QPixmap& fileName)
-{
+void QtViewer::drawOverpaint(QPainter *painter, float x, float y, const QPixmap& fileName, int r, int g, int b)
+{	
 	
 	//painter->translate(width() / multiple_w, height() / multiple_h);
 	QRadialGradient radialGrad(QPointF(-40, -40), 100);
-	radialGrad.setColorAt(1, QColor(255, 255, 255, 100));
+	radialGrad.setColorAt(1, QColor(r, g, b, 100));
 	painter->setBrush(QBrush(radialGrad));
 	painter->drawRoundRect(width() / x, height() / y, width() / 10, height() / 40);
 	painter->drawPixmap(width() / x, height() / y, width() / 10, height() / 40, fileName);
@@ -1267,50 +1315,58 @@ void QtViewer::ApplyMouseInteractorTransformation(int x, int y)
 
 void QtViewer::keyPressEvent(QKeyEvent * e)
 {
-    if (isControlPressed()) // pass event to the scene data structure
+    //if (isControlPressed()) // pass event to the scene data structure
     {
         //	cerr<<"QtViewer::keyPressEvent, key = "<<e->key()<<" with Control pressed "<<endl;
         if (groot)
         {
             sofa::core::objectmodel::KeypressedEvent keyEvent(e->key());
             groot->propagateEvent(core::ExecParams::defaultInstance(), &keyEvent);
+			sofa::component::controller::ZygoteBodyDisplayController::SPtr zygoteController;
+			groot->get(zygoteController, sofa::core::objectmodel::BaseContext::SearchDown);
+
+			if (zygoteController)
+			{
+				m_visualization_flag = zygoteController->visualization_flag;
+			}	
+
         }
     }
-    else
-        // control the GUI
-        switch (e->key())
-        {
-
-#ifdef TRACKING
-        case Qt::Key_X:
-        {
-            tracking = !tracking;
-            break;
-        }
-#endif // TRACKING
-        case Qt::Key_C:
-        {
-            // --- switch interaction mode
-            if (!_mouseInteractorTranslationMode)
-            {
-                std::cout << "Interaction Mode ON\n";
-                _mouseInteractorTranslationMode = true;
-                _mouseInteractorRotationMode = false;
-            }
-            else
-            {
-                std::cout << "Interaction Mode OFF\n";
-                _mouseInteractorTranslationMode = false;
-                _mouseInteractorRotationMode = false;
-            }
-            break;
-        }
-        default:
-        {
-            SofaViewer::keyPressEvent(e);
-        }
-        update();
-        }
+//    else
+//        // control the GUI
+//        switch (e->key())
+//        {
+//
+//#ifdef TRACKING
+//        case Qt::Key_X:
+//        {
+//            tracking = !tracking;
+//            break;
+//        }
+//#endif // TRACKING
+//        case Qt::Key_C:
+//        {
+//            // --- switch interaction mode
+//            if (!_mouseInteractorTranslationMode)
+//            {
+//                std::cout << "Interaction Mode ON\n";
+//                _mouseInteractorTranslationMode = true;
+//                _mouseInteractorRotationMode = false;
+//            }
+//            else
+//            {
+//                std::cout << "Interaction Mode OFF\n";
+//                _mouseInteractorTranslationMode = false;
+//                _mouseInteractorRotationMode = false;
+//            }
+//            break;
+//        }
+//        default:
+//        {
+//            SofaViewer::keyPressEvent(e);
+//        }
+//        update();
+//        }
 }
 
 void QtViewer::keyReleaseEvent(QKeyEvent * e)
