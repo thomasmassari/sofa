@@ -86,7 +86,11 @@ protected:
      * @brief Default Destructor.
      */
     virtual ~MechanicalStateFilter() {};
+
+	double kineticEnergy;
 public:
+	float T;
+	std::ofstream outfile;
     /**
      * @brief SceneGraph callback initialization method.
      */

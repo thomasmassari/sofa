@@ -1332,6 +1332,9 @@ void QtViewer::keyPressEvent(QKeyEvent * e)
 
         }
     }
+	
+	SofaViewer::keyPressEvent(e);
+	//        }
 //    else
 //        // control the GUI
 //        switch (e->key())

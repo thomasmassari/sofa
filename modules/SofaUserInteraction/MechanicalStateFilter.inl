@@ -60,7 +60,10 @@ namespace sofa
 				, range(initData(&range, "range", "range of freedom beetwen a max e min value for each articulation in index"))
 				//, mainDirection( initData(&mainDirection, sofa::defaulttype::Vec<3,Real>((Real)0.0, (Real)0.0, (Real)-1.0), "mainDirection", "Main direction and orientation of the controlled DOF") )
 			{
-
+				kineticEnergy = 0;
+				T = 0;
+				outfile.open("Energia.txt", std::ios::app);
+				outfile << "T" << ",X" << std::endl;
 			}
 
 			template <class DataTypes>
@@ -78,32 +81,57 @@ namespace sofa
 			void MechanicalStateFilter<DataTypes>::onBeginAnimationStep(const double /*dt*/)
 			{
 				using sofa::defaulttype::Vec;
-
+				
 
 				if (mState)
 				{
+					
+
 					helper::WriteAccessor<Data<VecCoord> > x = *this->mState->write(core::VecCoordId::position());
 					helper::WriteAccessor<Data<VecCoord> > xfree = *this->mState->write(core::VecCoordId::freePosition());
-
+					helper::ReadAccessor<Data<VecDeriv> > v = *this->mState->read(core::VecDerivId::velocity());
+					helper::WriteAccessor<Data<VecDeriv> > v_write = *this->mState->write(core::VecDerivId::velocity());
 					//std::cout << indices.getValue().size() << std::endl;
 
 					for (int i = 0; i < indices.getValue().size(); i++)
 					{
-						std::cout << "Articolazione: " << indices.getValue()[i] << " Min: " << range.getValue()[2 * i] << " Max: " << range.getValue()[2 * i + 1] << std::endl;
+						//std::cout << "Articolazione: " << indices.getValue()[i] << " Min: " << range.getValue()[2 * i] << " Max: " << range.getValue()[2 * i + 1] << std::endl;
 
 						//Max
 						if ((x[indices.getValue()[i]].x() * 180 / M_PI) < range.getValue()[2 * i + 1])
+						{
 							x[indices.getValue()[i]].x() = (range.getValue()[2 * i + 1]) * M_PI / 180;
+							v_write[indices.getValue()[i]].x() = 0;
+						}
+							
 
 						//Min
 						if ((x[indices.getValue()[i]].x() * 180 / M_PI) > range.getValue()[2 * i])
+						{
 							x[indices.getValue()[i]].x() = range.getValue()[2 * i];
-
+							v_write[indices.getValue()[i]].x() = 0;
+						}
+							
 
 					}
+					
+					for (int i = 0; i < v.size()/3; i++)
+					{
+						if (i != 27)
+						{
+							double velocityX = v[i][0];
+							double velocityY = v[i][1];
+							double velocityZ = v[i][2];
+							//std::cout << "Articulation: " << i << " velocity X: " << velocityX << " velocity Y: " << velocityY << " velocity Z: " << velocityZ << std::endl;
+							kineticEnergy = kineticEnergy + velocityX*velocityX + velocityY*velocityY + velocityZ*velocityZ;
+						}
+						
+					}
 
-
-
+					kineticEnergy = kineticEnergy*0.95;
+					std::cout << "kineticEnergy: " << kineticEnergy << std::endl;
+					outfile <<T << ","<< kineticEnergy << std::endl;
+					T += 0.01f;
 
 				}
 
