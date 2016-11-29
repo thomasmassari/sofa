@@ -115,24 +115,21 @@ namespace sofa
 
 					}
 					
-					for (int i = 0; i < v.size()/3; i++)
+					for (int i = 0; i < v.size(); i++)
 					{
-						if (i != 27)
-						{
-							double velocityX = v[i][0];
-							double velocityY = v[i][1];
-							double velocityZ = v[i][2];
-							//std::cout << "Articulation: " << i << " velocity X: " << velocityX << " velocity Y: " << velocityY << " velocity Z: " << velocityZ << std::endl;
-							kineticEnergy = kineticEnergy + velocityX*velocityX + velocityY*velocityY + velocityZ*velocityZ;
-						}
+						double velocity = v[i].x();
+						//std::cout << "Articulation:"<< i << "velocityX: " << v[i].x() << std::endl;
+						//std::cout << "Articulation: " << i << " velocity X: " << velocityX << " velocity Y: " << velocityY << " velocity Z: " << velocityZ << std::endl;
+						kineticEnergy = kineticEnergy + velocity*velocity;
+		
 						
 					}
 
-					kineticEnergy = kineticEnergy*0.95;
-					std::cout << "kineticEnergy: " << kineticEnergy << std::endl;
-					outfile <<T << ","<< kineticEnergy << std::endl;
-					T += 0.01f;
-
+					kineticEnergy = kineticEnergy*0.99;
+					//std::cout << "kineticEnergy: " << kineticEnergy << std::endl;
+					/*outfile <<T << ","<< kineticEnergy << std::endl;
+					T += 0.02f;
+*/
 				}
 
 

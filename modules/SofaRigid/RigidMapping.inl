@@ -150,6 +150,9 @@ template <class TIn, class TOut>
 unsigned int RigidMapping<TIn, TOut>::getRigidIndex( unsigned int pointIndex ) const
 {
     // do we really need this crap?
+	if (useX0.getValue())
+		return index.getValue();
+
     if( points.getValue().size() == rigidIndexPerPoint.getValue().size() ) return rigidIndexPerPoint.getValue()[pointIndex];
     else
     {
@@ -348,7 +351,6 @@ void RigidMapping<TIn, TOut>::apply(const core::MechanicalParams * /*mparams*/, 
         out[i] = in[rigidIndex].translate( rotatedPoints[i] );
     }
 
-    //    cerr<<"RigidMapping<TIn, TOut>::apply, " << this->getName() << endl;
     //    cerr<<"RigidMapping<TIn, TOut>::apply, in = " << dIn << endl;
     //    cerr<<"RigidMapping<TIn, TOut>::apply, points = " << pts << endl;
     //    cerr<<"RigidMapping<TIn, TOut>::apply, out = " << dOut << endl;

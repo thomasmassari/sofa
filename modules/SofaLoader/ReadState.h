@@ -53,108 +53,108 @@ namespace misc
 
 /** Read State vectors from file at each timestep
 */
-class SOFA_LOADER_API ReadState: public core::objectmodel::BaseObject
+class SOFA_LOADER_API ReadState : public core::objectmodel::BaseObject
 {
 public:
-    SOFA_CLASS(ReadState,core::objectmodel::BaseObject);
+	SOFA_CLASS(ReadState, core::objectmodel::BaseObject);
 
-    sofa::core::objectmodel::DataFileName f_filename;
-    Data < double > f_interval;
-    Data < double > f_shift;
-    Data < bool > f_loop;
-    Data < double > f_scalePos;
+	sofa::core::objectmodel::DataFileName f_filename;
+	Data < double > f_interval;
+	Data < double > f_shift;
+	Data < bool > f_loop;
+	Data < double > f_scalePos;
 
 protected:
-    core::behavior::BaseMechanicalState* mmodel;
-    std::ifstream* infile;
+	core::behavior::BaseMechanicalState* mmodel;
+	std::ifstream* infile;
 #ifdef SOFA_HAVE_ZLIB
-    gzFile gzfile;
+	gzFile gzfile;
 #endif
-    double nextTime;
-    double lastTime;
-    double loopTime;
+	double nextTime;
+	double lastTime;
+	double loopTime;
 
-    ReadState();
+	ReadState();
 
-    virtual ~ReadState();
+	virtual ~ReadState();
 public:
-    virtual void init();
+	virtual void init();
 
-    virtual void reset();
+	virtual void reset();
 
-    void setTime(double time);
+	void setTime(double time);
 
-    virtual void handleEvent(sofa::core::objectmodel::Event* event);
+	virtual void handleEvent(sofa::core::objectmodel::Event* event);
 
-    void processReadState();
-    void processReadState(double time);
+	void processReadState();
+	void processReadState(double time);
 
-    /// Read the next values in the file corresponding to the last timestep before the given time
-    bool readNext(double time, std::vector<std::string>& lines);
+	/// Read the next values in the file corresponding to the last timestep before the given time
+	bool readNext(double time, std::vector<std::string>& lines);
 
-    /// Pre-construction check method called by ObjectFactory.
-    /// Check that DataTypes matches the MechanicalState.
-    template<class T>
-    static bool canCreate(T* obj, core::objectmodel::BaseContext* context, core::objectmodel::BaseObjectDescription* arg)
-    {
-        if (context->getMechanicalState() == NULL)
-            return false;
-        return BaseObject::canCreate(obj, context, arg);
-    }
+	/// Pre-construction check method called by ObjectFactory.
+	/// Check that DataTypes matches the MechanicalState.
+	template<class T>
+	static bool canCreate(T* obj, core::objectmodel::BaseContext* context, core::objectmodel::BaseObjectDescription* arg)
+	{
+		if (context->getMechanicalState() == NULL)
+			return false;
+		return BaseObject::canCreate(obj, context, arg);
+	}
 
 
 };
 
 
 ///Create ReadState component in the graph each time needed
-class SOFA_LOADER_API ReadStateCreator: public Visitor
+class SOFA_LOADER_API ReadStateCreator : public Visitor
 {
 public:
-    ReadStateCreator(const core::ExecParams* params);
-    ReadStateCreator(const std::string &n, bool _createInMapping, const core::ExecParams* params, bool i=true, int c=0);
-    virtual Result processNodeTopDown( simulation::Node*  );
+	ReadStateCreator(const core::ExecParams* params);
+	ReadStateCreator(const std::string &n, bool _createInMapping, const core::ExecParams* params, bool i = true, int c = 0);
+	virtual Result processNodeTopDown(simulation::Node*);
 
-    void setSceneName(std::string &n) { sceneName = n;}
-    void setCounter(int c) {counterReadState = c;};
-    void setCreateInMapping(bool b) {createInMapping=b;}
-    virtual const char* getClassName() const { return "ReadStateCreator"; }
+	void setSceneName(std::string &n) { sceneName = n; }
+	void setCounter(int c) { counterReadState = c; };
+	void setCreateInMapping(bool b) { createInMapping = b; }
+	virtual const char* getClassName() const { return "ReadStateCreator"; }
 protected:
-    void addReadState(sofa::core::behavior::BaseMechanicalState *ms, simulation::Node* gnode);
-    std::string sceneName;
-    std::string extension;
-    bool createInMapping;
-    bool init;
-    int counterReadState; //avoid to have two same files if two mechanical objects has the same name
+	void addReadState(sofa::core::behavior::BaseMechanicalState *ms, simulation::Node* gnode);
+	std::string sceneName;
+	std::string extension;
+	bool createInMapping;
+	bool init;
+	int counterReadState; //avoid to have two same files if two mechanical objects has the same name
 };
 
-class SOFA_LOADER_API ReadStateActivator: public Visitor
+class SOFA_LOADER_API ReadStateActivator : public Visitor
 {
 public:
-    ReadStateActivator(const core::ExecParams* params, bool active) : Visitor(params), state(active) {}
-    virtual Result processNodeTopDown( simulation::Node*  );
+	ReadStateActivator(const core::ExecParams* params, bool active) : Visitor(params), state(active) {}
+	virtual Result processNodeTopDown(simulation::Node*);
 
-    bool getState() const {return state;};
-    void setState(bool active) {state=active;};
-    virtual const char* getClassName() const { return "ReadStateActivator"; }
+	bool getState() const { return state; };
+	void setState(bool active) { state = active; };
+	virtual const char* getClassName() const { return "ReadStateActivator"; }
 protected:
-    void changeStateReader(sofa::component::misc::ReadState *ws);
+	void changeStateReader(sofa::component::misc::ReadState *ws);
 
-    bool state;
+	bool state;
 };
 
-class SOFA_LOADER_API ReadStateModifier: public simulation::Visitor
+class SOFA_LOADER_API ReadStateModifier : public simulation::Visitor
 {
 public:
-    ReadStateModifier(const core::ExecParams* params, double _time) : Visitor(params), time(_time) {}
-    virtual Result processNodeTopDown( simulation::Node*  );
+	ReadStateModifier(const core::ExecParams* params, double _time) : Visitor(params), time(_time) {}
+	virtual Result processNodeTopDown(simulation::Node*);
 
-    double getTime() const { return time; }
-    void setTime(double _time) { time=_time; }
-    virtual const char* getClassName() const { return "ReadStateModifier"; }
+	double getTime() const { return time; }
+	void setTime(double _time) { time = _time; }
+	virtual const char* getClassName() const { return "ReadStateModifier"; }
 protected:
-    void changeTimeReader(sofa::component::misc::ReadState *rs) { rs->processReadState(time); }
+	void changeTimeReader(sofa::component::misc::ReadState *rs) { rs->processReadState(time); }
 
-    double time;
+	double time;
 };
 
 } // namespace misc

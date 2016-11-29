@@ -223,7 +223,7 @@ bool VisualModelImpl::hasOpaque()
 void VisualModelImpl::drawVisual(const core::visual::VisualParams* vparams)
 {
     //Update external buffers (like VBO) if the mesh change AFTER doing the updateVisual() process
-    if(m_vertices2.isDirty())
+    //if(m_vertices2.isDirty())
     {
         updateBuffers();
     }

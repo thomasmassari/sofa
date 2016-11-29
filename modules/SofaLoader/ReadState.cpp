@@ -36,104 +36,104 @@ namespace misc
 
 SOFA_DECL_CLASS(ReadState)
 
-using namespace defaulttype;
+	using namespace defaulttype;
 
 int ReadStateClass = core::RegisterObject("Read State vectors from file at each timestep")
-        .add< ReadState >();
+	.add< ReadState >();
 
 ReadStateCreator::ReadStateCreator(const core::ExecParams* params)
-    : Visitor(params)
-    , sceneName("")
+	: Visitor(params)
+	, sceneName("")
 #ifdef SOFA_HAVE_ZLIB
-    , extension(".txt.gz")
+	, extension(".txt.gz")
 #else
-    , extension(".txt")
+	, extension(".txt")
 #endif
-    , createInMapping(false)
-    , init(true)
-    , counterReadState(0)
+	, createInMapping(false)
+	, init(true)
+	, counterReadState(0)
 {
 }
 
 ReadStateCreator::ReadStateCreator(const std::string &n, bool _createInMapping, const core::ExecParams* params, bool i, int c)
-    : Visitor(params)
-    , sceneName(n)
+	: Visitor(params)
+	, sceneName(n)
 #ifdef SOFA_HAVE_ZLIB
-    , extension(".txt.gz")
+	, extension(".txt.gz")
 #else
-    , extension(".txt")
+	, extension(".txt")
 #endif
-    , createInMapping(_createInMapping)
-    , init(i)
-    , counterReadState(c)
+	, createInMapping(_createInMapping)
+	, init(i)
+	, counterReadState(c)
 {
 }
 
 //Create a Read State component each time a mechanical state is found
-simulation::Visitor::Result ReadStateCreator::processNodeTopDown( simulation::Node* gnode)
+simulation::Visitor::Result ReadStateCreator::processNodeTopDown(simulation::Node* gnode)
 {
-    sofa::core::behavior::BaseMechanicalState * mstate=gnode->mechanicalState;
-    if (!mstate)   return Visitor::RESULT_CONTINUE;
-    core::behavior::OdeSolver *isSimulated;
-    mstate->getContext()->get(isSimulated);
-    if (!isSimulated) return simulation::Visitor::RESULT_CONTINUE;
+	sofa::core::behavior::BaseMechanicalState * mstate = gnode->mechanicalState;
+	if (!mstate)   return Visitor::RESULT_CONTINUE;
+	core::behavior::OdeSolver *isSimulated;
+	mstate->getContext()->get(isSimulated);
+	if (!isSimulated) return simulation::Visitor::RESULT_CONTINUE;
 
-    //We have a mechanical state
-    addReadState(mstate, gnode);
-    return simulation::Visitor::RESULT_CONTINUE;
+	//We have a mechanical state
+	addReadState(mstate, gnode);
+	return simulation::Visitor::RESULT_CONTINUE;
 }
 
 void ReadStateCreator::addReadState(sofa::core::behavior::BaseMechanicalState *ms, simulation::Node* gnode)
 {
-    sofa::core::objectmodel::BaseContext* context = gnode->getContext();
-    sofa::core::BaseMapping *mapping; context->get(mapping);
-    if (createInMapping || mapping== NULL)
-    {
-        sofa::component::misc::ReadState::SPtr rs;
-        context->get(rs, this->subsetsToManage, core::objectmodel::BaseContext::Local);
-        if (rs == NULL)
-        {
-            rs = sofa::core::objectmodel::New<ReadState>();
-            gnode->addObject(rs);
-            for (core::objectmodel::TagSet::iterator it=this->subsetsToManage.begin(); it != this->subsetsToManage.end(); ++it)
-                rs->addTag(*it);
-        }
+	sofa::core::objectmodel::BaseContext* context = gnode->getContext();
+	sofa::core::BaseMapping *mapping; context->get(mapping);
+	if (createInMapping || mapping == NULL)
+	{
+		sofa::component::misc::ReadState::SPtr rs;
+		context->get(rs, this->subsetsToManage, core::objectmodel::BaseContext::Local);
+		if (rs == NULL)
+		{
+			rs = sofa::core::objectmodel::New<ReadState>();
+			gnode->addObject(rs);
+			for (core::objectmodel::TagSet::iterator it = this->subsetsToManage.begin(); it != this->subsetsToManage.end(); ++it)
+				rs->addTag(*it);
+		}
 
-        std::ostringstream ofilename;
-        ofilename << sceneName << "_" << counterReadState << "_" << ms->getName()  << "_mstate" << extension ;
+		std::ostringstream ofilename;
+		ofilename << sceneName << "_" << counterReadState << "_" << ms->getName() << "_mstate" << extension;
 
-        rs->f_filename.setValue(ofilename.str());  rs->f_listening.setValue(false); //Deactivated only called by extern functions
-        if (init) rs->init();
+		rs->f_filename.setValue(ofilename.str());  rs->f_listening.setValue(false); //Deactivated only called by extern functions
+		if (init) rs->init();
 
-        ++counterReadState;
-    }
+		++counterReadState;
+	}
 }
 
 ///if state is true, we activate all the write states present in the scene.
-simulation::Visitor::Result ReadStateActivator::processNodeTopDown( simulation::Node* gnode)
+simulation::Visitor::Result ReadStateActivator::processNodeTopDown(simulation::Node* gnode)
 {
-    sofa::component::misc::ReadState *rs = gnode->get< sofa::component::misc::ReadState >(this->subsetsToManage);
-    if (rs != NULL) { changeStateReader(rs);}
+	sofa::component::misc::ReadState *rs = gnode->get< sofa::component::misc::ReadState >(this->subsetsToManage);
+	if (rs != NULL) { changeStateReader(rs); }
 
-    return simulation::Visitor::RESULT_CONTINUE;
+	return simulation::Visitor::RESULT_CONTINUE;
 }
 
 void ReadStateActivator::changeStateReader(sofa::component::misc::ReadState* rs)
 {
-    rs->reset();
-    rs->f_listening.setValue(state);
+	rs->reset();
+	rs->f_listening.setValue(state);
 }
 
 
 //if state is true, we activate all the write states present in the scene. If not, we activate all the readers.
-simulation::Visitor::Result ReadStateModifier::processNodeTopDown( simulation::Node* gnode)
+simulation::Visitor::Result ReadStateModifier::processNodeTopDown(simulation::Node* gnode)
 {
-    using namespace sofa::defaulttype;
+	using namespace sofa::defaulttype;
 
-    sofa::component::misc::ReadState*rs = gnode->get< sofa::component::misc::ReadState>(this->subsetsToManage);
-    if (rs != NULL) {changeTimeReader(rs);}
+	sofa::component::misc::ReadState*rs = gnode->get< sofa::component::misc::ReadState>(this->subsetsToManage);
+	if (rs != NULL) { changeTimeReader(rs); }
 
-    return simulation::Visitor::RESULT_CONTINUE;
+	return simulation::Visitor::RESULT_CONTINUE;
 }
 
 } // namespace misc

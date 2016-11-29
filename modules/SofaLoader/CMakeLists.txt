@@ -15,6 +15,8 @@ set(HEADER_FILES
     OffSequenceLoader.h
     ReadState.h
     ReadState.inl
+    ReadStateIteration.h
+    ReadStateIteration.inl
     ReadTopology.h
     ReadTopology.inl
     SphereLoader.h
@@ -37,6 +39,7 @@ set(SOURCE_FILES
     MeshXspLoader.cpp
     OffSequenceLoader.cpp
     ReadState.cpp
+    ReadStateIteration.cpp
     ReadTopology.cpp
     SphereLoader.cpp
     StringMeshCreator.cpp
