@@ -127,12 +127,15 @@ namespace controller
 			{
 				old_visualization_flag = visualization_flag;
 				//Change values for the wireless presenter (22 sx and 23 dx) (18 sx 20 dx for keyboard)
-				if ((int)kpev->getKey() == 22 && visualization_flag != 1) { //Sx
+				int key = (int)kpev->getKey();
+				if ((key == 18 || key == 22)) { //Sx
 					visualization_flag -= 1;
+					if (visualization_flag < 1) visualization_flag = 5;
 				}
 
-				if ((int)kpev->getKey() == 23 && visualization_flag != 5) { //Dx
+				if ((key == 20 || key == 23)) { //Dx
 					visualization_flag += 1;
+					if (visualization_flag > 5) visualization_flag = 1;
 				}
 
 				key_just_pressed = true;

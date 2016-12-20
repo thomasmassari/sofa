@@ -212,11 +212,11 @@ QtViewer::QtViewer(QWidget* parent, const char* name, const unsigned int nbMSAAS
     _mouseInteractorNewQuat = _mouseInteractorTrackball.GetQuaternion();
 
 	//Charge images for button interface
-	icon_man = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\man.png");
-	icon_muscle = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\muscle_transparent.png");
-	icon_vessels = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\veins_transparent.png");
-	icon_organs = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\organs.png");
-	icon_bones = QPixmap("C:\\Users\\Thomas\\Downloads\\Barra_Lato\\bones.png");
+	icon_man = QPixmap("C:\\Users\\Laurent\ Pierron\\Development\\Archive_Nancy\\icones\\man.png");
+	icon_muscle = QPixmap("C:\\Users\\Laurent\ Pierron\\Development\\Archive_Nancy\\icones\\muscle_transparent.png");
+	icon_vessels = QPixmap("C:\\Users\\Laurent\ Pierron\\Development\\Archive_Nancy\\icones\\veins_transparent.png");
+	icon_organs = QPixmap("C:\\Users\\Laurent\ Pierron\\Development\\Archive_Nancy\\icones\\organs.png");
+	icon_bones = QPixmap("C:\\Users\\Laurent\ Pierron\\Development\\Archive_Nancy\\icones\\bones.png");
 
     connect( &captureTimer, SIGNAL(timeout()), this, SLOT(captureEvent()) );
 }
